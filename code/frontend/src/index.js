@@ -1,5 +1,5 @@
 import './App.css'
-import Sidebar from './components/Sidebar'
+//import Sidebar from './components/Sidebar'
 import * as React from "react"
 import * as ReactDOM from "react-dom/client"
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
@@ -9,19 +9,36 @@ import Root from "./routes/root"
 import ErrorPage from './pages/Error'
 
 import Delegados from './pages/Delegados'
+import Medicos from './pages/Medicos'
+import Farmacias from './pages/Farmacias'
+import EditarDelegados from "./pages/EditarDelegados";
+
 
 const router = createBrowserRouter([
   {
     path: "/",
-    //element: <div>Hello, World!</div>
     element: <Root/>,
     errorElement: <ErrorPage />,
+    
+    children: [
+      {
+        path: "delegados/",
+        element: <Delegados />,
+      },
+      {
+        path: "medicos/",
+        element: <Medicos />,
+      },
+      {
+        path: "farmacias/",
+        element: <Farmacias />,
+      },
+      {
+        path: "vendas/",
+        element: <EditarDelegados />,
+      },
+    ],
   },
-
-  {
-    path: "delegados/",
-    element: <Delegados />
-  }
 ])
 
 ReactDOM.createRoot(document.getElementById("root")).render(
