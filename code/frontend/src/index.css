@@ -390,3 +390,11 @@ i {
   justify-content: space-between; /* Pushes content to opposite sides */
   align-items: center;            /* Aligns content vertically in the center */
 }
+
+#button-import {
+  padding: 0;
+  margin: 0;
+  background: 'none'; 
+  border: 'none';
+  cursor: 'pointer';
+}
