@@ -1,48 +1,49 @@
-import { Form } from "react-router-dom";
+import { IoAddCircleOutline, IoPersonOutline } from "react-icons/io5";
+import { Dropdown, message, Space } from 'antd';
 import { HiOutlineUpload } from "react-icons/hi";
 
-function Delegados() {
-  const contact = {
-    first: "Your",
-    last: "Name",
-    avatar: "https://robohash.org/you.png?size=200x200",
-    twitter: "your_handle",
-    notes: "Some notes",
-    favorite: true,
-  };
-  
+const onClick = ({ key }) => {
+  if (key == 1)
+    message.info(`Redirecionar para a página de Registo Individual`);
+  else
+    message.info(`Importar um ficheiro com o Registo por Ficheiro`);
+};
+
+const items = [
+  {
+    key: '1',
+    label: 'Registo Individual',
+    icon: <IoPersonOutline />
+  },
+  {
+    key: '2',
+    label: 'Registo por Ficheiro',
+    icon: <HiOutlineUpload />
+  },
+];
+
+
+function Delegados() {  
   const currentDate = new Date();
   const options = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
   const date = currentDate.toLocaleDateString('pt-BR', options);
 
   return (
     <div id="contact">
-      
       <div>
-        
         <h1>Consultar Delegados</h1>
 
         <div id="data-import">
-          <p>{date}</p>
-          <HiOutlineUpload/>
-        </div>
-        
-        <div>
-          <Form action="edit">
-            <button type="submit">Edit</button>
-          </Form>
-          <Form
-            method="post"
-            action="destroy"
-            onSubmit={(event) => {
-              if (!window.confirm("Please confirm you want to delete this record.")) {
-                event.preventDefault();
-              }
-            }}>
-            <button type="submit">Delete</button>
-          </Form>
+          {date}
+
+          <Dropdown menu={{items,onClick,}}>
+              <Space>
+                <IoAddCircleOutline onClick={(e) => e.preventDefault()}/>
+              </Space>
+          </Dropdown>
         </div>
       </div>
+
     </div>
   );
 }

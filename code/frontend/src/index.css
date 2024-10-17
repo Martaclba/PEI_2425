@@ -264,10 +264,10 @@ i {
   transition-delay: 200ms;
 }
 
-#contact {
-  max-width: 40rem;
+/*#contact {
   display: flex;
-}
+  max-width: 100%;
+}*/
 
 #contact h1 {
   font-size: 2rem;
@@ -287,16 +287,6 @@ i {
 #contact h1:focus {
   outline: none;
   color: hsl(224, 98%, 58%);
-}
-
-#contact a[href*="twitter"] {
-  display: flex;
-  font-size: 1.5rem;
-  color: #3992ff;
-  text-decoration: none;
-}
-#contact a[href*="twitter"]:hover {
-  text-decoration: underline;
 }
 
 #contact img {
@@ -399,6 +389,4 @@ i {
   display: flex;
   justify-content: space-between; /* Pushes content to opposite sides */
   align-items: center;            /* Aligns content vertically in the center */
-  width: 100%;                    /* Ensures container takes full width of the page */
-  padding: 0 20px;  
 }
