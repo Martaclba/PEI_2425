@@ -3,7 +3,7 @@ import { HiOutlineUpload } from "react-icons/hi";
 import { createStyles } from 'antd-style';
 import { IoAddCircleOutline, IoPersonOutline } from "react-icons/io5";
 import { Dropdown, message, Space, Upload, Button, Table } from 'antd';
-import { HiOutlineEye } from "react-icons/hi";
+
 
 // For the register dropdown menu
 const onClick = ({ key }) => {
@@ -62,7 +62,7 @@ const useStyle = createStyles(({ css, token }) => {
 
 const columns = [
   {
-    title: 'Delegados',
+    title: 'Delegado',
     width: 100,
     dataIndex: 'name',
     key: 'name',
@@ -135,8 +135,9 @@ const columns = [
       },
     }),
     render: () => (
-      <Space style={{alignItems: 'stretch'}}>
-        <HiOutlineEye />
+      <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%'}}>
+         <Button style={{ backgroundColor: '#F7E6D4',color: 'black', borderColor: '#F7E6D4'}}
+        >Detalhes</Button>
       </Space>
     ),
   },
@@ -151,7 +152,6 @@ const dataSource = Array.from({
   address: `Edward King ${i}`,
 }));
  
-
 
 function Delegados() {  
   const currentDate = new Date();
@@ -184,7 +184,8 @@ function Delegados() {
         className={styles.customTable}
         columns={columns}
         dataSource={dataSource}
-        scroll={{x: 'max-content', y: 55 * 5}}
+        scroll={{x: 'max-content'}}
+        pagination={{ pageSize: 7, showSizeChanger: false }}
       />
       
     </div>
