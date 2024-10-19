@@ -3,8 +3,8 @@ import { HiOutlineUpload } from "react-icons/hi";
 import { createStyles } from 'antd-style';
 import { IoAddCircleOutline, IoPersonOutline } from "react-icons/io5";
 import { Dropdown, message, Space, Upload, Button, Table } from 'antd';
-import { HiOutlineEye } from "react-icons/hi";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom"
+
 
 // Upload a Excel file
 const props = {
@@ -33,29 +33,6 @@ const props = {
     }
   },
 };
-
-const items = [
-  {
-    key: '1',
-    label:
-      <Link to={`/delegados/registar/`}><IoPersonOutline />Registo por Ficheiro</Link>
-
-      // <Button icon={<IoPersonOutline />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
-      //   Registo por Ficheiro
-      // </Button>
-  },
-  {
-    key: '2',
-    label: 
-    <Upload {...props} maxCount={1}>
-      <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
-        Registo por Ficheiro
-      </Button>
-    </Upload>
-  },
-];
-
-
 
 // For the table
 const useStyle = createStyles(({ css, token }) => {
@@ -174,6 +151,28 @@ function Delegados() {
   const date = currentDate.toLocaleDateString('pt-BR', options);
 
   const { styles } = useStyle();
+
+  let navigate = useNavigate()
+  const items = [
+    {
+      key: '1',
+      label:  
+        <Button icon={<IoPersonOutline />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}} 
+          onClick={() => navigate("/delegados/registar/")}
+        >
+          Registo por Ficheiro
+        </Button>
+    },
+    {
+      key: '2',
+      label: 
+      <Upload {...props} maxCount={1}>
+        <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
+          Registo por Ficheiro
+        </Button>
+      </Upload>
+    },
+  ];
   
   return (
     <div id="contact">
