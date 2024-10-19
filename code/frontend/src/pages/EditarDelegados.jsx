@@ -1,5 +1,5 @@
 import { Form } from "react-router-dom";
-import { HiOutlineUpload } from "react-icons/hi";
+//import { HiOutlineUpload } from "react-icons/hi";
 
 export default function EditContact() {
 

@@ -4,36 +4,51 @@ import { createStyles } from 'antd-style';
 import { IoAddCircleOutline, IoPersonOutline } from "react-icons/io5";
 import { Dropdown, message, Space, Upload, Button, Table } from 'antd';
 import { HiOutlineEye } from "react-icons/hi";
+import { Link } from "react-router-dom";
 
-// For the register dropdown menu
-const onClick = ({ key }) => {
-  if (key == 1)
-    message.info(`Redirecionar para a página de Registo Individual`);
-};
+// Upload a Excel file
+const props = {
+  listType: 'picture',
+  
+  beforeUpload: (file) => {
+    const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
+    // Check if the file is an Excel file
+    if (!isExcel) {
+      message.error(`"${file.name}" não é um ficheiro Excel`);
+      return Upload.LIST_IGNORE;
+    }
+    else {
+      message.success(`"${file.name}" importado com sucesso`);
+    }
+  },
 
-const beforeUpload = (file) => {
-  console.log(file.type)
-  const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-
-  // Check if the file is an Excel file
-  if (!isExcel) {
-    message.error('Apenas pode importar ficheiros Excel');
-    return Upload.LIST_IGNORE;
-  }
+  // Handling the change event to monitor upload progress and success/failure
+  onChange: (info) => {
+    const { status } = info.file;
+    if (status === 'done') {
+      console.log(`${info.file.name} file uploaded successfully.`);
+    } else if (status === 'error') {
+      console.log(`${info.file.name} file upload failed.`);
+    }
+  },
 };
 
 const items = [
   {
     key: '1',
-    label: 'Registo Individual',
-    icon: <IoPersonOutline />
+    label:
+      <Link to={`/delegados/registar/`}><IoPersonOutline />Registo por Ficheiro</Link>
+
+      // <Button icon={<IoPersonOutline />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
+      //   Registo por Ficheiro
+      // </Button>
   },
   {
     key: '2',
     label: 
-    <Upload maxCount={1} beforeUpload={beforeUpload}>
-      <Button className='button-import' icon={<HiOutlineUpload />} type="text">
+    <Upload {...props} maxCount={1}>
+      <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
         Registo por Ficheiro
       </Button>
     </Upload>
@@ -155,31 +170,27 @@ const dataSource = Array.from({
 
 function Delegados() {  
   const currentDate = new Date();
-  const options = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
+  const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
   const date = currentDate.toLocaleDateString('pt-BR', options);
 
   const { styles } = useStyle();
   
   return (
     <div id="contact">
-      
       <div>
-        
         <h1>Consultar Delegados</h1>
 
         <div id="data-import">
           {date}
 
-          <Dropdown menu={{items,onClick,}}>
-              <Space 
-  >
+          <Dropdown menu={{items}}>
+              <Space>
                 <IoAddCircleOutline onClick={(e) => e.preventDefault()}/>
               </Space>
           </Dropdown>
         </div>
       </div>
 
-      
       <Table 
         className={styles.customTable}
         columns={columns}
@@ -192,7 +203,3 @@ function Delegados() {
 }
 
 export default Delegados
-
-
-
-

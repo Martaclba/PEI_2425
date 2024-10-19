@@ -11,8 +11,8 @@ import ErrorPage from './pages/Error'
 import Delegados from './pages/Delegados'
 import Medicos from './pages/Medicos'
 import Farmacias from './pages/Farmacias'
-import EditarDelegados from "./pages/EditarDelegados";
-
+import EditarDelegados from "./pages/EditarDelegados"
+import RegistarDelegado from "./pages/RegistarDelegado"
 
 const router = createBrowserRouter([
   {
@@ -25,6 +25,11 @@ const router = createBrowserRouter([
         path: "delegados/",
         element: <Delegados />,
       },
+      {
+        path: "delegados/registar/",
+        element: <RegistarDelegado />,
+      },
+
       {
         path: "medicos/",
         element: <Medicos />,
