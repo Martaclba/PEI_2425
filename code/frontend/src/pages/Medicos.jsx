@@ -3,44 +3,36 @@ import { HiOutlineUpload } from "react-icons/hi";
 import { createStyles } from 'antd-style';
 import { IoAddCircleOutline, IoPersonOutline } from "react-icons/io5";
 import { Dropdown, message, Space, Upload, Button, Table,Tag } from 'antd';
+import { useNavigate } from "react-router-dom"
 
 
-// For the register dropdown menu
-const onClick = ({ key }) => {
-  if (key == 1)
-    message.info(`Redirecionar para a página de Registo Individual`);
-};
+// Upload a Excel file
+const props = {
+  listType: 'picture',
+  
+  beforeUpload: (file) => {
+    const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
-
-const beforeUpload = (file) => {
-  console.log(file.type)
-  const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-
-  // Check if the file is an Excel file
-  if (!isExcel) {
-    message.error('Apenas pode importar ficheiros Excel');
-    return Upload.LIST_IGNORE;
-  }
-};
-
-const items = [
-  {
-    key: '1',
-    label: 'Registo Individual',
-    icon: <IoPersonOutline />
+    // Check if the file is an Excel file
+    if (!isExcel) {
+      message.error(`"${file.name}" não é um ficheiro Excel`);
+      return Upload.LIST_IGNORE;
+    }
+    else {
+      message.success(`"${file.name}" importado com sucesso`);
+    }
   },
-  {
-    key: '2',
-    label: 
-    <Upload maxCount={1} beforeUpload={beforeUpload}>
-      <Button className='button-import' icon={<HiOutlineUpload />} type="text">
-        Registo por Ficheiro
-      </Button>
-    </Upload>
+
+  // Handling the change event to monitor upload progress and success/failure
+  onChange: (info) => {
+    const { status } = info.file;
+    if (status === 'done') {
+      console.log(`${info.file.name} file uploaded successfully.`);
+    } else if (status === 'error') {
+      console.log(`${info.file.name} file upload failed.`);
+    }
   },
-];
-
-
+};
 
 // For the table
 const useStyle = createStyles(({ css, token }) => {
@@ -63,7 +55,7 @@ const useStyle = createStyles(({ css, token }) => {
 const columns = [
   {
     title: 'Médico',
-    width: 100,
+    width: '30%',
     dataIndex: 'name',
     key: 'name',
     fixed: 'left',
@@ -90,7 +82,6 @@ const columns = [
     filterMode: 'tree',
     filterSearch: true,
     onFilter: (value, record) => record.name.startsWith(value),
-    width: '30%',
   },
   {
     title: 'Instituição',
@@ -167,9 +158,8 @@ const columns = [
       },
     }),
     render: () => (
-      <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%'}}>
-         <Button style={{ backgroundColor: '#F7E6D4',color: 'black', borderColor: '#F7E6D4'}}
-        >Detalhes</Button>
+      <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%' }}>
+         <Button style={{ backgroundColor: '#F7E6D4', color: 'black', borderColor: '#F7E6D4' }} >Detalhes</Button>
       </Space>
     ),
   },
@@ -183,37 +173,54 @@ const dataSource = Array.from({
   age: 32,
   address: `Edward King ${i}`,
   tags: ['Ativo','Inativo','Férias'],
-
 }));
  
 
 function Medicos() {  
   const currentDate = new Date();
-  const options = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
+  const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
   const date = currentDate.toLocaleDateString('pt-BR', options);
 
   const { styles } = useStyle();
   
+  let navigate = useNavigate()
+  const items = [
+    {
+      key: '1',
+      label:  
+        <Button icon={<IoPersonOutline />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}} 
+          onClick={() => navigate("/medicos/registar/")}
+        >
+          Registo por Ficheiro
+        </Button>
+    },
+    {
+      key: '2',
+      label: 
+      <Upload {...props} maxCount={1}>
+        <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
+          Registo por Ficheiro
+        </Button>
+      </Upload>
+    },
+  ];
+
   return (
     <div id="contact">
-      
       <div>
-        
         <h1>Consultar Médicos</h1>
 
         <div id="data-import">
           {date}
 
-          <Dropdown menu={{items,onClick,}}>
-              <Space 
-  >
+          <Dropdown menu={{items}}>
+              <Space>
                 <IoAddCircleOutline onClick={(e) => e.preventDefault()}/>
               </Space>
           </Dropdown>
         </div>
       </div>
 
-      
       <Table 
         className={styles.customTable}
         columns={columns}
@@ -227,7 +234,3 @@ function Medicos() {
 }
 
 export default Medicos
-
-
-
-

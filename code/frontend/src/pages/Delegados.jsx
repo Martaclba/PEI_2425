@@ -55,7 +55,7 @@ const useStyle = createStyles(({ css, token }) => {
 const columns = [
   {
     title: 'Delegado',
-    width: 100,
+    width: '30%',
     dataIndex: 'name',
     key: 'name',
     fixed: 'left',
@@ -71,7 +71,6 @@ const columns = [
     width: 100,
     dataIndex: 'age',
     key: 'age',
-    fixed: 'left',
     onHeaderCell: () => ({
       style: {
         backgroundColor: '#F7D4D4',
