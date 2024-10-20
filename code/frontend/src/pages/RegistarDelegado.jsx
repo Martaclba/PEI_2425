@@ -24,7 +24,7 @@ const onFinish = (values) => {
     console.log('Received values of form: ', values);
 };
 
-function RegistarDelegado() {
+export default function RegistarDelegado() {
     const currentDate = new Date();
     const date_options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
     const date = currentDate.toLocaleDateString('pt-BR', date_options);
@@ -76,29 +76,29 @@ function RegistarDelegado() {
                                 hasFeedback
                                 rules={[{
                                     required: true,
-                                    message: 'Por favor selecione um distrito',},]}>
+                                    message: 'Por favor insira um distrito',},]}>
 
                                 <Select 
                                     allowClear
                                     showSearch
-                                    placeholder="Selecione um distrito"
+                                    placeholder="Insira um distrito"
                                     options={options}
                                     filterOption={(input, option) => 
                                         (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                             </Form.Item>
 
                             <Form.Item
-                                label="Regiao"
+                                label="Região"
                                 name="Regiao"
                                 hasFeedback
                                 rules={[{
                                     required: true,
-                                    message: 'Por favor selecione uma região',},]}>
+                                    message: 'Por favor insira uma região',},]}>
 
                                 <Select 
                                     allowClear
                                     showSearch
-                                    placeholder="Selecione uma região"
+                                    placeholder="Insira uma região"
                                     options={options}
                                     filterOption={(input, option) => 
                                         (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
@@ -110,12 +110,12 @@ function RegistarDelegado() {
                                 hasFeedback
                                 rules={[{
                                     required: true,
-                                    message: 'Por favor selecione uma freguesia',},]}>
+                                    message: 'Por favor insira uma freguesia',},]}>
 
                                 <Select 
                                     allowClear
                                     showSearch
-                                    placeholder="Selecione uma freguesia"
+                                    placeholder="Insira uma freguesia"
                                     options={options}
                                     filterOption={(input, option) => 
                                         (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
@@ -137,5 +137,3 @@ function RegistarDelegado() {
         </div>
     )
 };
-
-export default RegistarDelegado

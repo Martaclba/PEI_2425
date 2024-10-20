@@ -1,8 +1,7 @@
 import React from 'react';
 import { HiOutlineUpload } from "react-icons/hi";
-import { createStyles } from 'antd-style';
 import { IoAddCircleOutline, IoPersonOutline } from "react-icons/io5";
-import { Dropdown, message, Space, Upload, Button, Table } from 'antd';
+import { Dropdown, message, Space, Upload, Button, Table, ConfigProvider } from 'antd';
 import { useNavigate } from "react-router-dom"
 
 
@@ -35,100 +34,60 @@ const props = {
 };
 
 // For the table
-const useStyle = createStyles(({ css, token }) => {
-  const { antCls } = token;
-  return {
-    customTable: css`
-      ${antCls}-table {
-        ${antCls}-table-container {
-          ${antCls}-table-body,
-          ${antCls}-table-content {
-            scrollbar-width: thin;
-            scrollbar-color: unset;
-          }
-        }
-      }
-    `,
-  };
-});
-
 const columns = [
   {
+    key: 'delegado',
     title: 'Delegado',
-    width: '30%',
-    dataIndex: 'name',
-    key: 'name',
+    dataIndex: 'delegado',
+    width: '15%',
     fixed: 'left',
-    onHeaderCell: () => ({
-      style: {
-        backgroundColor: '#F7D4D4',
-        color: '#4A0000',
-      },
-    }),
   },
   {
+    key: 'distrito',
     title: 'Distrito',
-    width: 100,
-    dataIndex: 'age',
-    key: 'age',
-    onHeaderCell: () => ({
-      style: {
-        backgroundColor: '#F7D4D4',
-        color: '#4A0000',
-      },
-    }),
+    dataIndex: 'distrito',
+    width: '15%',
   },
   {
+    key: 'regiao',
     title: 'Região',
-    dataIndex: 'address',
-    key: '1',
-    width: 150,
-    onHeaderCell: () => ({
-      style: {
-        backgroundColor: '#F7D4D4',
-        color: '#4A0000',
-      },
-    }),
+    dataIndex: 'regiao',
+    width: '15%',
   },
   {
+    key: 'freguesia',
     title: 'Freguesia',
-    dataIndex: 'address',
-    key: '2',
-    width: 150,
-    onHeaderCell: () => ({
-      style: {
-        backgroundColor: '#F7D4D4',
-        color: '#4A0000',
-      },
-    }),
+    dataIndex: 'freguesia',
+    width: '15%',
   },
   {
+    key: 'brick',
     title: 'Brick',
-    dataIndex: 'address',
-    key: '3',
-    width: 150,
-    onHeaderCell: () => ({
-      style: {
-        backgroundColor: '#F7D4D4',
-        color: '#4A0000',
-      },
-    }),
+    dataIndex: 'brick',
+    width: '15%',
   },
   {
+    key: 'action',
     title: '',
-    dataIndex: 'address',
-    key: '4',
-    width: 150,
-    onHeaderCell: () => ({
-      style: {
-        backgroundColor: '#F7D4D4',
-        color: '#4A0000',
-      },
-    }),
+    width: '15%',
     render: () => (
       <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%'}}>
-         <Button style={{ backgroundColor: '#F7E6D4',color: 'black', borderColor: '#F7E6D4'}}
-        >Detalhes</Button>
+              <ConfigProvider
+                theme={{
+                  components: { 
+                    "Button": {
+                      "defaultBg": "rgb(247,230,212)",
+                      "defaultBorderColor": "rgb(247,230,212)",
+                      "defaultHoverColor": "rgb(74,0,0)",
+                      "defaultHoverBorderColor": "rgb(74,0,0)",
+                      "defaultHoverBg": "rgb(247,230,212)",
+                      "defaultActiveBorderColor": "rgb(74,0,0)",
+                      "defaultActiveColor": "rgb(74,0,0)"
+                    }
+                  },
+                }}>
+                <Button>Detalhes</Button>  
+              </ConfigProvider>
       </Space>
     ),
   },
@@ -138,18 +97,26 @@ const dataSource = Array.from({
   length: 100,
 }).map((_, i) => ({
   key: i,
-  name: `Edward King ${i}`,
-  age: 32,
-  address: `Edward King ${i}`,
+  delegado: `Edward King ${i}`,
+  distrito: `Distrito ${i}`,
+  regiao: `Região ${i}`,      
+  freguesia: `Freguesia ${i}`,
+  brick: `Brick ${i}`,
 }));
+
+ 
+const table = <Table 
+  columns={columns}
+  dataSource={dataSource}
+  scroll={{x: 'max-content'}}
+  pagination={{ pageSize: 7, showSizeChanger: false }}
+/>
  
 
-function Delegados() {  
+export default function Delegados() {  
   const currentDate = new Date();
   const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
   const date = currentDate.toLocaleDateString('pt-BR', options);
-
-  const { styles } = useStyle();
 
   let navigate = useNavigate()
   const items = [
@@ -189,16 +156,18 @@ function Delegados() {
         </div>
       </div>
 
-      <Table 
-        className={styles.customTable}
-        columns={columns}
-        dataSource={dataSource}
-        scroll={{x: 'max-content'}}
-        pagination={{ pageSize: 7, showSizeChanger: false }}
-      />
-      
+      <ConfigProvider
+        theme={{
+          components: { 
+            "Table": {
+              "headerBg": "#F7D4D4",              // Background da header
+              "headerColor": "#4A0000",           // Texto da header
+              "stickyScrollBarBg": "#565656"      // Backgroud da barra de scroll
+            }
+          },
+        }}>
+        {table}  
+      </ConfigProvider>
     </div>
   );
 }
-
-export default Delegados

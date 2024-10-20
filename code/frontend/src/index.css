@@ -256,6 +256,10 @@ i {
   padding: 2rem 4rem;
   width: 100%;
   background-color: #F9F9F9;
+
+  /*Scroll bar*/
+  height: 100vh;        /* Full height for the content area */
+  overflow-y: auto;     /* Enables scrolling when content overflows */
 }
 
 #detail.loading {
@@ -263,11 +267,6 @@ i {
   transition: opacity 200ms;
   transition-delay: 200ms;
 }
-
-/*#contact {
-  display: flex;
-  max-width: 100%;
-}*/
 
 #contact h1 {
   font-size: 2rem;
@@ -430,3 +429,28 @@ i {
   }
 }
 
+/*SCROLL BAR*/
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 12px;  /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;  /* Transparent scrollbar track */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #565656;  /* gray color for the scrollbar thumb */
+  border-radius: 10px;          /* Rounded corners */
+  border: 3px solid transparent;  /* Creates spacing for the thumb */
+  background-clip: content-box;  /* Ensure the thumb remains inside the space */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #4e4e4e;  /* Darker gray on hover */
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: rgb(67, 67, 67);  /* Even darker gray when active */
+}

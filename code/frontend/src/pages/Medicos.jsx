@@ -1,10 +1,10 @@
 import React from 'react';
 import { HiOutlineUpload } from "react-icons/hi";
 import { createStyles } from 'antd-style';
-import { IoAddCircleOutline, IoPersonOutline } from "react-icons/io5";
+import { LuStethoscope } from "react-icons/lu";
+import { IoAddCircleOutline } from "react-icons/io5";
 import { Dropdown, message, Space, Upload, Button, Table,Tag } from 'antd';
 import { useNavigate } from "react-router-dom"
-
 
 // Upload a Excel file
 const props = {
@@ -176,7 +176,7 @@ const dataSource = Array.from({
 }));
  
 
-function Medicos() {  
+export default function Medicos() {  
   const currentDate = new Date();
   const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
   const date = currentDate.toLocaleDateString('pt-BR', options);
@@ -188,10 +188,10 @@ function Medicos() {
     {
       key: '1',
       label:  
-        <Button icon={<IoPersonOutline />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}} 
+        <Button icon={<LuStethoscope />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}} 
           onClick={() => navigate("/medicos/registar/")}
         >
-          Registo por Ficheiro
+          Registo Individual
         </Button>
     },
     {
@@ -232,5 +232,3 @@ function Medicos() {
     </div>
   );
 }
-
-export default Medicos
