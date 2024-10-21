@@ -88,16 +88,16 @@ export default function RegistarDelegado() {
                             </Form.Item>
 
                             <Form.Item
-                                label="Região"
+                                label="Região HMR"
                                 name="Regiao"
                                 hasFeedback
                                 rules={[{
                                     required: true,
-                                    message: 'Por favor insira uma região',},]}>
+                                    message: 'Por favor insira, pelo menos, uma região',},]}>
 
                                 <Select 
                                     allowClear
-                                    showSearch
+                                    mode='multiple'
                                     placeholder="Insira uma região"
                                     options={options}
                                     filterOption={(input, option) => 
@@ -107,14 +107,11 @@ export default function RegistarDelegado() {
                             <Form.Item
                                 label="Freguesia"
                                 name="Freguesia"
-                                hasFeedback
-                                rules={[{
-                                    required: true,
-                                    message: 'Por favor insira uma freguesia',},]}>
-
+                                hasFeedback>
+                                
                                 <Select 
                                     allowClear
-                                    showSearch
+                                    mode='multiple'
                                     placeholder="Insira uma freguesia"
                                     options={options}
                                     filterOption={(input, option) => 

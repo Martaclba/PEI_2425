@@ -1,7 +1,7 @@
 import { Form } from "react-router-dom";
 //import { HiOutlineUpload } from "react-icons/hi";
 
-export default function EditContact() {
+export default function EditarDelegado() {
 
   return (
     <Form method="post" id="contact-form">

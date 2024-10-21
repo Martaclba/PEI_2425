@@ -5,24 +5,6 @@ import { Dropdown, Space, Button, Table, ConfigProvider } from 'antd';
 import { useNavigate } from "react-router-dom"
 
 
-// For the table
-// const useStyle = createStyles(({ css, token }) => {
-//   const { antCls } = token;
-//   return {
-//     customTable: css`
-//       ${antCls}-table {
-//         ${antCls}-table-container {
-//           ${antCls}-table-body,
-//           ${antCls}-table-content {
-//             scrollbar-width: thin;
-//             scrollbar-color: unset;
-//           }
-//         }
-//       }
-//     `,
-//   };
-// });
-
 const columns = [
   {
     key: 'farmacia',
@@ -47,30 +29,41 @@ const columns = [
     filterMode: 'tree',
     filterSearch: true,
     onFilter: (value, record) => record.name.startsWith(value),
+    sorter: (a, b) => a.farmacia.localeCompare(b.farmacia)          
+    /*
+      localeCompare: This method compares two strings alphabetically. It returns:
+        A negative value if a.distrito comes before b.distrito alphabetically.
+        A positive value if a.distrito comes after b.distrito alphabetically.
+        0 if both strings are equal. 
+    */
   },
   {
     key: 'distrito',
     title: 'Distrito',
     dataIndex: 'distrito',
     width: '15%',
+    sorter: (a, b) => a.distrito.localeCompare(b.distrito) 
   },
   {
     key: 'regiao',
     title: 'Região',
     dataIndex: 'regiao',
     width: '15%',
+    sorter: (a, b) => a.regiao.localeCompare(b.regiao) 
   },
   {
     key: 'freguesia',
     title: 'Freguesia',
     dataIndex: 'freguesia',
     width: '15%',
+    sorter: (a, b) => a.freguesia.localeCompare(b.freguesia) 
   },
   {
     key: 'morada',
     title: 'Morada',
     dataIndex: 'morada',
     width: '15%',
+    sorter: (a, b) => a.morada.localeCompare(b.morada) 
   },
   {
     key: 'contacto',
@@ -122,6 +115,7 @@ const table = <Table
   dataSource={dataSource}
   scroll={{x: 'max-content'}}
   pagination={{ pageSize: 7, showSizeChanger: false }}
+  showSorterTooltip={false}                             // desativa o pop up que aparecia quando tentava ordenar uma coluna
 /> 
 
 export default function Farmacias() {  
@@ -161,9 +155,12 @@ export default function Farmacias() {
         theme={{
           components: { 
             "Table": {
-              "headerBg": "#F7D4D4",              // Background da header
-              "headerColor": "#4A0000",           // Texto da header
-              "stickyScrollBarBg": "#565656"      // Backgroud da barra de scroll
+              "headerBg": "#F7D4D4",                // Background da header
+              "headerColor": "#4A0000",             // Texto da header
+              "stickyScrollBarBg": "#565656",       // Backgroud da barra de scroll
+              "headerSortHoverBg": "#ddbebe",       // Background da header com hover quando ela tem um sorter aplicado,
+              "fixedHeaderSortActiveBg": "#ddbebe", // Mesma coisa do de cima mas para colunas fixas
+              "headerSortActiveBg": "#ddbebe",      
             } 
           },
         }}>
