@@ -129,7 +129,7 @@ export default function Farmacias() {
       key: '1',
       label:  
         <Button icon={<LuCross />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}} 
-          onClick={() => navigate("/farmacia/registar/")}>
+          onClick={() => navigate("/farmacias/registar/")}>
           Registo Individual
         </Button>
     },

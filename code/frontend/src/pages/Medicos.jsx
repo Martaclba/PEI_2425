@@ -172,7 +172,7 @@ const dataSource = Array.from({
   name: `Edward King ${i}`,
   age: 32,
   address: `Edward King ${i}`,
-  tags: ['Ativo','Inativo','Férias'],
+  tags: ['Ativo','Inativo','Indisponível'],
 }));
  
 

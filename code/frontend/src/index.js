@@ -1,5 +1,4 @@
 import './App.css'
-//import Sidebar from './components/Sidebar'
 import * as React from "react"
 import * as ReactDOM from "react-dom/client"
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
@@ -13,6 +12,8 @@ import Medicos from './pages/Medicos'
 import Farmacias from './pages/Farmacias'
 import EditarDelegado from "./pages/EditarDelegado"
 import RegistarDelegado from "./pages/RegistarDelegado"
+import RegistarFarmacia from './pages/RegistarFarmacia';
+import RegistarMedico from './pages/RegistarMedico';
 
 const router = createBrowserRouter([
   {
@@ -39,9 +40,19 @@ const router = createBrowserRouter([
         element: <Medicos />,
       },
       {
+        path: "medicos/registar/",
+        element: <RegistarMedico />,
+      },
+
+      {
         path: "farmacias/",
         element: <Farmacias />,
       },
+      {
+        path: "farmacias/registar/",
+        element: <RegistarFarmacia />,
+      },
+
       {
         path: "vendas/",
         element: <EditarDelegado />,

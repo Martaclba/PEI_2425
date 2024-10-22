@@ -41,7 +41,7 @@ export default function RegistarDelegado() {
                 </div>
             </div>
 
-            <div style={{width: '80%', height: '80%', justifySelf: 'center', alignContent: 'center'}}>
+            <div style={{width: '100%', height: '80%', justifySelf: 'center', alignContent: 'center'}}>
                 <Card>
                         <Form  
                             name="validate_other"
