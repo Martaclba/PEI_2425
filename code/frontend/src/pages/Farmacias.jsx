@@ -2,8 +2,10 @@ import React from 'react';
 import { LuCross } from "react-icons/lu";
 import { IoAddCircleOutline} from "react-icons/io5";
 import { Dropdown, Space, Button, Table, ConfigProvider } from 'antd';
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 
+import themeConfig from '../styles/themeConfig';
+import { getFormattedDate } from '../components/utils';
 
 const columns = [
   {
@@ -30,12 +32,6 @@ const columns = [
     filterSearch: true,
     onFilter: (value, record) => record.name.startsWith(value),
     sorter: (a, b) => a.farmacia.localeCompare(b.farmacia)          
-    /*
-      localeCompare: This method compares two strings alphabetically. It returns:
-        A negative value if a.distrito comes before b.distrito alphabetically.
-        A positive value if a.distrito comes after b.distrito alphabetically.
-        0 if both strings are equal. 
-    */
   },
   {
     key: 'distrito',
@@ -77,20 +73,7 @@ const columns = [
     width: '15%',
     render: () => (
       <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%'}}>
-              <ConfigProvider
-                theme={{
-                  components: { 
-                    "Button": {
-                      "defaultBg": "rgb(247,230,212)",
-                      "defaultBorderColor": "rgb(247,230,212)",
-                      "defaultHoverColor": "rgb(74,0,0)",
-                      "defaultHoverBorderColor": "rgb(74,0,0)",
-                      "defaultHoverBg": "rgb(247,230,212)",
-                      "defaultActiveBorderColor": "rgb(74,0,0)",
-                      "defaultActiveColor": "rgb(74,0,0)"
-                    }
-                  },
-                }}>
+              <ConfigProvider theme={themeConfig}>
                 <Button>Detalhes</Button>  
               </ConfigProvider>
       </Space>
@@ -110,18 +93,9 @@ const dataSource = Array.from({
   contacto: '252 543 667',    
 }));
  
-const table = <Table 
-  columns={columns}
-  dataSource={dataSource}
-  scroll={{x: 'max-content'}}
-  pagination={{ pageSize: 7, showSizeChanger: false }}
-  showSorterTooltip={false}                             // desativa o pop up que aparecia quando tentava ordenar uma coluna
-/> 
 
 export default function Farmacias() {  
-  const currentDate = new Date();
-  const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-  const date = currentDate.toLocaleDateString('pt-BR', options);
+  const date = getFormattedDate();
   
   let navigate = useNavigate()
   const items = [
@@ -151,20 +125,14 @@ export default function Farmacias() {
         </div>
       </div>
 
-      <ConfigProvider
-        theme={{
-          components: { 
-            "Table": {
-              "headerBg": "#F7D4D4",                // Background da header
-              "headerColor": "#4A0000",             // Texto da header
-              "stickyScrollBarBg": "#565656",       // Backgroud da barra de scroll
-              "headerSortHoverBg": "#ddbebe",       // Background da header com hover quando ela tem um sorter aplicado,
-              "fixedHeaderSortActiveBg": "#ddbebe", // Mesma coisa do de cima mas para colunas fixas
-              "headerSortActiveBg": "#ddbebe",      
-            } 
-          },
-        }}>
-        {table}  
+      <ConfigProvider theme={themeConfig}>
+        <Table 
+          columns={columns}
+          dataSource={dataSource}
+          scroll={{x: 'max-content'}}
+          pagination={{ pageSize: 7, showSizeChanger: false }}
+          showSorterTooltip={false}                            
+        />   
       </ConfigProvider>
     </div>
   );

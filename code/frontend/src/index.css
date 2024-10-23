@@ -424,9 +424,10 @@ i {
   content:none;
 }
 
-@media (max-width: 730px) {
+@media (max-width: 865px) {
   :where(.css-dev-only-do-not-override-1hpnbz2).ant-flex {
     flex-direction: column;
+    justify-content: center;
   }
 }
 
@@ -454,4 +455,9 @@ i {
 
 ::-webkit-scrollbar-thumb:active {
   background-color: rgb(67, 67, 67);  /* Even darker gray when active */
+}
+
+/* FORM */
+:where(.css-dev-only-do-not-override-1hpnbz2).ant-card {
+  width: 100%;
 }

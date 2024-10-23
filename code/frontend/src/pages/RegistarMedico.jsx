@@ -2,6 +2,7 @@ import React from 'react';
 import { Form, Select, Card, Button, Input, Flex, Row, Col, Tag } from 'antd';
 import { useNavigate } from "react-router-dom"
 
+import { getFormattedDate } from '../components/utils';
 
 const formItemLayout = { labelCol: {span: 6,}, wrapperCol: { span: 14,},};
 
@@ -46,10 +47,8 @@ const onFinish = (values) => {
 };
 
 export default function RegistarMedico() {
-    const currentDate = new Date();
-    const date_options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-    const date = currentDate.toLocaleDateString('pt-BR', date_options);
-  
+    const date = getFormattedDate();
+
     let navigate = useNavigate()
 
     return(
@@ -70,10 +69,9 @@ export default function RegistarMedico() {
                             layout='vertical'
                         >
 
-                            <Row gutter={16}>
-
-                                <Col span={12}>
-                                    <Card>
+                            <Row gutter={16} style={{ display: 'flex' }}>
+                                <Col span={12} style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <Card style={{flex: 1}}>
                                         <Form.Item label="Nome" name="Nome" style={{ marginBottom: 0 }}>
                                             <Form.Item
                                                 name="Primeiro"
@@ -95,7 +93,7 @@ export default function RegistarMedico() {
                                         </Form.Item>
 
                                         <Form.Item
-                                            label="Instituicao"
+                                            label="Instituição"
                                             name="Instituicao"
                                             hasFeedback
                                             rules={[{
@@ -180,9 +178,9 @@ export default function RegistarMedico() {
                                     </Card>
                                 </Col>
 
-                                <Col span={12}>
-                                    <Card>        
-                                    <Form.Item
+                                <Col span={12} style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <Card style={{ flex: 1}}>        
+                                        <Form.Item
                                             label="Morada"
                                             name="Morada"
                                             hasFeedback

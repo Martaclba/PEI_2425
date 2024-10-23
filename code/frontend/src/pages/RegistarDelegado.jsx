@@ -2,6 +2,7 @@ import React from 'react';
 import { Form, Select, Card, Button, Input, Flex } from 'antd';
 import { useNavigate } from "react-router-dom"
 
+import { getFormattedDate } from '../components/utils';
 
 const formItemLayout = { labelCol: {span: 6,}, wrapperCol: { span: 14,},};
 
@@ -25,10 +26,8 @@ const onFinish = (values) => {
 };
 
 export default function RegistarDelegado() {
-    const currentDate = new Date();
-    const date_options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-    const date = currentDate.toLocaleDateString('pt-BR', date_options);
-  
+    const date = getFormattedDate();
+
     let navigate = useNavigate()
 
     return(

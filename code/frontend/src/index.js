@@ -7,6 +7,7 @@ import "./index.css";
 import Root from "./routes/root"
 import ErrorPage from './pages/Error'
 
+import Vendas from './pages/Vendas';
 import Delegados from './pages/Delegados'
 import Medicos from './pages/Medicos'
 import Farmacias from './pages/Farmacias'
@@ -22,6 +23,9 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     
     children: [
+      { index: true, element: <Vendas />},
+
+      /* Routes */
       {
         path: "delegados/",
         element: <Delegados />,
@@ -53,10 +57,10 @@ const router = createBrowserRouter([
         element: <RegistarFarmacia />,
       },
 
-      {
-        path: "vendas/",
-        element: <EditarDelegado />,
-      },
+      // {
+      //   path: "vendas/",
+      //   element: <EditarDelegado />,
+      // },
     ],
   },
 ])

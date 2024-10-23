@@ -1,37 +1,12 @@
 import React from 'react';
 import { HiOutlineUpload } from "react-icons/hi";
 import { IoAddCircleOutline, IoPersonOutline } from "react-icons/io5";
-import { Dropdown, message, Space, Upload, Button, Table, ConfigProvider } from 'antd';
+import { Dropdown, Space, Upload, Button, Table, ConfigProvider } from 'antd';
 import { useNavigate } from "react-router-dom"
 
-
-// Upload a Excel file
-const props = {
-  listType: 'picture',
-  
-  beforeUpload: (file) => {
-    const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-
-    // Check if the file is an Excel file
-    if (!isExcel) {
-      message.error(`"${file.name}" não é um ficheiro Excel`);
-      return Upload.LIST_IGNORE;
-    }
-    else {
-      message.success(`"${file.name}" importado com sucesso`);
-    }
-  },
-
-  // Handling the change event to monitor upload progress and success/failure
-  onChange: (info) => {
-    const { status } = info.file;
-    if (status === 'done') {
-      console.log(`${info.file.name} file uploaded successfully.`);
-    } else if (status === 'error') {
-      console.log(`${info.file.name} file upload failed.`);
-    }
-  },
-};
+import themeConfig from '../styles/themeConfig';
+import UploadFileProps from '../components/UploadFile';
+import { getFormattedDate } from '../components/utils';
 
 // For the table
 const columns = (navigate) => [
@@ -57,7 +32,7 @@ const columns = (navigate) => [
     ],
     filterMode: 'tree',
     filterSearch: true,
-    onFilter: (value, record) => record.name.startsWith(value),
+    onFilter: (value, record) => record.delegado.startsWith(value),
     sorter: (a, b) => a.delegado.localeCompare(b.delegado)          
   },
   {
@@ -94,20 +69,7 @@ const columns = (navigate) => [
     width: '15%',
     render: (title, entry) => (
       <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%'}}>
-              <ConfigProvider
-                theme={{
-                  components: { 
-                    "Button": {
-                      "defaultBg": "rgb(247,230,212)",
-                      "defaultBorderColor": "rgb(247,230,212)",
-                      "defaultHoverColor": "rgb(74,0,0)",
-                      "defaultHoverBorderColor": "rgb(74,0,0)",
-                      "defaultHoverBg": "rgb(247,230,212)",
-                      "defaultActiveBorderColor": "rgb(74,0,0)",
-                      "defaultActiveColor": "rgb(74,0,0)"
-                    }
-                  },
-                }}>
+              <ConfigProvider theme={themeConfig}>
                 <Button onClick={() => navigate(`/delegados/detalhes/${entry.key}`)}>Detalhes</Button>  
               </ConfigProvider>
       </Space>
@@ -126,15 +88,10 @@ const dataSource = Array.from({
   brick: `Brick ${i}`,
 }));
 
-
-
 export default function Delegados() {  
-  const currentDate = new Date();
-  const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-  const date = currentDate.toLocaleDateString('pt-BR', options);
+  const date = getFormattedDate();
 
   let navigate = useNavigate()
-  
   const items = [
     {
       key: '1',
@@ -148,7 +105,7 @@ export default function Delegados() {
     {
       key: '2',
       label: 
-      <Upload {...props} maxCount={1}>
+      <Upload {...UploadFileProps} maxCount={1}>
         <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
           Registo por Ficheiro
         </Button>
@@ -156,45 +113,31 @@ export default function Delegados() {
     },
   ];
 
-  const table = <Table 
-    columns={columns(navigate)}
-    dataSource={dataSource}
-    scroll={{x: 'max-content'}}
-    pagination={{ pageSize: 7, showSizeChanger: false }}
-    showSorterTooltip={false}                             // desativa o pop up que aparecia quando tentava ordenar uma coluna
-  />
-  
   return (
-    <div id="contact">
-      <div>
-        <h1>Consultar Delegados</h1>
+      <div id="contact">
+        <div>
+          <h1>Consultar Delegados</h1>
 
-        <div id="data-import">
-          {date}
+          <div id="data-import">
+            {date}
 
-          <Dropdown menu={{items}}>
-              <Space>
-                <IoAddCircleOutline onClick={(e) => e.preventDefault()}/>
-              </Space>
-          </Dropdown>
+            <Dropdown menu={{items}}>
+                <Space>
+                  <IoAddCircleOutline onClick={(e) => e.preventDefault()}/>
+                </Space>
+            </Dropdown>
+          </div>
         </div>
+        
+        <ConfigProvider theme={themeConfig}>
+          <Table 
+            columns={columns(navigate)}
+            dataSource={dataSource}
+            scroll={{x: 'max-content'}}
+            pagination={{ pageSize: 7, showSizeChanger: false }}
+            showSorterTooltip={false}                             
+          />
+        </ConfigProvider>        
       </div>
-      
-      <ConfigProvider
-        theme={{
-          components: { 
-            "Table": {
-              "headerBg": "#F7D4D4",                // Background da header
-              "headerColor": "#4A0000",             // Texto da header
-              "stickyScrollBarBg": "#565656",       // Backgroud da barra de scroll
-              "headerSortHoverBg": "#ddbebe",       // Background da header com hover quando ela tem um sorter aplicado,
-              "fixedHeaderSortActiveBg": "#ddbebe", // Mesma coisa do de cima mas para colunas fixas
-              "headerSortActiveBg": "#ddbebe",      
-            }
-          },
-        }}>
-        {table}  
-      </ConfigProvider>
-    </div>
   );
 }
