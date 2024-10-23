@@ -1,0 +1,83 @@
+```import pandas as pd
+
+# Definir os nomes das colunas manualmente
+nomes_colunas = ['Regiao', 'Empresa', 'Medicamento', 'Mes1', 'Mes2', 'Mes3']
+
+# Ler o ficheiro Excel a partir da linha correta, ignorando o cabeçalho original e definindo os nomes das colunas
+df = pd.read_excel('hmR_Concorrência_Julho.xlsx', sheet_name='Total Concorrência Regiões', dtype=str, names=nomes_colunas)
+
+# Preencher as células unidas nas colunas 'Regiao' e 'Empresa' com o valor superior (forward fill)
+df['Regiao'] = df['Regiao'].ffill()
+df['Empresa'] = df['Empresa'].ffill()
+
+# Remover o apóstrofo das colunas 1, 2 e 3, se presente
+for coluna in ['Regiao', 'Empresa', 'Medicamento']:
+    df[coluna] = df[coluna].astype(str).str.lstrip("'")
+
+# Variáveis para armazenar a hierarquia
+market = sub_market = product = ''
+
+# Colunas que serão construídas a partir da hierarquia da coluna 'Medicamento'
+market_col = []
+sub_market_col = []
+product_col = []
+pack_col = []
+
+# Linhas para armazenar as outras colunas (Regiao, Empresa, Meses) associadas
+regiao_col = []
+empresa_col = []
+mes1_col = []
+mes2_col = []
+mes3_col = []
+
+# Processar cada linha da coluna 'Medicamento' e criar a hierarquia
+for index, row in df.iterrows():
+    medicamento = row['Medicamento'].strip()  # Remover espaços desnecessários
+
+    if medicamento.startswith('+'):  # Linha de Market
+        market = medicamento.replace('+', '').strip()
+    elif medicamento.startswith('-') and '.' in medicamento:  # Linha de Sub-Market
+        sub_market = medicamento.replace('-', '').strip()
+    elif medicamento.startswith('-'):  # Linha de Produto
+        product = medicamento.replace('-', '').strip()
+    else:  # Caso seja o Pack
+        pack = medicamento.strip()
+        
+        # Armazenar as informações de hierarquia
+        market_col.append(market)
+        sub_market_col.append(sub_market)
+        product_col.append(product)
+        pack_col.append(pack)
+
+        # Armazenar as informações associadas às outras colunas
+        regiao_col.append(row['Regiao'])
+        empresa_col.append(row['Empresa'])
+        mes1_col.append(row['Mes1'])
+        mes2_col.append(row['Mes2'])
+        mes3_col.append(row['Mes3'])
+
+# Criar DataFrame apenas com as linhas completas da hierarquia e meses
+hierarchical_df = pd.DataFrame({
+    'Regiao': regiao_col,
+    'Empresa': empresa_col,
+    'Market': market_col,
+    'Sub-Market': sub_market_col,
+    'Product': product_col,
+    'Pack': pack_col,
+    'Mes1': mes1_col,
+    'Mes2': mes2_col,
+    'Mes3': mes3_col
+})
+
+# Converter Mes1, Mes2 e Mes3 para tipo inteiro
+for mes in ['Mes1', 'Mes2', 'Mes3']:
+    hierarchical_df[mes] = pd.to_numeric(hierarchical_df[mes], errors='coerce').fillna(-1).astype(int)
+
+hierarchical_df = hierarchical_df.iloc[10:]
+
+# Exportar para CSV
+hierarchical_df.to_csv('output.csv', sep=';', encoding='utf-8', index=False)
+
+# Exibir o DataFrame final para verificação
+print(hierarchical_df.head())`
+```
