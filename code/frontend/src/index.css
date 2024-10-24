@@ -29,7 +29,6 @@ body {
 }
 
 textarea,
-input,
 button {
   font-size: 1rem;
   font-family: inherit;
@@ -48,7 +47,6 @@ button {
 }
 
 textarea:hover,
-input:hover,
 button:hover {
   box-shadow: 0 0px 1px hsla(0, 0%, 0%, 0.6), 0 1px 2px hsla(0, 0%, 0%, 0.2);
 }
@@ -454,4 +452,8 @@ i {
 
 ::-webkit-scrollbar-thumb:active {
   background-color: rgb(67, 67, 67);  /* Even darker gray when active */
+}
+
+:where(.css-dev-only-do-not-override-o2ooq2).ant-col-14{
+  max-width: 100%;
 }

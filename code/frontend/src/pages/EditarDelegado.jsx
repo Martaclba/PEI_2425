@@ -1,57 +1,177 @@
-import { Form } from "react-router-dom";
-//import { HiOutlineUpload } from "react-icons/hi";
+import React, { useState } from 'react';
+import { Form, Select, Card, Button, Input, ConfigProvider } from 'antd';
+import { useNavigate } from "react-router-dom";
+
+const formItemLayout = { labelCol: { span: 6 }, wrapperCol: { span: 14 } };
+
+const options = [
+  {
+    value: '1',
+    label: 'Jack',
+  },
+  {
+    value: '2',
+    label: 'Lucy',
+  },
+  {
+    value: '3',
+    label: 'Tom',
+  },
+];
+
+const onFinish = (values) => {
+  console.log('Received values of form: ', values);
+};
 
 export default function EditarDelegado() {
+  const currentDate = new Date();
+  const date_options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+  const date = currentDate.toLocaleDateString('pt-BR', date_options);
+
+  let navigate = useNavigate();
+  
+  // State to control edit mode
+  const [isEditing, setIsEditing] = useState(false);
+
+  // Predefined data
+  const predefinedValues = {
+    Nome: {
+      Primeiro: 'John',
+      Ultimo: 'Doe',
+    },
+    Distrito: '1',
+    Regiao: ['1', '2'],
+    Freguesia: ['3'],
+  };
+
+  const select1 =               <Select
+  allowClear
+  mode="multiple"
+  placeholder="Insira uma região"
+  options={options}
+  disabled={!isEditing}
+  filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+/>
 
   return (
-    <Form method="post" id="contact-form">
-      <p>
-        <span>Name</span>
-        <input
-          placeholder="First"
-          aria-label="First name"
-          type="text"
-          name="first"
-        />
-        <input
-          placeholder="Last"
-          aria-label="Last name"
-          type="text"
-          name="last"
-        />
-      </p>
+    <ConfigProvider
+              theme={{
+                "components": {
+                  "Select": {
+                    "colorBgContainerDisabled": "rgba(255,255,255)",
+                    "colorTextDisabled": "rgb(0,0,0)"
+                  },
+                  "Input": {
+                    "colorTextDisabled": "rgb(0,0,0)",
+                    "colorBgContainerDisabled": "rgb(255,255,255)",
+                  }
+                }
+              }}>
+    <div id="contact" style={{ height: '100%' }}>
+      <div>
+        <h1>Editar Delegado</h1>
+        <div>{date}</div>
+      </div>
 
-      <label>
-        <span>Twitter</span>
-        <input
-          type="text"
-          name="twitter"
-          placeholder="@jack"
-        />
-      </label>
+      <div style={{ width: '100%', height: '80%', justifySelf: 'center', alignContent: 'center' }}>
+        <Card>
+          <Form
+            name="validate_other"
+            {...formItemLayout}
+            onFinish={onFinish}
+            layout="vertical"
+            initialValues={predefinedValues} // Pre-fill with predefined values
+          >
+            <Form.Item label="Nome" name="Nome" style={{ marginBottom: 0 }}>
+              <Form.Item
+                name={['Nome', 'Primeiro']}
+                hasFeedback
+                rules={[{ required: true, message: "Insira o primeiro nome" }]}
+                style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
+              >
+                <Input allowClear placeholder="Primeiro" disabled={!isEditing} />
+              </Form.Item>
 
-      <label>
-        <span>Avatar URL</span>
-        <input
-          placeholder="https://example.com/avatar.jpg"
-          aria-label="Avatar URL"
-          type="text"
-          name="avatar"
-        />
-      </label>
+              <Form.Item
+                name={['Nome', 'Ultimo']}
+                hasFeedback
+                rules={[{ required: true, message: "Insira o último nome" }]}
+                style={{ display: 'inline-block', width: 'calc(50% - 8px)', margin: '0 8px' }}
+              >
+                <Input allowClear placeholder="Último" disabled={!isEditing} style={{boxShadow:0}}/>
+              </Form.Item>
+            </Form.Item>
 
-      <label>
-        <span>Notes</span>
-        <textarea
-          name="notes"
-          rows={6}
-        />
-      </label>
-      
-      <p>
-        <button type="submit">Save</button>
-        <button type="button">Cancel</button>
-      </p>
-    </Form>
+            <Form.Item
+              label="Distrito"
+              name="Distrito"
+              hasFeedback
+              rules={[{ required: true, message: 'Por favor insira um distrito' }]}
+            >
+              <Select
+                allowClear
+                showSearch
+                placeholder="Insira um distrito"
+                options={options}
+                disabled={!isEditing}
+                filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Região HMR"
+              name="Regiao"
+              hasFeedback
+              rules={[{ required: true, message: 'Por favor insira, pelo menos, uma região' }]}
+            >
+            <Select
+                allowClear
+                mode="multiple"
+                placeholder="Insira uma região"
+                options={options}
+                disabled={!isEditing}
+                filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+              />
+            </Form.Item>
+
+            <Form.Item label="Freguesia" name="Freguesia" hasFeedback>
+              <Select
+                allowClear
+                mode="multiple"
+                placeholder="Insira uma freguesia"
+                options={options}
+                disabled={!isEditing}
+                filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+              />
+            </Form.Item>
+
+            <Form.Item>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                {isEditing ? (
+                  <>
+                    <Button type="primary" onClick={() => setIsEditing(false)}>
+                      Salvar
+                    </Button>
+                    <Button danger onClick={() => navigate("/delegados/")}>
+                      Cancelar
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                  <Button type="primary" onClick={() => setIsEditing(true)}>
+                    Editar
+                  </Button>
+                  <Button danger onClick={() => navigate("/delegados/")}>
+                    Cancelar
+                  </Button>
+                  </>
+                )}
+              </div>
+            </Form.Item>
+          </Form>
+        </Card>
+      </div>
+    </div>
+    </ConfigProvider>
   );
 }

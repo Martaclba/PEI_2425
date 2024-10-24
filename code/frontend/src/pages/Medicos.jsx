@@ -3,7 +3,7 @@ import { HiOutlineUpload } from "react-icons/hi";
 import { createStyles } from 'antd-style';
 import { LuStethoscope } from "react-icons/lu";
 import { IoAddCircleOutline } from "react-icons/io5";
-import { Dropdown, message, Space, Upload, Button, Table,Tag } from 'antd';
+import { Dropdown, message, Space, Upload, Button, Table,Tag,  ConfigProvider} from 'antd';
 import { useNavigate } from "react-router-dom"
 
 // Upload a Excel file
@@ -34,37 +34,13 @@ const props = {
   },
 };
 
-// For the table
-const useStyle = createStyles(({ css, token }) => {
-  const { antCls } = token;
-  return {
-    customTable: css`
-      ${antCls}-table {
-        ${antCls}-table-container {
-          ${antCls}-table-body,
-          ${antCls}-table-content {
-            scrollbar-width: thin;
-            scrollbar-color: unset;
-          }
-        }
-      }
-    `,
-  };
-});
-
-const columns = [
+const columns = (navigate) => [
   {
     title: 'Médico',
-    width: '30%',
-    dataIndex: 'name',
-    key: 'name',
+    width: '16%',
+    dataIndex: 'medico',
+    key: 'medico',
     fixed: 'left',
-    onHeaderCell: () => ({
-      style: {
-        backgroundColor: '#F7D4D4',
-        color: '#4A0000',
-      },
-    }),
     filters: [
       {
         text: 'Edward King 1',
@@ -81,43 +57,28 @@ const columns = [
     ],
     filterMode: 'tree',
     filterSearch: true,
-    onFilter: (value, record) => record.name.startsWith(value),
+    onFilter: (value, record) => record.medico.startsWith(value),
+    sorter: (a, b) => a.medico.localeCompare(b.medico)
   },
   {
     title: 'Instituição',
-    width: 100,
-    dataIndex: 'age',
-    key: 'age',
-    onHeaderCell: () => ({
-      style: {
-        backgroundColor: '#F7D4D4',
-        color: '#4A0000',
-      },
-    }),
+    width: '16%',
+    dataIndex: 'instituicao',
+    key: 'instituicao',
+    sorter: (a, b) => a.instituicao.localeCompare(b.instituicao)
   },
   {
     title: 'Especialidade',
-    dataIndex: 'address',
-    key: '1',
-    width: 150,
-    onHeaderCell: () => ({
-      style: {
-        backgroundColor: '#F7D4D4',
-        color: '#4A0000',
-      },
-    }),
+    dataIndex: 'especialidade',
+    key: 'especialidade',
+    width: '16%',
+    sorter: (a, b) => a.especialidade.localeCompare(b.especialidade)
   },
   {
     title: 'Estado',
-    dataIndex: 'tags',
-    key: '2',
-    width: 150,
-    onHeaderCell: () => ({
-      style: {
-        backgroundColor: '#F7D4D4',
-        color: '#4A0000',
-      },
-    }),
+    dataIndex: 'estado',
+    key: 'estado',
+    width: '16%',
     render: (tags) => (
       <>
         {tags.map((tag) => {
@@ -132,34 +93,44 @@ const columns = [
           );
         })}
       </>
-    )
+    ),
   },
   {
     title: 'Distrito',
-    dataIndex: 'address',
-    key: '3',
-    width: 150,
-    onHeaderCell: () => ({
-      style: {
-        backgroundColor: '#F7D4D4',
-        color: '#4A0000',
-      },
-    }),
+    dataIndex: 'distrito',
+    key: 'distrito',
+    width: '16%',
+    sorter: (a, b) => a.distrito.localeCompare(b.distrito)
   },
   {
     title: '',
     dataIndex: 'address',
     key: '4',
-    width: 150,
+    width: '16%',
     onHeaderCell: () => ({
       style: {
         backgroundColor: '#F7D4D4',
         color: '#4A0000',
       },
     }),
-    render: () => (
-      <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%' }}>
-         <Button style={{ backgroundColor: '#F7E6D4', color: 'black', borderColor: '#F7E6D4' }} >Detalhes</Button>
+    render: (title, entry) => (
+      <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%'}}>
+              <ConfigProvider
+                theme={{
+                  components: { 
+                    "Button": {
+                      "defaultBg": "rgb(247,230,212)",
+                      "defaultBorderColor": "rgb(247,230,212)",
+                      "defaultHoverColor": "rgb(74,0,0)",
+                      "defaultHoverBorderColor": "rgb(74,0,0)",
+                      "defaultHoverBg": "rgb(247,230,212)",
+                      "defaultActiveBorderColor": "rgb(74,0,0)",
+                      "defaultActiveColor": "rgb(74,0,0)"
+                    }
+                  },
+                }}>
+                <Button onClick={() => navigate(`/medicos/detalhes/${entry.key}`)}>Detalhes</Button>  
+              </ConfigProvider>
       </Space>
     ),
   },
@@ -169,10 +140,11 @@ const dataSource = Array.from({
   length: 100,
 }).map((_, i) => ({
   key: i,
-  name: `Edward King ${i}`,
-  age: 32,
-  address: `Edward King ${i}`,
-  tags: ['Ativo','Inativo','Indisponível'],
+  medico: `Medico ${i}`,
+  instituicao: `Hospital ${i}`,
+  especialidade: `Especialidade ${i}`,
+  estado: ['Ativo','Inativo','Indisponível'],
+  distrito: `Braga ${i}`
 }));
  
 
@@ -181,7 +153,7 @@ export default function Medicos() {
   const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
   const date = currentDate.toLocaleDateString('pt-BR', options);
 
-  const { styles } = useStyle();
+  
   
   let navigate = useNavigate()
   const items = [
@@ -204,6 +176,14 @@ export default function Medicos() {
       </Upload>
     },
   ];
+  
+  const table = <Table 
+  columns={columns(navigate)}
+  dataSource={dataSource}
+  scroll={{x: 'max-content'}}
+  pagination={{ pageSize: 7, showSizeChanger: false }}
+  showSorterTooltip={false}                             // desativa o pop up que aparecia quando tentava ordenar uma coluna
+/>
 
   return (
     <div id="contact">
@@ -221,14 +201,21 @@ export default function Medicos() {
         </div>
       </div>
 
-      <Table 
-        className={styles.customTable}
-        columns={columns}
-        dataSource={dataSource}
-        scroll={{x: 'max-content'}}
-        pagination={{ pageSize: 7, showSizeChanger: false }}
-      />
-      
+      <ConfigProvider
+        theme={{
+          components: { 
+            "Table": {
+              "headerBg": "#F7D4D4",                // Background da header
+              "headerColor": "#4A0000",             // Texto da header
+              "stickyScrollBarBg": "#565656",       // Backgroud da barra de scroll
+              "headerSortHoverBg": "#ddbebe",       // Background da header com hover quando ela tem um sorter aplicado,
+              "fixedHeaderSortActiveBg": "#ddbebe", // Mesma coisa do de cima mas para colunas fixas
+              "headerSortActiveBg": "#ddbebe",      
+            }
+          },
+        }}>
+        {table}  
+      </ConfigProvider>
     </div>
   );
 }
