@@ -6,6 +6,8 @@ import { IoAddCircleOutline } from "react-icons/io5";
 import { Dropdown, message, Space, Upload, Button, Table,Tag,  ConfigProvider} from 'antd';
 import { useNavigate } from "react-router-dom"
 
+import { getFormattedDate } from '../components/utils';
+
 // Upload a Excel file
 const props = {
   listType: 'picture',
@@ -149,9 +151,7 @@ const dataSource = Array.from({
  
 
 export default function Medicos() {  
-  const currentDate = new Date();
-  const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-  const date = currentDate.toLocaleDateString('pt-BR', options);
+  const date = getFormattedDate();
 
   
   

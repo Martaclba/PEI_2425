@@ -3,55 +3,47 @@ import { Form, Select, Card, Button, Input, Flex, Tag, Row, Col, List } from 'an
 import { useNavigate } from "react-router-dom"
 
 import AddProdutoComponent from '../components/AddProduto';
+import { getFormattedDate } from '../components/utils';
 
 const formItemLayout = { labelCol: {span: 6,}, wrapperCol: { span: 14,},};
 
 const options= [
     {
-    value: '1',
-    label: 'Jack',
+        value: '1',
+        label: 'Jack',
     },
     {
-    value: '2',
-    label: 'Lucy',
+        value: '2',
+        label: 'Lucy',
     },
     {
-    value: '3',
-    label: 'Tom',
+        value: '3',
+        label: 'Tom',
     },
 ];
 
-const tagRender = (props) => {
+const renderDisabledTag = (props) => {
     const { label, value, closable, onClose } = props;
-    const onPreventMouseDown = (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-    };
+
     return (
       <Tag
         color={value}
-        onMouseDown={onPreventMouseDown}
         closable={closable}
         onClose={onClose}
-        style={{
-          marginInlineEnd: 4,
-        }}
+        style={{ marginInlineEnd: 4 }}
       >
         {label}
       </Tag>
     );
 };
 
-
 const onFinish = (values) => {
     console.log('Received values of form: ', values);
 };
 
 export default function RegistarFarmacia() {
-    const currentDate = new Date();
-    const date_options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-    const date = currentDate.toLocaleDateString('pt-BR', date_options);
-  
+    const date = getFormattedDate();
+
     let navigate = useNavigate()
 
     // State for the product list (initialy empty)
@@ -101,40 +93,6 @@ export default function RegistarFarmacia() {
                                         >
                                             <Input allowClear placeholder="Último" />
                                         </Form.Item>
-                                    </Form.Item>
-
-                                    <Form.Item
-                                        label="Instituicao"
-                                        name="Instituicao"
-                                        hasFeedback
-                                        rules={[{
-                                            required: true,
-                                            message: 'Por favor insira uma instituição',},]}>
-
-                                        <Select 
-                                            allowClear
-                                            showSearch
-                                            placeholder="Insira uma instituição"
-                                            options={options}
-                                            filterOption={(input, option) => 
-                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                                    </Form.Item>
-
-                                    <Form.Item
-                                        label="Especialidade"
-                                        name="Especialidade"
-                                        hasFeedback
-                                        rules={[{
-                                            required: true,
-                                            message: 'Por favor insira uma especialidade',},]}>
-
-                                        <Select 
-                                            allowClear
-                                            showSearch
-                                            placeholder="Insira uma especialidade"
-                                            options={options}
-                                            filterOption={(input, option) => 
-                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                                     </Form.Item>
 
                                     <Form.Item
@@ -221,6 +179,17 @@ export default function RegistarFarmacia() {
                                             filterOption={(input, option) => 
                                                 (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                                     </Form.Item>
+
+                                    <Form.Item
+                                        label="Estado"
+                                        name="Estado">
+
+                                        <Select
+                                            mode='multiple'         
+                                            disabled                                       
+                                            tagRender={renderDisabledTag}
+                                            defaultValue={[{label:'Ativo', value:'green'}]}/>
+                                    </Form.Item>
                                 </Card>
                             </Col>
 
@@ -260,29 +229,9 @@ export default function RegistarFarmacia() {
                                         
                                         {/* Pass down the state and set function to AddProduto_Component */}
                                         <AddProdutoComponent produtos={produtos} setProdutos={setProdutos}/>
-
-
                                     </Form.Item>
 
-                                    <Form.Item
-                                        label="Estado"
-                                        name="Estado">
-
-                                        <Select 
-                                            allowClear
-                                            mode='multiple'         
-                                            disabled                                       
-                                            tagRender={tagRender}
-                                            defaultValue={[{label:'Ativo', value:'green'}]}                                        
-                                            placeholder="Insira um estado"
-                                            options={options}
-                                            filterOption={(input, option) => 
-                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                                    </Form.Item>
-                                </Card>
-
-                                <Card style={{ flex: 1}}>        
-                                    <Form.Item>
+                                    <Form.Item style={{display: 'flex', justifyContent: 'right' }}>
                                         <Flex gap="large">
                                             <Button type="primary" htmlType="submit">
                                                 Confirmar

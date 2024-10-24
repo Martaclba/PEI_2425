@@ -9,18 +9,18 @@ function Root() {
     <>
       <div id="sidebar">
         
-      <div>
-        <img src="../../myPharmaImage.png" alt=""
-        style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
-      </div>
-        
+        <div>
+          <img src="../../myPharmaImage.png" alt=""
+          style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
+        </div>
+          
         <h1><RiLogoutBoxRLine /></h1>
 
         <nav>
           <ul>
             <li>
               <div id="sidebar-option">
-                <Link to={`/vendas/`}><BsGraphUpArrow />Vendas</Link>
+                <Link to={`/`}><BsGraphUpArrow />Vendas</Link>
               </div>
             </li>
             <li>
@@ -42,6 +42,7 @@ function Root() {
         </nav>
       </div>
 
+      
       <div id="detail">
         <Outlet />
       </div>

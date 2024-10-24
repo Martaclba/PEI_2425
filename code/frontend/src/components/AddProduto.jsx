@@ -12,8 +12,8 @@ const AddProdutoComponent = ({produtos, setProdutos}) => {
   ];
 
   // Function to add selected product to the list
-  const addProduto = (e) => {
-    const selectedProduct = produtos_items.find(item => item.key === e.key);
+  const addProduto = (p) => {
+    const selectedProduct = produtos_items.find(item => item.key === p.key);
 
     // Check if the product (based on key) is already in the list
     if (selectedProduct && !produtos.some(produto => produto.key === selectedProduct.key)) {
