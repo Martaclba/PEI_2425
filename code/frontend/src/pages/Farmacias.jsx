@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import themeConfig from '../styles/themeConfig';
 import { getFormattedDate } from '../components/utils';
 
-const columns = [
+const columns = (navigate) => [
   {
     key: 'farmacia',
     title: 'Farmácia',
@@ -71,10 +71,10 @@ const columns = [
     key: 'action',
     title: '',
     width: '15%',
-    render: () => (
+    render: (title, entry) => (
       <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%'}}>
               <ConfigProvider theme={themeConfig}>
-                <Button>Detalhes</Button>  
+                <Button onClick={() => navigate(`/farmacias/detalhes/${entry.key}`)}>Detalhes</Button>  
               </ConfigProvider>
       </Space>
     ),
@@ -127,7 +127,7 @@ export default function Farmacias() {
 
       <ConfigProvider theme={themeConfig}>
         <Table 
-          columns={columns}
+          columns={columns(navigate)}
           dataSource={dataSource}
           scroll={{x: 'max-content'}}
           pagination={{ pageSize: 7, showSizeChanger: false }}

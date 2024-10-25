@@ -44,15 +44,6 @@ export default function EditarDelegado() {
     Freguesia: ['3'],
   };
 
-  const select1 =               <Select
-  allowClear
-  mode="multiple"
-  placeholder="Insira uma região"
-  options={options}
-  disabled={!isEditing}
-  filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
-/>
-
   return (
     <ConfigProvider
               theme={{
@@ -69,8 +60,33 @@ export default function EditarDelegado() {
               }}>
     <div id="contact" style={{ height: '100%' }}>
       <div>
-        <h1>Editar Delegado</h1>
-        <div>{date}</div>
+        <div id="title-edit">
+          <h1>Editar Delegado</h1>
+          <Form.Item>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                {isEditing ? (
+                  <>
+                    <Button type="primary" onClick={() => setIsEditing(false)}>
+                      Guardar
+                    </Button>
+                    <Button danger onClick={() => navigate("/delegados/")}>
+                      Voltar
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                  <Button type="primary" onClick={() => setIsEditing(true)}>
+                    Editar
+                  </Button>
+                  <Button danger onClick={() => navigate("/delegados/")}>
+                    Voltar
+                  </Button>
+                  </>
+                )}
+              </div>
+            </Form.Item>
+          </div>
+        <div style={{marginBottom:"1rem",marginBottom:"1rem"}}>{date}</div>
       </div>
 
       <div style={{ width: '100%', height: '80%', justifySelf: 'center', alignContent: 'center' }}>
@@ -98,7 +114,7 @@ export default function EditarDelegado() {
                 rules={[{ required: true, message: "Insira o último nome" }]}
                 style={{ display: 'inline-block', width: 'calc(50% - 8px)', margin: '0 8px' }}
               >
-                <Input allowClear placeholder="Último" disabled={!isEditing} style={{boxShadow:0}}/>
+                <Input allowClear placeholder="Último" disabled={!isEditing}/>
               </Form.Item>
             </Form.Item>
 
@@ -143,30 +159,6 @@ export default function EditarDelegado() {
                 disabled={!isEditing}
                 filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
               />
-            </Form.Item>
-
-            <Form.Item>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                {isEditing ? (
-                  <>
-                    <Button type="primary" onClick={() => setIsEditing(false)}>
-                      Salvar
-                    </Button>
-                    <Button danger onClick={() => navigate("/delegados/")}>
-                      Cancelar
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                  <Button type="primary" onClick={() => setIsEditing(true)}>
-                    Editar
-                  </Button>
-                  <Button danger onClick={() => navigate("/delegados/")}>
-                    Cancelar
-                  </Button>
-                  </>
-                )}
-              </div>
             </Form.Item>
           </Form>
         </Card>

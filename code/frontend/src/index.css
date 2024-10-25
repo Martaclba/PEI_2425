@@ -463,3 +463,26 @@ i {
 :where(.css-dev-only-do-not-override-o2ooq2).ant-col-14{
   max-width: 100%;
 }
+
+#title-edit {
+  display: flex;
+  justify-content: space-between; /* Pushes content to opposite sides */
+  align-items: center;            /* Aligns content vertically in the center */
+}
+
+:where(.css-dev-only-do-not-override-1hpnbz2).ant-col-16{
+  max-width: 100%;
+}
+
+:where(.css-dev-only-do-not-override-1hpnbz2).ant-col-8 {
+  flex: 0 0 0%;
+}
+
+:where(.css-dev-only-do-not-override-1hpnbz2).ant-col-offset-8 {
+  margin-inline-start: 0%;
+}
+
+:where(.css-dev-only-do-not-override-1hpnbz2).ant-btn-variant-solid {
+  color: #fff;
+  background: #242424;
+}

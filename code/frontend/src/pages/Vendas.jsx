@@ -307,7 +307,7 @@ export default function Vendas() {
           <Table 
             columns={columns_produto}
             dataSource={dados_produto}
-            scroll={{x: 'max-content'}}
+            scroll={{x: '200%'}}
             pagination={{ pageSize: 7, showSizeChanger: false }}
             showSorterTooltip={false}                             
           />
@@ -316,7 +316,7 @@ export default function Vendas() {
           <Table
             columns={columns_brick}
             dataSource={dados_brick}
-            scroll={{x: 'max-content'}}
+            scroll={{x: '200%'}}
             pagination={{ pageSize: 7, showSizeChanger: false }}
             showSorterTooltip={false}                             
           />
