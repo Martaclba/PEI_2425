@@ -353,10 +353,10 @@ form[action$="destroy"] button {
   margin-inline-start: 0%;
 }
 
-:where(.css-dev-only-do-not-override-1hpnbz2).ant-btn-variant-solid {
+/* :where(.css-dev-only-do-not-override-1hpnbz2).ant-btn-variant-solid {
   color: #fff;
   background: #242424;
-}
+} */
 
 /* MODAL */
 :where(.css-dev-only-do-not-override-1hpnbz2).ant-modal .ant-modal-header {

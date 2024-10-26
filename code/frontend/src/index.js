@@ -16,7 +16,7 @@ import RegistarDelegado from "./pages/RegistarDelegado"
 import RegistarFarmacia from './pages/RegistarFarmacia';
 import RegistarMedico from './pages/RegistarMedico';
 import EditarFarmacia from './pages/EditarFarmacia';
-import EditarMedicos from './pages/EditarMedicos';
+import EditarMedico from './pages/EditarMedico';
 import Login from './pages/Login';
 import Visitas from './pages/Visitas';
 
@@ -51,6 +51,10 @@ const router = createBrowserRouter([
         path: "medicos/registar/",
         element: <RegistarMedico />,
       },
+      {
+        path: "medicos/detalhes/:key",
+        element: <EditarMedico />,
+      },
 
       {
         path: "farmacias/",
@@ -64,11 +68,7 @@ const router = createBrowserRouter([
         path: "farmacias/detalhes/:key",
         element: <EditarFarmacia />,
       },
-      {
-        path: "medicos/detalhes/:key",
-        element: <EditarMedicos/>,
-      },
-
+      
       {
         path: "visitas/",
         element: <Visitas />,

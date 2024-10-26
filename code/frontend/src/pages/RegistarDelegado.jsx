@@ -49,7 +49,7 @@ export default function RegistarDelegado() {
                             layout='vertical'
                         >
 
-                            <Form.Item label="Nome" name="Nome" style={{ marginBottom: 0 }}>
+                            <Form.Item label="Nome" style={{ marginBottom: 0 }}>
                                 <Form.Item
                                     name="Primeiro"
                                     hasFeedback

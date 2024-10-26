@@ -21,21 +21,15 @@ const options= [
     },
 ];
 
-const tagRender = (props) => {
+const renderDisabledTag = (props) => {
     const { label, value, closable, onClose } = props;
-    const onPreventMouseDown = (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-    };
+
     return (
       <Tag
         color={value}
-        onMouseDown={onPreventMouseDown}
         closable={closable}
         onClose={onClose}
-        style={{
-          marginInlineEnd: 4,
-        }}
+        style={{ marginInlineEnd: 4 }}
       >
         {label}
       </Tag>
@@ -67,12 +61,13 @@ export default function RegistarMedico() {
                             {...formItemLayout}
                             onFinish={onFinish}
                             layout='vertical'
+                            initialValues={{Estado: [{label:'Ativo', value:'green'}],}}
                         >
 
                             <Row gutter={16} style={{ display: 'flex' }}>
                                 <Col span={12} style={{ display: 'flex', flexDirection: 'column' }}>
                                     <Card style={{flex: 1}}>
-                                        <Form.Item label="Nome" name="Nome" style={{ marginBottom: 0 }}>
+                                        <Form.Item label="Nome" style={{ marginBottom: 0 }}>
                                             <Form.Item
                                                 name="Primeiro"
                                                 hasFeedback
@@ -209,7 +204,7 @@ export default function RegistarMedico() {
                                             <Select 
                                                 allowClear
                                                 showSearch
-                                                placeholder="Insira uma morada"
+                                                placeholder="Insira um contacto"
                                                 options={options}
                                                 filterOption={(input, option) => 
                                                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
@@ -223,8 +218,7 @@ export default function RegistarMedico() {
                                                 allowClear
                                                 mode='multiple'         
                                                 disabled                                     
-                                                tagRender={tagRender}
-                                                defaultValue={[{label:'Ativo', value:'green'}]}                                        
+                                                tagRender={renderDisabledTag}                                 
                                                 placeholder="Insira um estado"
                                                 options={options}
                                                 filterOption={(input, option) => 

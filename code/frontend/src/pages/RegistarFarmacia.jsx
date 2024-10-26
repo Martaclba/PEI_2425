@@ -1,4 +1,4 @@
-import React, { useState }  from 'react';
+import React, { useState, useEffect }  from 'react';
 import { Form, Select, Card, Button, Input, Flex, Tag, Row, Col, List } from 'antd';
 import { useNavigate } from "react-router-dom"
 
@@ -26,14 +26,14 @@ const renderDisabledTag = (props) => {
     const { label, value, closable, onClose } = props;
 
     return (
-      <Tag
-        color={value}
-        closable={closable}
-        onClose={onClose}
-        style={{ marginInlineEnd: 4 }}
-      >
-        {label}
-      </Tag>
+        <Tag
+            color={value}
+            closable={closable}
+            onClose={onClose}
+            style={{ marginInlineEnd: 4 }}
+        >
+            {label}
+        </Tag>
     );
 };
 
@@ -54,6 +54,18 @@ export default function RegistarFarmacia() {
         setProdutos(produtos.filter(produto => produto.key !== key));
     };
 
+    // Predefined data
+    const predefinedValues = {
+        Contacto: 2342213,
+        Estado: [{label:'Ativo', value:'green'}],
+    };
+    
+    // Update the "Produtos" form field whenever "produtos" state changes
+    const [form] = Form.useForm();
+    useEffect(() => {
+        form.setFieldsValue({ Produtos: produtos });
+    }, [produtos, form]);
+
     return(
         <div id="contact" style={{height: '100%'}}>
         <div>
@@ -66,34 +78,27 @@ export default function RegistarFarmacia() {
 
         <div style={{width: '100%', height: '80%', justifySelf: 'center', alignContent: 'center'}}>
                     <Form  
+                        form={form}
                         name="validate_other"
                         {...formItemLayout}
                         onFinish={onFinish}
                         layout='vertical'
+                        initialValues={predefinedValues}
                     >
 
                         <Row gutter={16} style={{ display: 'flex' }}>
                             <Col span={12} style={{ display: 'flex', flexDirection: 'column' }}>
                                 <Card style={{flex: 1}}>
-                                    <Form.Item label="Nome" name="Nome" style={{ marginBottom: 0 }}>
-                                        <Form.Item
-                                            name="Primeiro"
-                                            hasFeedback
-                                            rules={[{ required: true, message: "Insira o primeiro nome" }]}
-                                            style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
-                                        >
-                                            <Input allowClear placeholder="Primeiro" />
-                                        </Form.Item>
-
-                                        <Form.Item
-                                            name="Ultimo"
-                                            hasFeedback
-                                            rules={[{ required: true, message: "Insira o último nome" }]}
-                                            style={{ display: 'inline-block', width: 'calc(50% - 8px)', margin: '0 8px' }}
-                                        >
-                                            <Input allowClear placeholder="Último" />
-                                        </Form.Item>
-                                    </Form.Item>
+                                <Form.Item
+                                        label="Nome" 
+                                        name="Nome"
+                                        hasFeedback
+                                        rules={[{ 
+                                            required: true, 
+                                            message: "Insira um nome" }]}
+                                    >
+                                        <Input allowClear placeholder="Nome"/>
+                                    </Form.Item>   
 
                                     <Form.Item
                                         label="Distrito"
@@ -187,8 +192,7 @@ export default function RegistarFarmacia() {
                                         <Select
                                             mode='multiple'         
                                             disabled                                       
-                                            tagRender={renderDisabledTag}
-                                            defaultValue={[{label:'Ativo', value:'green'}]}/>
+                                            tagRender={renderDisabledTag}/>
                                     </Form.Item>
                                 </Card>
                             </Col>
@@ -204,31 +208,33 @@ export default function RegistarFarmacia() {
                                     <Form.Item                            
                                         label="Produtos"
                                         name="Produtos">
-
-                                        <List 
-                                            id='Product_List'
-                                            bordered
-                                            dataSource={produtos}
-                                            rows={10}
-                                            style={{ maxHeight: '225px', overflow: 'auto' }}
-                                            renderItem={(produto) => (
-                                                <List.Item style={{ display: 'flex', justifyContent: 'space-between'}}>
-                                                    {produto.label}
-
-                                                    <div style={{ display: 'flex' }}>
-                                                        <Button
-                                                            type="default"
-                                                            style={{ backgroundColor: '#F0F3FA', color: '#4A4A4A', borderRadius: '12px' }}
-                                                            onClick={() => deleteProduto(produto.key)}
-                                                        >
-                                                            Remover
-                                                        </Button>
-                                                    </div>
-                                                </List.Item>
-                                        )}/>
                                         
-                                        {/* Pass down the state and set function to AddProduto_Component */}
-                                        <AddProdutoComponent produtos={produtos} setProdutos={setProdutos}/>
+                                        <div>
+                                            <List 
+                                                id='Product_List'
+                                                bordered
+                                                dataSource={produtos}
+                                                rows={10}
+                                                style={{ maxHeight: '225px', overflow: 'auto' }}
+                                                renderItem={(produto) => (
+                                                    <List.Item style={{ display: 'flex', justifyContent: 'space-between'}}>
+                                                        {produto.label}
+
+                                                        <div style={{ display: 'flex' }}>
+                                                            <Button
+                                                                type="default"
+                                                                style={{ backgroundColor: '#F0F3FA', color: '#4A4A4A', borderRadius: '12px' }}
+                                                                onClick={() => deleteProduto(produto.key)}
+                                                            >
+                                                                Remover
+                                                            </Button>
+                                                        </div>
+                                                    </List.Item>
+                                            )}/>
+                                            
+                                            {/* Pass down the state and set function to AddProduto_Component */}
+                                            <AddProdutoComponent produtos={produtos} setProdutos={setProdutos}/>
+                                        </div>
                                     </Form.Item>
 
                                     <Form.Item style={{display: 'flex', justifyContent: 'right' }}>

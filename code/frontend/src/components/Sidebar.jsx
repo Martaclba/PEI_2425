@@ -29,7 +29,7 @@ const Sidebar = () => {
     return (
         <div className={`sidebar ${isOpen ? "open" : ""}`}>
             <div className="logo-details">
-                <img src="../../mypharma-logo-white.png" alt="" className="icon" style={{height:'30px', width:'120px'}}/>
+                <img src="../../mypharma-logo-white.png" alt="" className="icon" style={{height:'30px', width:'120px', paddingInlineStart: '18px'}}/>
                 
                 <i className="bx bx-menu" id="btn" onClick={toggleSidebar}>
                     {isOpen ? <HiOutlineMenuAlt3/> : <HiOutlineMenu/>}                    
@@ -74,7 +74,7 @@ const Sidebar = () => {
                             <div className="job">Delegado</div>
                         </div>
                     </div>
-                    <Link to={`/`}>
+                    <Link to={`/login/`}>
                         <i className="bx bx-log-out" id="log_out"><TbLogout2 /></i>
                         <span className="links_name">Logout</span>
                     </Link>

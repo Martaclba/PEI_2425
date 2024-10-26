@@ -86,7 +86,7 @@ export default function EditarDelegado() {
               </div>
             </Form.Item>
           </div>
-        <div style={{marginBottom:"1rem",marginBottom:"1rem"}}>{date}</div>
+        <div style={{marginBottom:"1rem"}}>{date}</div>
       </div>
 
       <div style={{ width: '100%', height: '80%', justifySelf: 'center', alignContent: 'center' }}>
@@ -96,9 +96,9 @@ export default function EditarDelegado() {
             {...formItemLayout}
             onFinish={onFinish}
             layout="vertical"
-            initialValues={predefinedValues} // Pre-fill with predefined values
+            initialValues={predefinedValues}
           >
-            <Form.Item label="Nome" name="Nome" style={{ marginBottom: 0 }}>
+            <Form.Item label="Nome" style={{ marginBottom: 0 }}>
               <Form.Item
                 name={['Nome', 'Primeiro']}
                 hasFeedback

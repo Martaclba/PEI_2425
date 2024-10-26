@@ -1,13 +1,16 @@
 import React from 'react';
-import { Button, Checkbox, Form, Input, ConfigProvider } from 'antd';
+import { Button, Form, Input, ConfigProvider } from 'antd';
 import { IoPersonOutline } from "react-icons/io5";
 import { IoLockClosedOutline } from "react-icons/io5";
+
 const onFinish = (values) => {
   console.log('Success:', values);
 };
+
 const onFinishFailed = (errorInfo) => {
   console.log('Failed:', errorInfo);
 };
+
 const Login = () => (
   <div style={{ height: "100%",
     width: "100%", 
@@ -43,7 +46,7 @@ const Login = () => (
       rules={[
         {
           required: true,
-          message: 'Please input your email!',
+          message: 'Por favor insira um email',
         },
       ]}
     >
@@ -55,7 +58,7 @@ const Login = () => (
       rules={[
         {
           required: true,
-          message: 'Please input your password!',
+          message: 'Por favor insira uma password',
         },
       ]}
     >
@@ -69,16 +72,18 @@ const Login = () => (
       }}
     >
        <ConfigProvider 
-        theme={{"components": {
-                    "Button": {
-                      "colorPrimaryHover": "rgba(36,36,36,0.8)",
-                      "colorPrimary": "rgb(36,36,36)"
-                    }
-                  }
-                }}>
-      <Button type="primary" htmlType="submit" style={{width:'100%'}}>
-        Login
-      </Button>
+        theme={{
+          "components": {
+            "Button": {
+              "colorPrimaryHover": "rgba(36,36,36,0.8)",
+              "colorPrimary": "rgb(36,36,36)",
+              "colorPrimaryActive": "rgb(20,20,20)",
+            }
+          }
+      }}>
+        <Button type="primary" htmlType="submit" style={{width:'100%'}}>
+          Login
+        </Button>
       </ConfigProvider>
     </Form.Item>
   </Form>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Select, Card, Button, Input, Flex, Row, Col, Tag, ConfigProvider } from 'antd';
+import { Form, Select, Card, Button, Input, Row, Col, Tag, ConfigProvider } from 'antd';
 import { useNavigate } from "react-router-dom";
 
 import { getFormattedDate } from '../components/utils';
@@ -23,10 +23,12 @@ const options= [
 
 const tagRender = (props) => {
     const { label, value, closable, onClose } = props;
+    
     const onPreventMouseDown = (event) => {
       event.preventDefault();
       event.stopPropagation();
     };
+
     return (
       <Tag
         color={value}
@@ -46,7 +48,7 @@ const onFinish = (values) => {
     console.log('Received values of form: ', values);
 };
 
-export default function RegistarMedico() {
+export default function EditarMedico() {
     const date = getFormattedDate();
     const navigate = useNavigate();
 
@@ -93,10 +95,10 @@ export default function RegistarMedico() {
                         {isEditing ? (
                         <>
                             <Button type="primary" onClick={() => setIsEditing(false)}>
-                            Guardar
+                                Guardar
                             </Button>
-                            <Button danger onClick={() => navigate("/delegados/")}>
-                            Voltar
+                            <Button danger onClick={() => navigate("/medicos/")}>
+                                Voltar
                             </Button>
                         </>
                         ) : (
@@ -104,7 +106,7 @@ export default function RegistarMedico() {
                         <Button type="primary" onClick={() => setIsEditing(true)}>
                             Editar
                         </Button>
-                        <Button danger onClick={() => navigate("/delegados/")}>
+                        <Button danger onClick={() => navigate("/medicos/")}>
                             Voltar
                         </Button>
                         </>
@@ -129,7 +131,7 @@ export default function RegistarMedico() {
                             <Row gutter={16} style={{ display: 'flex' }}>
                                 <Col span={12} style={{ display: 'flex', flexDirection: 'column' }}>
                                     <Card style={{flex: 1}}>
-                                        <Form.Item label="Nome" name="Nome" style={{ marginBottom: 0 }}>
+                                        <Form.Item label="Nome" style={{ marginBottom: 0 }}>
                                             <Form.Item
                                                 name={['Nome', 'Primeiro']}
                                                 hasFeedback
@@ -272,7 +274,7 @@ export default function RegistarMedico() {
                                             <Select 
                                                 allowClear
                                                 showSearch
-                                                placeholder="Insira uma morada"
+                                                placeholder="Insira um contacto"
                                                 options={options}
                                                 disabled={!isEditing}
                                                 filterOption={(input, option) => 
@@ -283,7 +285,7 @@ export default function RegistarMedico() {
                                             label="Estado"
                                             name="Estado"
                                             rules={[{
-                                                required: true,                                                                        // meter depois
+                                                required: true,                                                                        
                                                 message: 'Por favor defina um estado'}]}>
 
                                             <Select 
@@ -291,7 +293,6 @@ export default function RegistarMedico() {
                                                 mode='multiple'         
                                                 maxCount={1}                                       
                                                 tagRender={tagRender}
-                                                defaultValue={[{label:'Ativo', value:'green'}]}                                        // tirar isto depois na parte de editar
                                                 placeholder="Insira um estado"
                                                 options={options}
                                                 disabled={!isEditing}

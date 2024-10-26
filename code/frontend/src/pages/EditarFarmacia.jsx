@@ -1,5 +1,5 @@
-import React, { useState }  from 'react';
-import { Form, Select, Card, Button, Input, Flex, Tag, Row, Col, List, ConfigProvider } from 'antd';
+import React, { useState, useEffect }  from 'react';
+import { Form, Select, Card, Button, Input, Tag, Row, Col, List, ConfigProvider } from 'antd';
 import { useNavigate } from "react-router-dom"
 
 import AddProdutoComponent from '../components/AddProduto';
@@ -39,10 +39,12 @@ const options2= [
 
 const tagRender = (props) => {
     const { label, value, closable, onClose } = props;
+    
     const onPreventMouseDown = (event) => {
       event.preventDefault();
       event.stopPropagation();
     };
+
     return (
       <Tag
         color={value}
@@ -58,40 +60,44 @@ const tagRender = (props) => {
     );
 };
 
+const onFinish = (values) => {
+    console.log('Received values of form: ', values);
+};
+
 export default function EditarFarmacia() {
     const date = getFormattedDate();
 
     let navigate = useNavigate()
 
-    // State for the product list (initialy empty)
+    // State for the product list
     const [produtos, setProdutos] = useState([{ key: '1', label: 'Produto 1' }]); 
 
     // Function to remove a product from the list
     const deleteProduto = (key) => {
         setProdutos(produtos.filter(produto => produto.key !== key));
     };
-
-    const onFinish = (values) => {
-        console.log('Received values of form: ', values);
-    };
     
     // State to control edit mode
-      const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
     
-      // Predefined data
-      const predefinedValues = {
-        Nome: {
-          Primeiro: 'John',
-          Ultimo: 'Doe',
-        },
+    // Predefined data
+    const predefinedValues = {
+        Nome: 'Farmácia A',
         Distrito: '1',
         Regiao: ['1', '2'],
         Freguesia: ['3'],
         Morada: ['rua 123'],
         Contacto: ['973493749'],
         Estado: [{label:'Ativo', value:'green'}],
-        Notas: ['janknffnkn kajsndkjfn kjsndknfna kajndfnsn']
-      };
+        Notas: ['janknffnkn kajsndkjfn kjsndknfna kajndfnsn'],
+        Produtos: [{ key: '1', label: 'Produto 1' }]
+    };
+
+    // Update the "Produtos" form field whenever "produtos" state changes
+    const [form] = Form.useForm();
+    useEffect(() => {
+        form.setFieldsValue({ Produtos: produtos });
+    }, [produtos, form]);
 
     return(
         <ConfigProvider
@@ -116,10 +122,10 @@ export default function EditarFarmacia() {
                         {isEditing ? (
                         <>
                             <Button type="primary" onClick={() => setIsEditing(false)}>
-                            Guardar
+                                Guardar
                             </Button>
-                            <Button danger onClick={() => navigate("/delegados/")}>
-                            Voltar
+                            <Button danger onClick={() => navigate("/farmacias/")}>
+                                Voltar
                             </Button>
                         </>
                         ) : (
@@ -127,7 +133,7 @@ export default function EditarFarmacia() {
                         <Button type="primary" onClick={() => setIsEditing(true)}>
                             Editar
                         </Button>
-                        <Button danger onClick={() => navigate("/delegados/")}>
+                        <Button danger onClick={() => navigate("/farmacias/")}>
                             Voltar
                         </Button>
                         </>
@@ -142,6 +148,7 @@ export default function EditarFarmacia() {
 
         <div style={{width: '100%', height: '80%', justifySelf: 'center', alignContent: 'center'}}>
                     <Form  
+                        form={form}
                         name="validate_other"
                         {...formItemLayout}
                         onFinish={onFinish}
@@ -152,25 +159,16 @@ export default function EditarFarmacia() {
                         <Row gutter={16} style={{ display: 'flex' }}>
                             <Col span={12} style={{ display: 'flex', flexDirection: 'column' }}>
                                 <Card style={{flex: 1}}>
-                                    <Form.Item label="Nome" name="Nome" style={{ marginBottom: 0 }}>
-                                        <Form.Item
-                                            name={['Nome', 'Primeiro']}
-                                            hasFeedback
-                                            rules={[{ required: true, message: "Insira o primeiro nome" }]}
-                                            style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
-                                        >
-                                            <Input allowClear placeholder="Primeiro" disabled={!isEditing} />
-                                        </Form.Item>
-
-                                        <Form.Item
-                                            name={['Nome', 'Ultimo']}
-                                            hasFeedback
-                                            rules={[{ required: true, message: "Insira o último nome" }]}
-                                            style={{ display: 'inline-block', width: 'calc(50% - 8px)', margin: '0 8px' }}
-                                        >
-                                            <Input allowClear placeholder="Último"  disabled={!isEditing}/>
-                                        </Form.Item>
-                                    </Form.Item>
+                                    <Form.Item
+                                        label="Nome" 
+                                        name="Nome"
+                                        hasFeedback
+                                        rules={[{ 
+                                            required: true, 
+                                            message: "Insira um nome" }]}
+                                    >
+                                        <Input allowClear placeholder="Nome" disabled={!isEditing} />
+                                    </Form.Item>                            
 
                                     <Form.Item
                                         label="Distrito"
@@ -266,15 +264,14 @@ export default function EditarFarmacia() {
                                         label="Estado"
                                         name="Estado"
                                         rules={[{
-                                                required: true,                                                                        // meter depois
+                                                required: true,                                                                       
                                                 message: 'Por favor defina um estado'}]}>
                                         <Select
                                             mode='multiple'  
                                             maxCount={1}       
                                             disabled={!isEditing}                                      
                                             tagRender={tagRender}
-                                            options={options2}
-                                            defaultValue={[{label:'Ativo', value:'green'}]}/>
+                                            options={options2}/>
                                     </Form.Item>
                                 </Card>
                             </Col>
@@ -289,34 +286,36 @@ export default function EditarFarmacia() {
 
                                     <Form.Item                            
                                         label="Produtos"
-                                        name="Produtos">
+                                        name="Produtos"
+                                    >
+                                        <div>
+                                            <List 
+                                                id='Product_List'
+                                                bordered
+                                                dataSource={produtos}
+                                                rows={10}
+                                                style={{ maxHeight: '225px', overflow: 'auto' }}
+                                                renderItem={(produto) => (
+                                                    <List.Item style={{ display: 'flex', justifyContent: 'space-between'}}>
+                                                        {produto.label}
 
-                                        <List 
-                                            id='Product_List'
-                                            bordered
-                                            dataSource={produtos}
-                                            rows={10}
-                                            style={{ maxHeight: '225px', overflow: 'auto' }}
-                                            renderItem={(produto) => (
-                                                <List.Item style={{ display: 'flex', justifyContent: 'space-between'}}>
-                                                    {produto.label}
-
-                                                    <div style={{ display: 'flex' }}>
-                                                        <Button
-                                                            disabled={!isEditing}
-                                                            type="default"
-                                                            style={{ backgroundColor: '#F0F3FA', color: '#4A4A4A', borderRadius: '12px' }}
-                                                            onClick={() => deleteProduto(produto.key)}
-                                                        >
-                                                            Remover
-                                                        </Button>
-                                                    </div>
-                                                </List.Item>
-                                        )}/>
-                                        
-                                        {/* Pass down the state and set function to AddProduto_Component */}
-                                        <AddProdutoComponent produtos={produtos} setProdutos={setProdutos}  isEditing={!isEditing}/>
-                                    </Form.Item>
+                                                        <div style={{ display: 'flex' }}>
+                                                            <Button
+                                                                disabled={!isEditing}
+                                                                type="default"
+                                                                style={{ backgroundColor: '#F0F3FA', color: '#4A4A4A', borderRadius: '12px' }}
+                                                                onClick={() => deleteProduto(produto.key)}
+                                                            >
+                                                                Remover
+                                                            </Button>
+                                                        </div>
+                                                    </List.Item>
+                                            )}/>
+                                            
+                                            {/* Pass down the state and set function to AddProduto_Component */}
+                                            <AddProdutoComponent produtos={produtos} setProdutos={setProdutos}  isEditing={!isEditing}/>
+                                        </div>
+                                    </Form.Item >
                                 </Card>
                             </Col>
                         </Row>
@@ -325,4 +324,4 @@ export default function EditarFarmacia() {
         </div>
         </ConfigProvider>
     )
-};
+}
