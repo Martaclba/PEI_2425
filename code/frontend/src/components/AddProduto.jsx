@@ -2,7 +2,7 @@ import React from 'react';
 import { Dropdown, Space, Button, message } from 'antd';
 
 // It receives the list of products state
-const AddProdutoComponent = ({produtos, setProdutos}) => {
+const AddProdutoComponent = ({produtos, setProdutos, isEditing}) => {
   
   // Items for the Dropdown menu
   const produtos_items = [
@@ -26,6 +26,7 @@ const AddProdutoComponent = ({produtos, setProdutos}) => {
   return (
       <div style={{ display: 'flex', justifyContent: 'right', marginTop: '14px' }}>
         <Dropdown 
+            disabled={isEditing}  
             menu={{
                 items: produtos_items,
                 onClick: addProduto,
@@ -34,6 +35,7 @@ const AddProdutoComponent = ({produtos, setProdutos}) => {
             <Space>
                 <Button
                     type="primary"
+                    disabled={isEditing}  
                     style={{
                         backgroundColor: '#F7D4D4',
                         color: '#4A0000',
