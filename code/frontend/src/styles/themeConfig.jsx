@@ -1,12 +1,12 @@
 const themeConfig = {
     components: { 
       "Table": {
-        "headerBg": "#F7D4D4",                
-        "headerColor": "#4A0000",             
-        "stickyScrollBarBg": "#565656",       
-        "headerSortHoverBg": "#ddbebe",        
-        "fixedHeaderSortActiveBg": "#ddbebe",
-        "headerSortActiveBg": "#ddbebe",      
+        "headerBg": "#a93e3e",                // Background da header                
+        "headerColor": "#ffffff",             // Texto da header
+        "stickyScrollBarBg": "#565656",       // Backgroud da barra de scroll
+        "headerSortHoverBg": "#C25858",       // Background da header com hover quando ela tem um sorter aplicado,
+        "fixedHeaderSortActiveBg": "#C25858", // Mesma coisa do de cima mas para colunas fixas
+        "headerSortActiveBg": "#C25858",      
       },
       "Button": {
         "defaultBg": "rgb(247,230,212)",

@@ -112,7 +112,7 @@ export default function Farmacias() {
   return (
     <div id="contact">
       <div>
-        <h1>Consultar Farmácias</h1>
+        <h1>Farmácias</h1>
 
         <div id="data-import">
           {date}

@@ -217,18 +217,14 @@ export default function RegistarMedico() {
 
                                         <Form.Item
                                             label="Estado"
-                                            name="Estado"
-                                            /*rules={[{
-                                                required: true,                                                                        // meter depois
-                                                message: 'Por favor defina um estado'}]}*/>
+                                            name="Estado">
 
                                             <Select 
                                                 allowClear
                                                 mode='multiple'         
-                                                disabled
-                                                //maxCount={1}                                       
+                                                disabled                                     
                                                 tagRender={tagRender}
-                                                defaultValue={[{label:'Ativo', value:'green'}]}                                        // tirar isto depois na parte de editar
+                                                defaultValue={[{label:'Ativo', value:'green'}]}                                        
                                                 placeholder="Insira um estado"
                                                 options={options}
                                                 filterOption={(input, option) => 

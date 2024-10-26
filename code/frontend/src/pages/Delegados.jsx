@@ -116,7 +116,7 @@ export default function Delegados() {
   return (
       <div id="contact">
         <div>
-          <h1>Consultar Delegados</h1>
+          <h1>Delegados</h1>
 
           <div id="data-import">
             {date}

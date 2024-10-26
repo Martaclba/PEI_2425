@@ -15,6 +15,7 @@ import EditarDelegado from "./pages/EditarDelegado"
 import RegistarDelegado from "./pages/RegistarDelegado"
 import RegistarFarmacia from './pages/RegistarFarmacia';
 import RegistarMedico from './pages/RegistarMedico';
+import Visitas from './pages/Visitas';
 
 const router = createBrowserRouter([
   {
@@ -57,10 +58,10 @@ const router = createBrowserRouter([
         element: <RegistarFarmacia />,
       },
 
-      // {
-      //   path: "vendas/",
-      //   element: <EditarDelegado />,
-      // },
+      {
+        path: "visitas/",
+        element: <Visitas />,
+      },
     ],
   },
 ])
