@@ -3,7 +3,7 @@ import { HiOutlineUpload } from "react-icons/hi";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { Dropdown, Space, Upload, Button, Table, ConfigProvider } from 'antd';
 
-import themeConfig from '../styles/themeConfig';
+import themeConfig from '../styles/themeConfigTable';
 import UploadFileProps from '../components/UploadFile';
 import { getFormattedDate } from '../components/utils';
 

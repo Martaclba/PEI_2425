@@ -6,7 +6,7 @@ import { Dropdown, Space, Upload, Button, Table,Tag,  ConfigProvider} from 'antd
 import { useNavigate } from "react-router-dom"
 
 import { getFormattedDate } from '../components/utils';
-import themeConfig from '../styles/themeConfig';
+import themeConfig from '../styles/themeConfigTable';
 import UploadFileProps from '../components/UploadFile';
 
 const columns = (navigate) => [
@@ -84,8 +84,7 @@ const columns = (navigate) => [
     width: '16%',
     render: (title, entry) => (
       <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%'}}>
-              <ConfigProvider
-                theme={themeConfig}>
+              <ConfigProvider theme={themeConfig}>
                 <Button onClick={() => navigate(`/medicos/detalhes/${entry.key}`)}>Detalhes</Button>  
               </ConfigProvider>
       </Space>
@@ -156,8 +155,7 @@ export default function Medicos() {
         </div>
       </div>
 
-      <ConfigProvider
-        theme={themeConfig}>
+      <ConfigProvider theme={themeConfig}>
         {table}  
       </ConfigProvider>
     </div>

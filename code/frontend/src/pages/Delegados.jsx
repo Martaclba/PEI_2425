@@ -4,7 +4,7 @@ import { IoAddCircleOutline, IoPersonOutline } from "react-icons/io5";
 import { Dropdown, Space, Upload, Button, Table, ConfigProvider } from 'antd';
 import { useNavigate } from "react-router-dom"
 
-import themeConfig from '../styles/themeConfig';
+import themeConfig from '../styles/themeConfigTable';
 import UploadFileProps from '../components/UploadFile';
 import { getFormattedDate } from '../components/utils';
 

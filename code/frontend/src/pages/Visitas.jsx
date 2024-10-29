@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { IoAddCircleOutline } from "react-icons/io5";
 import { Modal, Form, DatePicker, Select, Button, Table, ConfigProvider, Flex } from 'antd';
 
-import themeConfig from '../styles/themeConfig';
+import themeConfig from '../styles/themeConfigTable';
 import { getFormattedDate } from '../components/utils';
 
 // For the table
