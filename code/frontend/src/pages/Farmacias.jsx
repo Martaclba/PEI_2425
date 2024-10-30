@@ -4,7 +4,7 @@ import { IoAddCircleOutline} from "react-icons/io5";
 import { Dropdown, Space, Button, Table, ConfigProvider } from 'antd';
 import { useNavigate } from "react-router-dom";
 
-import themeConfig from '../styles/themeConfig';
+import themeConfig from '../styles/themeConfigTable';
 import { getFormattedDate } from '../components/utils';
 
 const columns = (navigate) => [
