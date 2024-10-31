@@ -26,6 +26,7 @@ const onFinish = (values) => {
 };
 
 export default function EditarDelegado() {
+  const [form] = Form.useForm();
   const currentDate = new Date();
   const date_options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
   const date = currentDate.toLocaleDateString('pt-BR', date_options);
@@ -46,6 +47,11 @@ export default function EditarDelegado() {
     Freguesia: ['3'],
   };
 
+  const handleSubmitIsEdit = () => {
+    setIsEditing(false); 
+    form.submit(); // Submit the form programmatically
+  };
+
   return (
     <ConfigProvider theme={themeConfig}>
       <div id="contact" style={{ height: '100%' }}>
@@ -56,7 +62,7 @@ export default function EditarDelegado() {
                 <div style={{ display: 'flex', gap: '10px' }}>
                   {isEditing ? (
                     <>
-                      <Button type="primary" onClick={() => setIsEditing(false)}>
+                      <Button type="primary" onClick={handleSubmitIsEdit}>
                         Guardar
                       </Button>
                       <Button danger onClick={() => navigate("/delegados/")}>
@@ -87,6 +93,7 @@ export default function EditarDelegado() {
               onFinish={onFinish}
               layout="vertical"
               initialValues={predefinedValues}
+              form={form}
             >
               <Form.Item label="Nome" style={{ marginBottom: 0 }}>
                 <Form.Item

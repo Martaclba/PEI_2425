@@ -97,6 +97,12 @@ export default function EditarMedico() {
         }
     }
 
+    const handleSubmitIsEdit = () => {
+        setIsEditing(false); 
+        form.submit(); // Submit the form programmatically
+      };
+
+
     return(
         <ConfigProvider theme={themeConfig}>
         {contextHolder}
@@ -108,7 +114,7 @@ export default function EditarMedico() {
                         <div style={{ display: 'flex', gap: '10px' }}>
                             {isEditing ? (
                             <>
-                                <Button type="primary" onClick={() => setIsEditing(false)}>
+                                <Button type="primary" onClick={handleSubmitIsEdit}>
                                     Guardar
                                 </Button>
                                 <Button danger onClick={() => navigate("/medicos/")}>
@@ -283,7 +289,6 @@ export default function EditarMedico() {
                                         hasFeedback
                                         rules={[{
                                             required: true,
-                                            type: 'number',
                                             message: 'Por favor insira um contacto',},]}>
 
                                         <Select 
