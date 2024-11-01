@@ -95,6 +95,12 @@ export default function EditarMedico() {
         }
     }
 
+    const handleSubmitIsEdit = () => {
+        setIsEditing(false); 
+        form.submit(); // Submit the form programmatically
+      };
+
+
     return(
         <ConfigProvider theme={themeConfig}>
         {contextHolder}
@@ -109,7 +115,7 @@ export default function EditarMedico() {
                             <div className="edit-container">
                                 {isEditing ? (
                                 <>
-                                    <Button type="primary" onClick={() => setIsEditing(false)}>
+                                    <Button type="primary" onClick={handleSubmitIsEdit}>
                                         Guardar
                                     </Button>
                                     <Button danger onClick={() => navigate("/medicos/")}>
