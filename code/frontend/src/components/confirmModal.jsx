@@ -8,9 +8,9 @@ const useConfirmModal = () => {
     const showConfirm = () => {
       return new Promise((resolve, reject) => {
         modal.confirm({
-          title: 'De certeza que deseja desativar o estado?',
+          title: 'Deseja desativar o estado?',
           icon: <ExclamationCircleFilled />,
-          content: 'Esta ação é permanente e não pode ser revertida.',
+          content: 'Esta ação poderá ser revertida.',
           okText: 'Sim',
           okType: 'danger',
           cancelText: 'Não',

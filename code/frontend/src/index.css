@@ -137,6 +137,19 @@ form[action$="destroy"] button {
   transition-delay: 200ms;
 }
 
+#title-edit {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;  /* Allows items to wrap on smaller screens */
+}
+
+.edit-container {
+  display: flex;
+  gap: 10px;
+}
+
+
 #contact h1 {
   font-size: 2rem;
   font-weight: 700;
@@ -293,13 +306,6 @@ form[action$="destroy"] button {
   content:none;
 }
 
-@media (max-width: 865px) {
-  :where(.css-dev-only-do-not-override-1hpnbz2).ant-flex {
-    flex-direction: column;
-    justify-content: center;
-  }
-}
-
 /*SCROLL BAR*/
 
 /* Custom scrollbar styles */
@@ -335,11 +341,6 @@ form[action$="destroy"] button {
   max-width: 100%;
 }
 
-#title-edit {
-  display: flex;
-  justify-content: space-between; /* Pushes content to opposite sides */
-  align-items: center;            /* Aligns content vertically in the center */
-}
 
 :where(.css-dev-only-do-not-override-1hpnbz2).ant-col-16{
   max-width: 100%;
@@ -362,4 +363,21 @@ form[action$="destroy"] button {
 :where(.css-dev-only-do-not-override-1hpnbz2).ant-modal .ant-modal-header {
   margin-bottom: 20px;
   font-size: 22px;
+}
+
+/* RESPONSIVE */
+/*Botões de registo*/
+@media (max-width: 420px) {
+  :where(.css-dev-only-do-not-override-1hpnbz2).ant-flex { 
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+/*Botões de editar*/
+@media (max-width: 420px) {
+  #title-edit {
+    flex-direction: column;
+    align-items: flex-end;
+  }
 }

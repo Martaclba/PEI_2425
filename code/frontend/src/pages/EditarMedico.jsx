@@ -6,7 +6,7 @@ import { getFormattedDate } from '../components/utils';
 import useConfirmModal from '../components/confirmModal';
 import themeConfig from '../styles/themeConfigForm';
 
-const formItemLayout = { labelCol: {span: 6,}, wrapperCol: { span: 14,},};
+// const formItemLayout = { labelCol: {span: 6,}, wrapperCol: { span: 14,},};
 
 const options= [
     {
@@ -58,14 +58,11 @@ export default function EditarMedico() {
     const [isEditing, setIsEditing] = useState(false);
     
     // State to control the field Estado
-    const [isInativo, setIsInativo] = useState(false);
+    // const [isInativo, setIsInativo] = useState(false);
 
     // Predefined data for the form
     const predefinedValues = {
-        Nome: {
-            Primeiro: 'John',
-            Ultimo: 'Doe',
-        },
+        Nome: 'John',
         Instituicao: 'Inativo',
         Especialidade: 'Ativo',
         Distrito: 'Indisponivel',
@@ -88,7 +85,8 @@ export default function EditarMedico() {
                 const confirmed = await showConfirm();
                 if (confirmed) {
                     // Disable the field if confirmed
-                    setIsInativo(true)  
+                    // setIsInativo(true)  
+                    console.log("Inactive state.");
                 }
             } catch (error) {
                 console.log("User cancelled the action.");
@@ -103,33 +101,33 @@ export default function EditarMedico() {
             <div id="contact" style={{height: '100%'}}>
                 <div>
                     <div id="title-edit">
-                    <h1>Médico A</h1>
-                    <Form.Item>
-                        <div style={{ display: 'flex', gap: '10px' }}>
-                            {isEditing ? (
-                            <>
-                                <Button type="primary" onClick={() => setIsEditing(false)}>
-                                    Guardar
-                                </Button>
-                                <Button danger onClick={() => navigate("/medicos/")}>
-                                    Voltar
-                                </Button>
-                            </>
-                            ) : (
-                            <>
-                                <Button type="primary" onClick={() => setIsEditing(true)}>
-                                    Editar
-                                </Button>
-                                <Button danger onClick={() => navigate("/medicos/")}>
-                                    Voltar
-                                </Button>
-                            </>
-                            )}
+                        <div>
+                            <h1>Médico A</h1>
+                            <div style={{ marginBottom: "1rem" }}>{date}</div>                        
                         </div>
-                    </Form.Item>
-                    </div>
-                    <div style={{marginBottom: "1rem", marginTop: "1rem" }}>
-                        {date}                        
+                        <Form.Item>
+                            <div className="edit-container">
+                                {isEditing ? (
+                                <>
+                                    <Button type="primary" onClick={() => setIsEditing(false)}>
+                                        Guardar
+                                    </Button>
+                                    <Button danger onClick={() => navigate("/medicos/")}>
+                                        Voltar
+                                    </Button>
+                                </>
+                                ) : (
+                                <>
+                                    <Button type="primary" onClick={() => setIsEditing(true)}>
+                                        Editar
+                                    </Button>
+                                    <Button danger onClick={() => navigate("/medicos/")}>
+                                        Voltar
+                                    </Button>
+                                </>
+                                )}
+                            </div>
+                        </Form.Item>
                     </div>
                 </div>
 
@@ -137,33 +135,24 @@ export default function EditarMedico() {
                     <Form 
                         form={form} 
                         name="validate_other"
-                        {...formItemLayout}
+                        // {...formItemLayout}
                         onFinish={onFinish}
                         layout='vertical'
                         initialValues={predefinedValues}
                     >
 
                         <Row gutter={16} style={{ display: 'flex' }}>
-                            <Col span={12} style={{ display: 'flex', flexDirection: 'column' }}>
+                            <Col xs={24} sm={24} md={12} style={{ display: 'flex', flexDirection: 'column' }}>
                                 <Card style={{flex: 1}}>
-                                    <Form.Item label="Nome" style={{ marginBottom: 0 }}>
-                                        <Form.Item
-                                            name={['Nome', 'Primeiro']}
-                                            hasFeedback
-                                            rules={[{ required: true, message: "Insira o primeiro nome" }]}
-                                            style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
-                                        >
-                                            <Input allowClear placeholder="Primeiro"  disabled={!isEditing}/>
-                                        </Form.Item>
-
-                                        <Form.Item
-                                            name={['Nome', 'Ultimo']}
-                                            hasFeedback
-                                            rules={[{ required: true, message: "Insira o último nome" }]}
-                                            style={{ display: 'inline-block', width: 'calc(50% - 8px)', margin: '0 8px' }}
-                                        >
-                                            <Input allowClear placeholder="Último"  disabled={!isEditing}/>
-                                        </Form.Item>
+                                    <Form.Item
+                                        label="Nome"
+                                        name="Nome"
+                                        hasFeedback
+                                        rules={[{ 
+                                            required: true, 
+                                            message: "Por favor insira um nome" }]}
+                                    >
+                                        <Input allowClear placeholder="Nome"  disabled={!isEditing}/>
                                     </Form.Item>
 
                                     <Form.Item
@@ -257,7 +246,7 @@ export default function EditarMedico() {
                                 </Card>
                             </Col>
 
-                            <Col span={12} style={{ display: 'flex', flexDirection: 'column' }}>
+                            <Col xs={24} sm={24} md={12} style={{ display: 'flex', flexDirection: 'column' }}>
                                 <Card style={{ flex: 1}}>        
                                     <Form.Item
                                         label="Morada"
@@ -283,7 +272,6 @@ export default function EditarMedico() {
                                         hasFeedback
                                         rules={[{
                                             required: true,
-                                            type: 'number',
                                             message: 'Por favor insira um contacto',},]}>
 
                                         <Select 
@@ -310,7 +298,7 @@ export default function EditarMedico() {
                                             tagRender={tagRender}
                                             placeholder="Insira um estado"
                                             options={options}
-                                            disabled={!isEditing || isInativo}
+                                            disabled={!isEditing}
                                             labelInValue
                                             onChange={changeState}
                                             filterOption={(input, option) => 

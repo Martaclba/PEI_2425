@@ -16,6 +16,7 @@ const columns = (navigate) => [
     dataIndex: 'medico',
     key: 'medico',
     fixed: 'left',
+    className: 'fixed-column', 
     filters: [
       {
         text: 'Edward King 1',

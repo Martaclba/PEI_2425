@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import themeConfig from '../styles/themeConfigForm';
 
-const formItemLayout = { labelCol: { span: 6 }, wrapperCol: { span: 14 } };
+// const formItemLayout = { labelCol: { span: 6 }, wrapperCol: { span: 14 } };
 
 const options = [
   {
@@ -51,39 +51,42 @@ export default function EditarDelegado() {
       <div id="contact" style={{ height: '100%' }}>
         <div>
           <div id="title-edit">
-            <h1>Editar Delegado</h1>
+            <div>
+              <h1>Delegado A</h1>
+              <div style={{ marginBottom: "1rem" }}>{date}</div>
+            </div>
+
             <Form.Item>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  {isEditing ? (
-                    <>
-                      <Button type="primary" onClick={() => setIsEditing(false)}>
-                        Guardar
-                      </Button>
-                      <Button danger onClick={() => navigate("/delegados/")}>
-                        Voltar
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                    <Button type="primary" onClick={() => setIsEditing(true)}>
-                      Editar
+              <div className="edit-container">
+                {isEditing ? (
+                  <>
+                    <Button type="primary" onClick={() => setIsEditing(false)}>
+                      Guardar
                     </Button>
                     <Button danger onClick={() => navigate("/delegados/")}>
                       Voltar
                     </Button>
-                    </>
-                  )}
-                </div>
-              </Form.Item>
-            </div>
-          <div style={{marginBottom:"1rem"}}>{date}</div>
+                  </>
+                ) : (
+                  <>
+                  <Button type="primary" onClick={() => setIsEditing(true)}>
+                    Editar
+                  </Button>
+                  <Button danger onClick={() => navigate("/delegados/")}>
+                    Voltar
+                  </Button>
+                  </>
+                )}
+              </div>
+            </Form.Item>
+          </div>
         </div>
 
         <div style={{ width: '100%', height: '80%', justifySelf: 'center', alignContent: 'center' }}>
           <Card>
             <Form
               name="validate_other"
-              {...formItemLayout}
+              // {...formItemLayout}
               onFinish={onFinish}
               layout="vertical"
               initialValues={predefinedValues}

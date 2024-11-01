@@ -6,16 +6,18 @@
   box-sizing: border-box;
   font-family: "Poppins" , sans-serif;
 }
+
 .sidebar{
   position: fixed;
   left: 0;
   top: 0;
-  height: 100%;
   width: 78px;
   background: #242424;
   padding: 6px 14px;
   z-index: 99;
   transition: all 0.5s ease;
+  height: 100vh;    /* Full viewport height */
+  overflow: hidden; /* To avoid content spilling */
 }
 .sidebar.open{
   width: 200px;
@@ -63,8 +65,12 @@
 }
 .sidebar .nav-list{
   margin-top: 20px;
-  height: 100%;
+  overflow-y: auto;             /* Enables vertical scrolling */
+  height: calc(100vh - 150px);  /* Adjust height to fit within sidebar */
+  -ms-overflow-style: none;     /* For Internet Explorer and Edge */
+  scrollbar-width: none;        /* For Firefox */
 }
+
 .sidebar li{
   position: relative;
   margin: 8px 0;
@@ -97,23 +103,6 @@
 .sidebar.open li .tooltip{
   display: none;
 }
-/* .sidebar input{
-  font-size: 15px;
-  color: #FFF;
-  font-weight: 400;
-  outline: none;
-  height: 50px;
-  width: 100%;
-  width: 50px;
-  border: none;
-  border-radius: 12px;
-  transition: all 0.5s ease;
-  background: #1d1b31;
-}
-.sidebar.open input{
-  padding: 0 20px 0 50px;
-  width: 100%;
-} */
 
 .sidebar li a{
   display: flex;
@@ -213,5 +202,9 @@
 @media (max-width: 420px) {
   .sidebar li .tooltip{
     display: none;
+  }
+  .fixed-column {
+    position: static !important; /* Override the fixed position */
+    left: auto !important;
   }
 }

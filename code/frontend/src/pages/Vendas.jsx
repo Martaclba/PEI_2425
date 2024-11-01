@@ -13,8 +13,8 @@ const columns_produto = [
     key: 'produto',
     title: 'Produto',
     dataIndex: 'produto',
-    width: '20%',
     fixed: 'left',
+    className: 'fixed-column', 
     filters: [
       {
         text: 'Produto 1',
@@ -38,84 +38,72 @@ const columns_produto = [
     key: 'janeiro',
     title: 'Jan',
     dataIndex: 'janeiro',
-    width: '20%',
     sorter: (a, b) => a.janeiro - b.janeiro          
   },
   {
     key: 'fevereiro',
     title: 'Fev',
     dataIndex: 'fevereiro',
-    width: '20%',
     sorter: (a, b) => a.fevereiro - b.fevereiro
   },
   {
     key: 'marco',
     title: 'Mar',
     dataIndex: 'marco',
-    width: '20%',
     sorter: (a, b) => a.marco - b.marco
   },
   {
     key: 'abril',
     title: 'Abr',
     dataIndex: 'abril',
-    width: '20%',
     sorter: (a, b) => a.abril - b.abril
   },
   {
     key: 'maio',
     title: 'Mai',
     dataIndex: 'maio',
-    width: '20%',
     sorter: (a, b) => a.maio - b.maio
   },
   {
     key: 'junho',
     title: 'Jun',
     dataIndex: 'junho',
-    width: '20%',
     sorter: (a, b) => a.junho - b.junho
   },
   {
     key: 'julho',
     title: 'Jul',
     dataIndex: 'junho',
-    width: '20%',
     sorter: (a, b) => a.junho - b.junho
   },
   {
     key: 'agosto',
     title: 'Ago',
     dataIndex: 'agosto',
-    width: '20%',
     sorter: (a, b) => a.agosto - b.agosto
   },
   {
     key: 'setembro',
     title: 'Set',
     dataIndex: 'setembro',
-    width: '20%',
     sorter: (a, b) => a.setembro - b.setembro
   },
   {
     key: 'outubro',
     title: 'Out',
     dataIndex: 'outubro',
-    width: '20%',
     sorter: (a, b) => a.outubro - b.outubro
   },
   {
     key: 'novembro',
     title: 'Nov',
     dataIndex: 'novembro',
-    width: '20%',
     sorter: (a, b) => a.novembro - b.novembro
   },
   {
     key: 'dezembro',
     title: 'Dez',
     dataIndex: 'dezembro',
-    width: '20%',
     sorter: (a, b) => a.dezembro - b.dezembro
   },
 ];
@@ -144,8 +132,8 @@ const columns_brick = [
     key: 'brick',
     title: 'Brick',
     dataIndex: 'brick',
-    width: '20%',
     fixed: 'left',
+    className: 'fixed-column', 
     filters: [
       {
         text: 'Produto 1',
@@ -169,84 +157,72 @@ const columns_brick = [
     key: 'janeiro',
     title: 'Jan',
     dataIndex: 'janeiro',
-    width: '20%',
     sorter: (a, b) => a.janeiro - b.janeiro          
   },
   {
     key: 'fevereiro',
     title: 'Fev',
     dataIndex: 'fevereiro',
-    width: '20%',
     sorter: (a, b) => a.fevereiro - b.fevereiro
   },
   {
     key: 'marco',
     title: 'Mar',
     dataIndex: 'marco',
-    width: '20%',
     sorter: (a, b) => a.marco - b.marco
   },
   {
     key: 'abril',
     title: 'Abr',
     dataIndex: 'abril',
-    width: '20%',
     sorter: (a, b) => a.abril - b.abril
   },
   {
     key: 'maio',
     title: 'Mai',
     dataIndex: 'maio',
-    width: '20%',
     sorter: (a, b) => a.maio - b.maio
   },
   {
     key: 'junho',
     title: 'Jun',
     dataIndex: 'junho',
-    width: '20%',
     sorter: (a, b) => a.junho - b.junho
   },
   {
     key: 'julho',
     title: 'Jul',
     dataIndex: 'junho',
-    width: '20%',
     sorter: (a, b) => a.junho - b.junho
   },
   {
     key: 'agosto',
     title: 'Ago',
     dataIndex: 'agosto',
-    width: '20%',
     sorter: (a, b) => a.agosto - b.agosto
   },
   {
     key: 'setembro',
     title: 'Set',
     dataIndex: 'setembro',
-    width: '20%',
     sorter: (a, b) => a.setembro - b.setembro
   },
   {
     key: 'outubro',
     title: 'Out',
     dataIndex: 'outubro',
-    width: '20%',
     sorter: (a, b) => a.outubro - b.outubro
   },
   {
     key: 'novembro',
     title: 'Nov',
     dataIndex: 'novembro',
-    width: '20%',
     sorter: (a, b) => a.novembro - b.novembro
   },
   {
     key: 'dezembro',
     title: 'Dez',
     dataIndex: 'dezembro',
-    width: '20%',
     sorter: (a, b) => a.dezembro - b.dezembro
   },
 ];
@@ -307,7 +283,7 @@ export default function Vendas() {
           <Table 
             columns={columns_produto}
             dataSource={dados_produto}
-            scroll={{x: '200%'}}
+            scroll={{x: 'max-content'}}
             pagination={{ pageSize: 7, showSizeChanger: false }}
             showSorterTooltip={false}                             
           />
@@ -316,7 +292,7 @@ export default function Vendas() {
           <Table
             columns={columns_brick}
             dataSource={dados_brick}
-            scroll={{x: '200%'}}
+            scroll={{x: 'max-content'}}
             pagination={{ pageSize: 7, showSizeChanger: false }}
             showSorterTooltip={false}                             
           />

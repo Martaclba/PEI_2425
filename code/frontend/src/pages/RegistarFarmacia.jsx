@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom"
 import AddProdutoComponent from '../components/AddProduto';
 import { getFormattedDate } from '../components/utils';
 
-const formItemLayout = { labelCol: {span: 6,}, wrapperCol: { span: 14,},};
+// const formItemLayout = { labelCol: {span: 6,}, wrapperCol: { span: 14,},};
 
 const options= [
     {
@@ -56,7 +56,7 @@ export default function RegistarFarmacia() {
 
     // Predefined data
     const predefinedValues = {
-        Contacto: 2342213,
+        Contacto: '2342213',
         Estado: [{label:'Ativo', value:'green'}],
     };
     
@@ -80,14 +80,14 @@ export default function RegistarFarmacia() {
                     <Form  
                         form={form}
                         name="validate_other"
-                        {...formItemLayout}
+                        // {...formItemLayout}
                         onFinish={onFinish}
                         layout='vertical'
                         initialValues={predefinedValues}
                     >
 
                         <Row gutter={16} style={{ display: 'flex' }}>
-                            <Col span={12} style={{ display: 'flex', flexDirection: 'column' }}>
+                            <Col xs={24} sm={24} md={12} style={{ display: 'flex', flexDirection: 'column' }}>
                                 <Card style={{flex: 1}}>
                                 <Form.Item
                                         label="Nome" 
@@ -173,7 +173,6 @@ export default function RegistarFarmacia() {
                                         hasFeedback
                                         rules={[{
                                             required: true,
-                                            type: 'number',
                                             message: 'Por favor insira um contacto',},]}>
 
                                         <Select 
@@ -197,7 +196,7 @@ export default function RegistarFarmacia() {
                                 </Card>
                             </Col>
 
-                            <Col span={12} style={{ display: 'flex', flexDirection: 'column' }}>
+                            <Col xs={24} sm={24} md={12} style={{ display: 'flex', flexDirection: 'column' }}>
                                 <Card style={{ flex: 1}}>        
                                     <Form.Item
                                         label="Notas"
@@ -237,7 +236,7 @@ export default function RegistarFarmacia() {
                                         </div>
                                     </Form.Item>
 
-                                    <Form.Item style={{display: 'flex', justifyContent: 'right' }}>
+                                    <Form.Item>
                                         <Flex gap="large">
                                             <Button type="primary" htmlType="submit">
                                                 Confirmar

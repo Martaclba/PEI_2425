@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 
 import { getFormattedDate } from '../components/utils';
 
-const formItemLayout = { labelCol: {span: 6,}, wrapperCol: { span: 14,},};
+// const formItemLayout = { labelCol: {span: 6,}, wrapperCol: { span: 14,},};
 
 const options= [
     {
@@ -58,33 +58,24 @@ export default function RegistarMedico() {
             <div style={{width: '100%', height: '80%', justifySelf: 'center', alignContent: 'center'}}>
                         <Form  
                             name="validate_other"
-                            {...formItemLayout}
+                            // {...formItemLayout}
                             onFinish={onFinish}
                             layout='vertical'
                             initialValues={{Estado: [{label:'Ativo', value:'green'}],}}
                         >
 
                             <Row gutter={16} style={{ display: 'flex' }}>
-                                <Col span={12} style={{ display: 'flex', flexDirection: 'column' }}>
+                                <Col xs={24} sm={24} md={12} style={{ display: 'flex', flexDirection: 'column' }}>
                                     <Card style={{flex: 1}}>
-                                        <Form.Item label="Nome" style={{ marginBottom: 0 }}>
-                                            <Form.Item
-                                                name="Primeiro"
-                                                hasFeedback
-                                                rules={[{ required: true, message: "Insira o primeiro nome" }]}
-                                                style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
-                                            >
-                                                <Input allowClear placeholder="Primeiro" />
-                                            </Form.Item>
-
-                                            <Form.Item
-                                                name="Ultimo"
-                                                hasFeedback
-                                                rules={[{ required: true, message: "Insira o último nome" }]}
-                                                style={{ display: 'inline-block', width: 'calc(50% - 8px)', margin: '0 8px' }}
-                                            >
-                                                <Input allowClear placeholder="Último" />
-                                            </Form.Item>
+                                        <Form.Item
+                                            label="Nome"
+                                            name="Nome"
+                                            hasFeedback
+                                            rules={[{ 
+                                                required: true, 
+                                                message: "Por favor insira um nome" }]}
+                                        >
+                                            <Input allowClear placeholder="Nome"/>
                                         </Form.Item>
 
                                         <Form.Item
@@ -173,7 +164,7 @@ export default function RegistarMedico() {
                                     </Card>
                                 </Col>
 
-                                <Col span={12} style={{ display: 'flex', flexDirection: 'column' }}>
+                                <Col xs={24} sm={24} md={12} style={{ display: 'flex', flexDirection: 'column' }}>
                                     <Card style={{ flex: 1}}>        
                                         <Form.Item
                                             label="Morada"
@@ -198,7 +189,6 @@ export default function RegistarMedico() {
                                             hasFeedback
                                             rules={[{
                                                 required: true,
-                                                type: 'number',
                                                 message: 'Por favor insira um contacto',},]}>
 
                                             <Select 

@@ -13,6 +13,7 @@ const columns = [
     dataIndex: 'data',
     width: '15%',
     fixed: 'left',
+    className: 'fixed-column', 
     filters: [
       {
         text: 'Edward King 1',

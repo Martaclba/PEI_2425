@@ -24,7 +24,7 @@ const AddProdutoComponent = ({produtos, setProdutos, isEditing}) => {
   };
 
   return (
-      <div style={{ display: 'flex', justifyContent: 'right', marginTop: '14px' }}>
+      <div style={{ display: 'flex', justifyContent: 'left', width: '100%', marginTop: '14px' }}>
         <Dropdown 
             disabled={isEditing}  
             menu={{
@@ -35,6 +35,7 @@ const AddProdutoComponent = ({produtos, setProdutos, isEditing}) => {
             <Space>
                 <Button
                     type="primary"
+                    className='add-button'
                     disabled={isEditing}  
                     style={{
                         backgroundColor: '#F7D4D4',
@@ -43,12 +44,26 @@ const AddProdutoComponent = ({produtos, setProdutos, isEditing}) => {
                         borderRadius: '16px',
                         padding: '0 24px',
                     }}
-                    >
+                >
                     Adicionar Produto
                 </Button>
             </Space>
             
         </Dropdown>
+
+        {/* Responsive CSS */}
+        <style>
+            {`
+            @media (max-width: 420px) {
+                .add-button {
+                    white-space: normal; /* Allow text to wrap */
+                    text-align: center;  /* Center align text when wrapping */
+                    padding: 0 16px;     /* Adjust padding for narrow screens */
+                    height: 52px
+                }
+            }
+            `}
+        </style>
 
       </div>
   );
