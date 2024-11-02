@@ -86,7 +86,7 @@ const dataSource = Array.from({
   length: 100,
 }).map((_, i) => ({
   key: i,
-  farmacia: `Edward King ${i}`,
+  farmacia: `Farmácia ${i}`,
   distrito: `Distrito ${i}`,
   regiao: `Região ${i}`,      
   freguesia: `Freguesia ${i}`,

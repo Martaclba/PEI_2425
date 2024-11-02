@@ -5,7 +5,10 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import "./index.css";
 
 import Root from "./routes/root"
-import ErrorPage from './pages/Error'
+import { AuthProvider } from './context/Auth';
+import Error from './pages/Error'
+import { ProtectedRoute } from './context/Auth';
+import Unhautorized from './pages/Unhautorized';
 
 import Vendas from './pages/Vendas';
 import Delegados from './pages/Delegados'
@@ -24,7 +27,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Root/>,
-    errorElement: <ErrorPage />,
+    errorElement: <Error />,
     
     children: [
       { index: true, element: <Vendas />},
@@ -32,46 +35,46 @@ const router = createBrowserRouter([
       /* Routes */
       {
         path: "delegados/",
-        element: <Delegados />,
+        element: <ProtectedRoute requiredRole="admin"><Delegados /></ProtectedRoute>,
       },
       {
         path: "delegados/registar/",
-        element: <RegistarDelegado />,
+        element: <ProtectedRoute requiredRole="admin"><RegistarDelegado /></ProtectedRoute>,
       },
       {
         path: "delegados/detalhes/:key",
-        element: <EditarDelegado />,
+        element: <ProtectedRoute requiredRole="admin"><EditarDelegado /></ProtectedRoute>,
       },
 
       {
         path: "medicos/",
-        element: <Medicos />,
+        element: <ProtectedRoute><Medicos /></ProtectedRoute>
       },
       {
         path: "medicos/registar/",
-        element: <RegistarMedico />,
+        element: <ProtectedRoute requiredRole="admin"><RegistarMedico /></ProtectedRoute>,
       },
       {
         path: "medicos/detalhes/:key",
-        element: <EditarMedico />,
+        element: <ProtectedRoute><EditarMedico /></ProtectedRoute>,
       },
 
       {
         path: "farmacias/",
-        element: <Farmacias />,
+        element: <ProtectedRoute><Farmacias /></ProtectedRoute>
       },
       {
         path: "farmacias/registar/",
-        element: <RegistarFarmacia />,
+        element: <ProtectedRoute requiredRole="admin"><RegistarFarmacia /></ProtectedRoute>,
       },
       {
         path: "farmacias/detalhes/:key",
-        element: <EditarFarmacia />,
+        element: <ProtectedRoute><EditarFarmacia /></ProtectedRoute>,
       },
       
       {
         path: "visitas/",
-        element: <Visitas />,
+        element: <ProtectedRoute requiredRole="user"><Visitas /></ProtectedRoute>
       },
     ],
   },
@@ -79,10 +82,16 @@ const router = createBrowserRouter([
     path: "/login/",
     element: <Login />,
   },
+  {
+    path: "/unauthorized/",
+    element: <Unhautorized />,
+  },
 ])
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </React.StrictMode>
 );

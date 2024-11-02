@@ -6,6 +6,7 @@ import { TbLogout2 } from "react-icons/tb";
 import { RxDashboard } from "react-icons/rx";
 import { HiOutlineMenu, HiOutlineMenuAlt3 } from "react-icons/hi";
 import { CgProfile } from "react-icons/cg";
+import { MdOutlineLocationOn } from "react-icons/md";
 
 import "../styles/sidebar.css"
 
@@ -50,6 +51,13 @@ const Sidebar = () => {
                         <span className="links_name">Delegados</span>
                     </Link>
                     <span className="tooltip">Delegados</span>
+                </li>
+                <li>
+                    <Link to={`/visitas/`}>
+                        <i className="bx bx-user"><MdOutlineLocationOn /></i>
+                        <span className="links_name">Visitas</span>
+                    </Link>
+                    <span className="tooltip">Visitas</span>
                 </li>
                 <li>
                     <Link to={`/medicos/`}>

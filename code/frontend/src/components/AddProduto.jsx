@@ -24,7 +24,7 @@ const AddProdutoComponent = ({produtos, setProdutos, isEditing}) => {
   };
 
   return (
-      <div style={{ display: 'flex', justifyContent: 'left', width: '100%', marginTop: '14px' }}>
+      <div style={{ display: 'flex', justifyContent: 'left', marginTop: '14px' }}>
         <Dropdown 
             disabled={isEditing}  
             menu={{
