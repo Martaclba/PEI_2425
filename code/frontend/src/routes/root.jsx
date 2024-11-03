@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
+import axios from "axios";
 
 import Sidebar from "../components/Sidebar";
 
@@ -7,15 +8,13 @@ function Root() {
 
   // Temporary
   useEffect(() => {
-    fetch("http://localhost:5000/")
+    axios.get("http://localhost:5000/")
       .then((res) => {
-        if (!res.ok) throw new Error("Network response was not ok");
-        return res.json();
+        console.log("Fetched data:", res.data);
       })
-      .then((data) => {
-        console.log("Fetched data:", data);
-      })
-      .catch((error) => console.error("Fetch error:", error));
+      .catch((error) => {
+        console.error("Fetch error:", error)
+      });
   }, []);
 
   return (
