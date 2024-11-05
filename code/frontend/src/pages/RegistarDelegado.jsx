@@ -28,7 +28,7 @@ const onFinish = (values) => {
 export default function RegistarDelegado() {
     const date = getFormattedDate();
 
-    let navigate = useNavigate()
+    const navigate = useNavigate()
 
     return(
         <div id="contact" style={{height: '100%'}}>

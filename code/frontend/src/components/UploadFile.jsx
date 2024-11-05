@@ -1,31 +1,31 @@
 import { message } from 'antd';
 
 // Upload a Excel file
-const UploadFileProps = {
+const UploadFileProps = (path) => ({    
     listType: 'picture',
 
     // Only accepts Excel files
     accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 
     // Set the backend URL
-    action: 'http://localhost:5000/',
+    action: "http://localhost:5000" + path,
 
     // Handling the change event to monitor upload progress and success/failure
     // States: 'done', 'error', 'uploading' and 'removed'
-    onChange: async (info) => {
+    onChange: (info) => {
         const { status } = info.file;
 
         if (status === 'done') {
-            message.success(`"${info.file.name}" importado com sucesso`);
+            message.success("Ficheiro importado com sucesso");
             console.log(`"${info.file.name}" uploaded successfully.`);
         } else if (status === 'error') {
-            message.error(`"${info.file.name}" Oops! Ocorreu algum erro durante o upload...`);
+            message.error("Oops! Ocorreu algum erro durante o upload...");
             console.log(`"${info.file.name}" upload failed.`);
         }else if (status === 'removed') {
-            message.info(`"${info.file.name}" foi removido`);
+            message.info("Ficheiro removido");
             console.log(`"${info.file.name}" file was removed.`);
         }
     },
-}
+})
 
 export default UploadFileProps;

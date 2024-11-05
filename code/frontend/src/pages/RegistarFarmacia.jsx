@@ -44,7 +44,7 @@ const onFinish = (values) => {
 export default function RegistarFarmacia() {
     const date = getFormattedDate();
 
-    let navigate = useNavigate()
+    const navigate = useNavigate()
 
     // State for the product list (initialy empty)
     const [produtos, setProdutos] = useState([]); 

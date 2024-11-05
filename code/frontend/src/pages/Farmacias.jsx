@@ -76,7 +76,7 @@ const columns = (navigate) => [
     render: (title, entry) => (
       <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%'}}>
               <ConfigProvider theme={themeConfig}>
-                <Button onClick={() => navigate(`/farmacias/detalhes/${entry.key}`)}>Detalhes</Button>  
+                <Button onClick={() => navigate(`/farmacias/${entry.key}`)}>Detalhes</Button>  
               </ConfigProvider>
       </Space>
     ),
@@ -99,7 +99,7 @@ const dataSource = Array.from({
 export default function Farmacias() {  
   const date = getFormattedDate();
   
-  let navigate = useNavigate()
+  const navigate = useNavigate()
   const items = [
     {
       key: '1',

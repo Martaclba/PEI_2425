@@ -37,7 +37,7 @@ export const useAuth = () => useContext(AuthContext)
 export const ProtectedRoute = ({ requiredRole, children }) => {
     const { user } = useAuth();
   
-    console.log("AAAAAAA ", user, requiredRole)
+    // console.log("AAAAAAA ", user, requiredRole)
 
     if (!user) {
         return <Navigate to="/login" replace/>

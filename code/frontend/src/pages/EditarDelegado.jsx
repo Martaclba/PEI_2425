@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Form, Select, Card, Button, Input, ConfigProvider } from 'antd';
-import { useNavigate } from "react-router-dom";
+import { Form, Select, Card, Button, Input, ConfigProvider, message } from 'antd';
+import { useNavigate, useLocation } from "react-router-dom";
+
+import axios from 'axios'
 
 import themeConfig from '../styles/themeConfigForm';
 import { getFormattedDate } from '../components/utils';
@@ -21,15 +23,12 @@ const options = [
   },
 ];
 
-const onFinish = (values) => {
-  console.log('Received values of form: ', values);
-};
-
 export default function EditarDelegado() {
   const [form] = Form.useForm();
   const date = getFormattedDate();
 
-  let navigate = useNavigate();
+  const navigate = useNavigate();
+  const location = useLocation();
   
   // State to control edit mode
   const [isEditing, setIsEditing] = useState(false);
@@ -43,6 +42,25 @@ export default function EditarDelegado() {
     Distrito: '1',
     Regiao: ['1', '2'],
     Freguesia: ['3'],
+  };
+
+  const onFinish = async (values) => {
+    console.log('Received values of form: ', values);
+  
+    try {
+      const response = await axios.put("http://localhost:5000"+location.pathname, values)
+    
+      if(response.status === 200){
+        message.success("Editado com sucesso")
+        console.log('Form submitted successfully:', response.data);
+      } else {
+        message.error("Oops! Ocorreu algum erro...")
+        console.error('Form submission failed:', response.status);
+      }
+    } catch (error) {
+      message.error("Oops! Ocorreu algum erro...")
+      console.error('Error submitting form:', error);
+    }
   };
 
   const handleSubmitIsEdit = () => {
@@ -138,7 +156,7 @@ export default function EditarDelegado() {
                 hasFeedback
                 rules={[{ required: true, message: 'Por favor insira uma região' }]}
               >
-              <Select
+                <Select
                   allowClear
                   placeholder="Insira uma região"
                   options={options}
@@ -147,7 +165,11 @@ export default function EditarDelegado() {
                 />
               </Form.Item>
 
-              <Form.Item label="Freguesia" name="Freguesia" hasFeedback>
+              <Form.Item 
+                label="Freguesia" 
+                name="Freguesia" 
+                hasFeedback
+              >
                 <Select
                   allowClear
                   placeholder="Insira uma freguesia"

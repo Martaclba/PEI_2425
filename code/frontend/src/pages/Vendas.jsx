@@ -3,6 +3,7 @@ import { IconContext } from "react-icons";
 import { HiOutlineUpload } from "react-icons/hi";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { Dropdown, Space, Upload, Button, Table, ConfigProvider } from 'antd';
+import { useLocation } from "react-router-dom"
 
 import themeConfig from '../styles/themeConfigTable';
 import UploadFileProps from '../components/UploadFile';
@@ -247,20 +248,26 @@ const dados_brick = Array.from({
   dezembro: i,
 }));
 
-const items = [
-  {
-    key: '1',
-    label:  
-      <Upload {...UploadFileProps} maxCount={1}>
-        <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
-          Importar Ficheiro
-        </Button>
-      </Upload>
-  },
-];
-
 export default function Vendas() {  
   const date = getFormattedDate();
+
+  const location = useLocation();
+  // Memo improves performance by memoizing/caching this function's output. 
+  // This way the function is not re-calculated everytime this page re-renders.  
+  // It re-calculates only when the dependency (location.pathname) changes
+  const upload = React.useMemo(() => UploadFileProps(location.pathname), [location.pathname])
+
+  const items = [
+    {
+      key: '1',
+      label:  
+        <Upload {...upload} maxCount={1}>
+          <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
+            Importar Ficheiro
+          </Button>
+        </Upload>
+    },
+  ];
 
   return (
       <div id="contact">
