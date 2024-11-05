@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { IconContext } from "react-icons";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { Modal, Form, DatePicker, Select, Button, Table, ConfigProvider, Flex } from 'antd';
 
@@ -179,9 +180,11 @@ export default function Visitas() {
 
                 <div id="data-import">
                     {date}
-                
-                    <Button icon={<IoAddCircleOutline />} onClick={openModal} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}/>
-                    
+
+                    <IconContext.Provider value={{ size: '1.5rem' }}>  
+                        <Button icon={<IoAddCircleOutline />} onClick={openModal} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}/>
+                    </IconContext.Provider>
+
                     <Modal title="Agende a sua visita" open={modalOpen} footer={null} closeIcon={null}>
                         <Form 
                             form={form}
@@ -239,15 +242,17 @@ export default function Visitas() {
                 </div>
             </div>
             
-            <ConfigProvider theme={themeConfig}>
-                <Table 
-                    columns={columns}
-                    dataSource={dataSource}
-                    scroll={{x: 'max-content'}}
-                    pagination={{ pageSize: 7, showSizeChanger: false }}
-                    showSorterTooltip={false}                             
-                />
-            </ConfigProvider>        
+            <div style={{padding: '1rem'}}>
+                <ConfigProvider theme={themeConfig}>
+                    <Table 
+                        columns={columns}
+                        dataSource={dataSource}
+                        scroll={{x: 'max-content'}}
+                        pagination={{ pageSize: 7, showSizeChanger: false }}
+                        showSorterTooltip={false}                             
+                    />
+                </ConfigProvider>        
+            </div>
         </div>
     );
 }

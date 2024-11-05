@@ -1,4 +1,5 @@
 import React from 'react';
+import { IconContext } from "react-icons";
 import { HiOutlineUpload } from "react-icons/hi";
 import { LuStethoscope } from "react-icons/lu";
 import { IoAddCircleOutline } from "react-icons/io5";
@@ -150,15 +151,19 @@ export default function Medicos() {
 
           <Dropdown menu={{items}}>
               <Space>
-                <IoAddCircleOutline onClick={(e) => e.preventDefault()}/>
+                <IconContext.Provider value={{ size: '1.5rem' }}>  
+                  <IoAddCircleOutline onClick={(e) => e.preventDefault()}/>
+                </IconContext.Provider>
               </Space>
           </Dropdown>
         </div>
       </div>
 
-      <ConfigProvider theme={themeConfig}>
-        {table}  
-      </ConfigProvider>
+      <div style={{padding: '1rem'}}>
+        <ConfigProvider theme={themeConfig}>
+          {table}  
+        </ConfigProvider>
+      </div>
     </div>
   );
 }

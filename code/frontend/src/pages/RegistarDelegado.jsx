@@ -92,11 +92,10 @@ export default function RegistarDelegado() {
                                 hasFeedback
                                 rules={[{
                                     required: true,
-                                    message: 'Por favor insira, pelo menos, uma região',},]}>
+                                    message: 'Por favor insira uma região',},]}>
 
                                 <Select 
                                     allowClear
-                                    mode='multiple'
                                     placeholder="Insira uma região"
                                     options={options}
                                     filterOption={(input, option) => 
@@ -110,7 +109,6 @@ export default function RegistarDelegado() {
                                 
                                 <Select 
                                     allowClear
-                                    mode='multiple'
                                     placeholder="Insira uma freguesia"
                                     options={options}
                                     filterOption={(input, option) => 

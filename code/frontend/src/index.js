@@ -30,7 +30,7 @@ const router = createBrowserRouter([
     errorElement: <Error />,
     
     children: [
-      { index: true, element: <Vendas />},
+      { index: true, element: <ProtectedRoute><Vendas /></ProtectedRoute>,},
 
       /* Routes */
       {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { IconContext } from "react-icons";
 import { HiOutlineUpload } from "react-icons/hi";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { Dropdown, Space, Upload, Button, Table, ConfigProvider } from 'antd';
@@ -270,33 +271,41 @@ export default function Vendas() {
             {date}
 
             <Dropdown menu={{items}}>
-                <Space>
+              <Space>
+                <IconContext.Provider value={{ size: '1.5rem' }}>  
                   <IoAddCircleOutline onClick={(e) => e.preventDefault()}/>
-                </Space>
+                </IconContext.Provider>
+              </Space>
             </Dropdown>
           </div>
         </div>
         
-        <ConfigProvider theme={themeConfig}>  
+        <div style={{padding: '1rem'}}>
+          <ConfigProvider theme={themeConfig}>  
 
-          <p>Consulta por Produto</p>
-          <Table 
-            columns={columns_produto}
-            dataSource={dados_produto}
-            scroll={{x: 'max-content'}}
-            pagination={{ pageSize: 7, showSizeChanger: false }}
-            showSorterTooltip={false}                             
-          />
+            <div className='dashboard-card'>
+              <p className="table-title">Consulta por Produto</p>
+              <Table 
+                columns={columns_produto}
+                dataSource={dados_produto}
+                scroll={{x: 'max-content'}}
+                pagination={{ pageSize: 7, showSizeChanger: false }}
+                showSorterTooltip={false}                             
+              />
+            </div>
 
-          <p>Consulta por Brick</p>
-          <Table
-            columns={columns_brick}
-            dataSource={dados_brick}
-            scroll={{x: 'max-content'}}
-            pagination={{ pageSize: 7, showSizeChanger: false }}
-            showSorterTooltip={false}                             
-          />
-        </ConfigProvider>
+            <div className='dashboard-card'>
+              <p className="table-title">Consulta por Brick</p>
+              <Table
+                columns={columns_brick}
+                dataSource={dados_brick}
+                scroll={{x: 'max-content'}}
+                pagination={{ pageSize: 7, showSizeChanger: false }}
+                showSorterTooltip={false}                             
+              />
+            </div>
+          </ConfigProvider>
+        </div>
       </div>
   );
 }

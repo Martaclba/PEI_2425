@@ -1,4 +1,5 @@
 import React from 'react';
+import { IconContext } from "react-icons";
 import { HiOutlineUpload } from "react-icons/hi";
 import { IoAddCircleOutline, IoPersonOutline } from "react-icons/io5";
 import { Dropdown, Space, Upload, Button, Table, ConfigProvider } from 'antd';
@@ -124,21 +125,25 @@ export default function Delegados() {
 
             <Dropdown menu={{items}}>
                 <Space>
-                  <IoAddCircleOutline onClick={(e) => e.preventDefault()}/>
+                  <IconContext.Provider value={{ size: '1.5rem' }}>  
+                    <IoAddCircleOutline onClick={(e) => e.preventDefault()}/>
+                  </IconContext.Provider>
                 </Space>
             </Dropdown>
           </div>
         </div>
-        
-        <ConfigProvider theme={themeConfig}>
-          <Table 
-            columns={columns(navigate)}
-            dataSource={dataSource}
-            scroll={{x: 'max-content'}}
-            pagination={{ pageSize: 7, showSizeChanger: false }}
-            showSorterTooltip={false}                             
-          />
-        </ConfigProvider>        
+
+        <div style={{padding: '1rem'}}>
+          <ConfigProvider theme={themeConfig}>
+            <Table 
+              columns={columns(navigate)}
+              dataSource={dataSource}
+              scroll={{x: 'max-content'}}
+              pagination={{ pageSize: 7, showSizeChanger: false }}
+              showSorterTooltip={false}                             
+            />
+          </ConfigProvider>        
+        </div>
       </div>
   );
 }

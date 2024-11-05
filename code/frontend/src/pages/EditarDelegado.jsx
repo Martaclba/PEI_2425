@@ -3,7 +3,7 @@ import { Form, Select, Card, Button, Input, ConfigProvider } from 'antd';
 import { useNavigate } from "react-router-dom";
 
 import themeConfig from '../styles/themeConfigForm';
-
+import { getFormattedDate } from '../components/utils';
 // const formItemLayout = { labelCol: { span: 6 }, wrapperCol: { span: 14 } };
 
 const options = [
@@ -27,9 +27,7 @@ const onFinish = (values) => {
 
 export default function EditarDelegado() {
   const [form] = Form.useForm();
-  const currentDate = new Date();
-  const date_options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-  const date = currentDate.toLocaleDateString('pt-BR', date_options);
+  const date = getFormattedDate();
 
   let navigate = useNavigate();
   
@@ -138,11 +136,10 @@ export default function EditarDelegado() {
                 label="Região HMR"
                 name="Regiao"
                 hasFeedback
-                rules={[{ required: true, message: 'Por favor insira, pelo menos, uma região' }]}
+                rules={[{ required: true, message: 'Por favor insira uma região' }]}
               >
               <Select
                   allowClear
-                  mode="multiple"
                   placeholder="Insira uma região"
                   options={options}
                   disabled={!isEditing}
@@ -153,7 +150,6 @@ export default function EditarDelegado() {
               <Form.Item label="Freguesia" name="Freguesia" hasFeedback>
                 <Select
                   allowClear
-                  mode="multiple"
                   placeholder="Insira uma freguesia"
                   options={options}
                   disabled={!isEditing}

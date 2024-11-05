@@ -1,33 +1,31 @@
-import { message, Upload } from 'antd';
+import { message } from 'antd';
 
 // Upload a Excel file
-export const UploadFileProps = (onSuccess = null, onError = null) => ({
+const UploadFileProps = {
     listType: 'picture',
-    
-    beforeUpload: (file) => {
-    const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
-    // Check if the file is an Excel file
-    if (!isExcel) {
-        message.error(`"${file.name}" não é um ficheiro Excel`);
-        return Upload.LIST_IGNORE;
-    }
-    else {
-        message.success(`"${file.name}" importado com sucesso`);
-    }
-    },
+    // Only accepts Excel files
+    accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+
+    // Set the backend URL
+    action: 'http://localhost:5000/',
 
     // Handling the change event to monitor upload progress and success/failure
-    onChange: (info) => {
-    const { status } = info.file;
-    if (status === 'done') {
-        console.log(`${info.file.name} file uploaded successfully.`);
-        if (onSuccess) onSuccess(info);
-    } else if (status === 'error') {
-        console.log(`${info.file.name} file upload failed.`);
-        if (onError) onError(info);
-    }
+    // States: 'done', 'error', 'uploading' and 'removed'
+    onChange: async (info) => {
+        const { status } = info.file;
+
+        if (status === 'done') {
+            message.success(`"${info.file.name}" importado com sucesso`);
+            console.log(`"${info.file.name}" uploaded successfully.`);
+        } else if (status === 'error') {
+            message.error(`"${info.file.name}" Oops! Ocorreu algum erro durante o upload...`);
+            console.log(`"${info.file.name}" upload failed.`);
+        }else if (status === 'removed') {
+            message.info(`"${info.file.name}" foi removido`);
+            console.log(`"${info.file.name}" file was removed.`);
+        }
     },
-})
+}
 
 export default UploadFileProps;
