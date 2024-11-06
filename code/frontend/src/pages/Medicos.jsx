@@ -4,7 +4,7 @@ import { HiOutlineUpload } from "react-icons/hi";
 import { LuStethoscope } from "react-icons/lu";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { Dropdown, Space, Upload, Button, Table,Tag,  ConfigProvider} from 'antd';
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 
 import { getFormattedDate } from '../components/utils';
 import themeConfig from '../styles/themeConfigTable';
@@ -87,7 +87,7 @@ const columns = (navigate) => [
     render: (title, entry) => (
       <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%'}}>
               <ConfigProvider theme={themeConfig}>
-                <Button onClick={() => navigate(`/medicos/detalhes/${entry.key}`)}>Detalhes</Button>  
+                <Button onClick={() => navigate(`/medicos/${entry.key}`)}>Detalhes</Button>  
               </ConfigProvider>
       </Space>
     ),
@@ -109,9 +109,13 @@ const dataSource = Array.from({
 export default function Medicos() {  
   const date = getFormattedDate();
 
-  
-  
-  let navigate = useNavigate()
+  const navigate = useNavigate()
+  const location = useLocation()
+  // Memo improves performance by memoizing/caching this function's output. 
+  // This way the function is not re-calculated everytime this page re-renders.  
+  // It re-calculates only when the dependency (location.pathname) changes
+  const upload = React.useMemo(() => UploadFileProps(location.pathname), [location.pathname])
+
   const items = [
     {
       key: '1',
@@ -125,7 +129,7 @@ export default function Medicos() {
     {
       key: '2',
       label: 
-      <Upload {...UploadFileProps} maxCount={1}>
+      <Upload {...upload} maxCount={1}>
         <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
           Registo por Ficheiro
         </Button>

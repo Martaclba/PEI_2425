@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Form, Select, Card, Button, Input, Row, Col, Tag, ConfigProvider } from 'antd';
-import { useNavigate } from "react-router-dom";
+import { Form, Select, Card, Button, Input, Row, Col, Tag, ConfigProvider, message } from 'antd';
+import { useNavigate, useLocation } from "react-router-dom";
+
+import axios from 'axios'
 
 import { getFormattedDate } from '../components/utils';
 import useConfirmModal from '../components/confirmModal';
@@ -46,13 +48,11 @@ const tagRender = (props) => {
     );
 };
 
-const onFinish = (values) => {
-    console.log('Received values of form: ', values);
-};
-
 export default function EditarMedico() {
     const date = getFormattedDate();
+
     const navigate = useNavigate();
+    const location = useLocation()
 
     // State to control edit mode
     const [isEditing, setIsEditing] = useState(false);
@@ -94,6 +94,25 @@ export default function EditarMedico() {
             }
         }
     }
+
+    const onFinish = async (values) => {
+        console.log('Received values of form: ', values);
+  
+        try {
+          const response = await axios.put("http://localhost:5000"+location.pathname, values)
+        
+          if(response.status === 200){
+            message.success("Editado com sucesso")
+            console.log('Form submitted successfully:', response.data);
+          } else {
+            message.error("Oops! Ocorreu algum erro...")
+            console.error('Form submission failed:', response.status);
+          }
+        } catch (error) {
+            message.error("Oops! Ocorreu algum erro...")
+            console.error('Error submitting form:', error);
+        } 
+    };
 
     const handleSubmitIsEdit = () => {
         setIsEditing(false); 

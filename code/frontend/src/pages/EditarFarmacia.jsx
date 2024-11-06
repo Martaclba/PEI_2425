@@ -1,6 +1,8 @@
 import React, { useState, useEffect }  from 'react';
-import { Form, Select, Card, Button, Input, Tag, Row, Col, List, ConfigProvider } from 'antd';
-import { useNavigate } from "react-router-dom"
+import { Form, Select, Card, Button, Input, Tag, Row, Col, List, ConfigProvider, message } from 'antd';
+import { useNavigate, useLocation } from "react-router-dom"
+
+import axios from 'axios'
 
 import AddProdutoComponent from '../components/AddProduto';
 import { getFormattedDate } from '../components/utils';
@@ -62,14 +64,11 @@ const tagRender = (props) => {
     );
 };
 
-const onFinish = (values) => {
-    console.log('Received values of form: ', values);
-};
-
 export default function EditarFarmacia() {
     const date = getFormattedDate();
 
-    let navigate = useNavigate()
+    const navigate = useNavigate()
+    const location = useLocation()
 
     // State for the product list
     const [produtos, setProdutos] = useState([{ key: '1', label: 'Produto 1' }]); 
@@ -122,6 +121,25 @@ export default function EditarFarmacia() {
             }
         }
     }
+
+    const onFinish = async (values) => {
+        console.log('Received values of form: ', values);
+  
+        try {
+          const response = await axios.put("http://localhost:5000"+location.pathname, values)
+        
+          if(response.status === 200){
+            message.success("Editado com sucesso")
+            console.log('Form submitted successfully:', response.data);
+          } else {
+            message.error("Oops! Ocorreu algum erro...")
+            console.error('Form submission failed:', response.status);
+          }
+        } catch (error) {
+            message.error("Oops! Ocorreu algum erro...")
+            console.error('Error submitting form:', error);
+        } 
+    };
 
     const handleSubmitIsEdit = () => {
         setIsEditing(false); 
@@ -207,7 +225,7 @@ export default function EditarFarmacia() {
                                         </Form.Item>
 
                                         <Form.Item
-                                            label="Região HMR"
+                                            label="Região"
                                             name="Regiao"
                                             hasFeedback
                                             rules={[{
