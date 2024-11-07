@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { IconContext } from "react-icons";
 import { HiOutlineUpload } from "react-icons/hi";
 import { IoAddCircleOutline, IoPersonOutline } from "react-icons/io5";
 import { Dropdown, Space, Upload, Button, Table, ConfigProvider } from 'antd';
 import { useNavigate, useLocation } from "react-router-dom"
+
+import axios from 'axios'
 
 import themeConfig from '../styles/themeConfigTable';
 import UploadFileProps from '../components/UploadFile';
@@ -71,24 +73,24 @@ const columns = (navigate) => [
     width: '15%',
     render: (title, entry) => (
       <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%'}}>
-              <ConfigProvider theme={themeConfig}>
-                <Button onClick={() => navigate(`/delegados/${entry.key}`)}>Detalhes</Button>  
-              </ConfigProvider>
+        <ConfigProvider theme={themeConfig}>
+          <Button onClick={() => navigate(`/delegados/${entry.key}`)}>Detalhes</Button>  
+        </ConfigProvider>
       </Space>
     ),
   },
 ];
 
-const dataSource = Array.from({
-  length: 100,
-}).map((_, i) => ({
-  key: i,
-  delegado: `Delegado ${i}`,
-  distrito: `Distrito ${i}`,
-  regiao: `Região ${i}`,      
-  freguesia: `Freguesia ${i}`,
-  brick: `Brick ${i}`,
-}));
+// const dataSource = Array.from({
+//   length: 100,
+// }).map((_, i) => ({
+//   key: i,
+//   delegado: `Delegado ${i}`,
+//   distrito: `Distrito ${i}`,
+//   regiao: `Região ${i}`,      
+//   freguesia: `Freguesia ${i}`,
+//   brick: `Brick ${i}`,
+// }));
 
 export default function Delegados() {  
   const date = getFormattedDate();
@@ -117,6 +119,39 @@ export default function Delegados() {
     },
   ];
 
+  // State to update table's content
+  const [data, setData] = useState([])
+
+  // Fetch data from the backend
+  const fetchData = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/delegados");
+
+      if (response.status === 200){
+        console.log('Form submitted successfully:', response.data);
+        setData(response.data)
+      } else {
+        console.error('Form submission failed:', response.status);
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    } 
+  }
+
+  // Load the table's content and update it when necessary
+  useEffect (() => {
+    // Track if the component is still mounted
+    let isMounted = true; 
+
+    // Fetch data if there's no data or if there's an update
+    if (isMounted && (!data.length || location.state?.shouldFetchData)) fetchData();
+
+    return () => {
+      // Cleanup flag when component unmounts
+      isMounted = false;
+    };
+  }, [data.length, location.state?.shouldFetchData]);
+
   return (
       <div id="contact">
         <div>
@@ -139,7 +174,7 @@ export default function Delegados() {
           <ConfigProvider theme={themeConfig}>
             <Table 
               columns={columns(navigate)}
-              dataSource={dataSource}
+              dataSource={data}
               scroll={{x: 'max-content'}}
               pagination={{ pageSize: 7, showSizeChanger: false }}
               showSorterTooltip={false}                             

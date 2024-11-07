@@ -32,6 +32,7 @@ export default function EditarDelegado() {
   
   // State to control edit mode
   const [isEditing, setIsEditing] = useState(false);
+  const [fetchTrigger, setFetchTrigger] = useState(false)
 
   // Predefined data
   const predefinedValues = {
@@ -53,6 +54,7 @@ export default function EditarDelegado() {
       if(response.status === 200){
         message.success("Editado com sucesso")
         console.log('Form submitted successfully:', response.data);
+        setFetchTrigger(true);
       } else {
         message.error("Oops! Ocorreu algum erro...")
         console.error('Form submission failed:', response.status);
@@ -65,8 +67,10 @@ export default function EditarDelegado() {
 
   const handleSubmitIsEdit = () => {
     setIsEditing(false); 
-    form.submit(); // Submit the form programmatically
+    form.submit(); // Submit the form programmatically (execute onFinish)
   };
+
+  
 
   return (
     <ConfigProvider theme={themeConfig}>
@@ -85,7 +89,7 @@ export default function EditarDelegado() {
                     <Button type="primary" onClick={handleSubmitIsEdit}>
                       Guardar
                     </Button>
-                    <Button danger onClick={() => navigate("/delegados/")}>
+                    <Button danger onClick={() => navigate("/delegados/", { state: { shouldFetchData: fetchTrigger } })}>
                       Voltar
                     </Button>
                   </>
