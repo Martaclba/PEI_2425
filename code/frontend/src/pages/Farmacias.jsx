@@ -98,7 +98,7 @@ const dataSource = Array.from({
 
 export default function Farmacias() {  
   const date = getFormattedDate();
-  const {isAdmin} = useAuth();
+  const {state} = useAuth();
   const navigate = useNavigate()
   const items = [
     {
@@ -119,7 +119,7 @@ export default function Farmacias() {
         <div id="data-import">
           {date}
 
-          {isAdmin && <Dropdown menu={{items}}>
+          {state.isAdmin && <Dropdown menu={{items}}>
               <Space>
                 <IconContext.Provider value={{ size: '1.5rem' }}>  
                   <IoAddCircleOutline onClick={(e) => e.preventDefault()}/>

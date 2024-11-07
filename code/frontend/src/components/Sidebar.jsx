@@ -9,11 +9,11 @@ import { CgProfile } from "react-icons/cg";
 import { MdOutlineLocationOn } from "react-icons/md";
 import {useAuth} from '../context/Auth';
 import "../styles/sidebar.css"
-import { useAuth } from "../context/Auth";
+
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const {isAdmin} = useAuth();
+    const {state} = useAuth();
 
     const navigate = useNavigate();
     const { logout } = useAuth()
@@ -55,14 +55,14 @@ const Sidebar = () => {
                     </Link>
                     <span className="tooltip">Vendas</span>
                 </li>
-                {isAdmin && <li>
+                {state.isAdmin && <li>
                     <Link to={`/delegados/`}>
                         <i className="bx bx-user"><IoPeopleOutline /></i>
                         <span className="links_name">Delegados</span>
                     </Link>
                     <span className="tooltip">Delegados</span>
                 </li>}
-                {!isAdmin && <li>
+                {!state.isAdmin && <li>
                     <Link to={`/visitas/`}>
                         <i className="bx bx-user"><MdOutlineLocationOn /></i>
                         <span className="links_name">Visitas</span>

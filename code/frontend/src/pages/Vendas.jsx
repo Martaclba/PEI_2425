@@ -316,7 +316,7 @@ const dados_brick = Array.from({
 export default function Vendas() {  
   const date = getFormattedDate();
   const location = useLocation();
-  const {isAdmin} = useAuth();
+  const {state} = useAuth();
   // Memo improves performance by memoizing/caching this function's output. 
   // This way the function is not re-calculated everytime this page re-renders.  
   // It re-calculates only when the dependency (location.pathname) changes
@@ -342,7 +342,7 @@ export default function Vendas() {
           <div id="data-import">
             {date}
 
-            {isAdmin && <Dropdown menu={{items}}>
+            {state.isAdmin && <Dropdown menu={{items}}>
               <Space>
                 <IconContext.Provider value={{ size: '1.5rem' }}>  
                   <IoAddCircleOutline onClick={(e) => e.preventDefault()}/>
@@ -355,33 +355,53 @@ export default function Vendas() {
         <div style={{padding: '1rem'}}>
           <div className='dashboard-card'>
             <div id='data-import'>
-              <p className="table-title">Histórico de Vendas</p>
-              <Select 
+              <p className="table-title">Histórico De Vendas</p>
+              {state.isAdmin && <Select 
                 allowClear
-                placeholder="Escolha um ano"
+                placeholder="Ano"
                 options={options} 
                 filterOption={(input, option) => 
-                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>}
             </div>
-              <DemoColumn />
-          </div>
-          <ConfigProvider theme={themeConfig}>  
-
-            <div className='dashboard-card'>
-              <p className="table-title">Consulta por Produto</p>
+            <div style={{marginBottom:'2rem'}}>
+              <DemoColumn/>
+            </div>
+            {state.isAdmin && <div id='data-import'>
+              <p className="table-title">Histórico De Vendas Por Delegado</p>
               <div style={{display:'flex', gap:'1rem',marginBottom: '1rem'}}>
-                <Select 
-                  allowClear
-                  placeholder="Ano"
-                  options={options} 
-                  filterOption={(input, option) => 
-                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                 <Select 
                   allowClear
                   placeholder="Delegado"
                   options={options} 
                   filterOption={(input, option) => 
                       (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                  <Select 
+                  allowClear
+                  placeholder="Ano"
+                  options={options} 
+                  filterOption={(input, option) => 
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+              </div>
+            </div>}
+            {state.isAdmin && <DemoColumn />}
+          </div>
+          <ConfigProvider theme={themeConfig}>  
+
+            <div className='dashboard-card'>
+              <p className="table-title">Consulta por Produto</p>
+              <div style={{display:'flex', gap:'1rem',marginBottom: '1rem'}}>
+                {state.isAdmin && <Select 
+                  allowClear
+                  placeholder="Ano"
+                  options={options} 
+                  filterOption={(input, option) => 
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>}
+                {state.isAdmin && <Select 
+                  allowClear
+                  placeholder="Delegado"
+                  options={options} 
+                  filterOption={(input, option) => 
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>}
                 <Select 
                   allowClear
                   placeholder="Empresa"
@@ -407,15 +427,21 @@ export default function Vendas() {
             <div className='dashboard-card'>
               <p className="table-title">Consulta por Brick</p>
               <div style={{display:'flex', gap:'1rem', marginBottom:'1rem'}}>
+                {state.isAdmin && <Select 
+                  allowClear
+                  placeholder="Ano"
+                  options={options} 
+                  filterOption={(input, option) => 
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>}
+                {state.isAdmin && <Select 
+                  allowClear
+                  placeholder="Delegado"
+                  options={options} 
+                  filterOption={(input, option) => 
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>}
                 <Select 
                   allowClear
                   placeholder="Empresa"
-                  options={options} 
-                  filterOption={(input, option) => 
-                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                <Select 
-                  allowClear
-                  placeholder="Brick"
                   options={options} 
                   filterOption={(input, option) => 
                       (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>

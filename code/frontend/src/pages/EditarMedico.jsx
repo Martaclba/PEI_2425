@@ -50,7 +50,7 @@ const tagRender = (props) => {
 
 export default function EditarMedico() {
     const date = getFormattedDate();
-    const {isAdmin} = useAuth();
+    const {state} = useAuth();
     const navigate = useNavigate();
     const location = useLocation()
 
@@ -143,7 +143,7 @@ export default function EditarMedico() {
                                 </>
                                 ) : (
                                 <>
-                                    {isAdmin && <Button type="primary" onClick={() => setIsEditing(true)}>
+                                    {state.isAdmin && <Button type="primary" onClick={() => setIsEditing(true)}>
                                         Editar
                                     </Button>}
                                     <Button danger onClick={() => navigate("/medicos/")}>

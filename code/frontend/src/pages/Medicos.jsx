@@ -108,7 +108,7 @@ const dataSource = Array.from({
 
 export default function Medicos() {  
   const date = getFormattedDate();
-  const {isAdmin} = useAuth();
+  const {state} = useAuth();
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -125,7 +125,7 @@ export default function Medicos() {
     {
       key: '2',
       label: 
-      (isAdmin ? <Upload {...upload} maxCount={1}>
+      (state.isAdmin ? <Upload {...UploadFileProps} maxCount={1}>
         <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
           Registo por Ficheiro
         </Button>
