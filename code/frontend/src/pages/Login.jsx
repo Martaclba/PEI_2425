@@ -17,23 +17,56 @@ const configTheme = {
 }
 
 const Login = () => {
+  const navigate = useNavigate();
   const { login } = useAuth(); 
-  const navigate = useNavigate(); // For redirecting after login
 
-  const onFinish = (values) => {
+  
+  const onFinish = async (values) => {
     const {email, password} = values
 
-    console.log(values)
+    // Send values to the backend
+    // try {
+    //   const response = await axios.post("http://localhost:5000/login", values)
+    
+    //   if(response.status === 200){
+    //     console.log('Login submited with success:', response.data);
 
-    // Simulate authentication process
+    //     const userID = response.data.userID;
+    //     const isAdmin = response.data.role === 'admin'; 
+    //     const token = response.data.token;
+  
+    //     login(userID, isAdmin, token); 
+
+    //   } else {
+    //     message.error("Oops! Login inválido...")
+    //     console.error('Login failed:', response.status);
+    //   }
+    // } catch (error) {
+    //   message.error("Oops! Ocorreu algum erro...")
+    //   console.error('Error submitting login:', error);
+    // }
+
+
+    // Simulate authentication process from the backend
+    // remover depois
     if (email === "admin" && password === "admin") {
-      login(email, password, 'admin'); 
+      const userID = "12345";
+      const isAdmin = true; 
+      const token = "user-auth-token";
+
+      login(userID, isAdmin, token); 
+
       navigate('/');
-    } else if (email === "user" && password === "user") {
-      login(email, password, 'user');
-      navigate('/');
+    } else if (email === "user" && password === "user") {     
+        const userID = "12345";
+        const isAdmin = false; 
+        const token = "user-auth-token";
+
+        login(userID, isAdmin, token); 
+
+        navigate('/');
     } else {
-      message.error("Credenciais Inválidas");
+        message.error("Credenciais Inválidas");
     }
   }
 

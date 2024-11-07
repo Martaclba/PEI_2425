@@ -20,16 +20,16 @@ const columns = (navigate) => [
     className: 'fixed-column', 
     filters: [
       {
-        text: 'Edward King 1',
-        value: 'Edward King 1',
+        text: 'Delegado 1',
+        value: 'Delegado 1',
       },
       {
-        text: 'Edward King 31',
-        value: 'Edward King 31',
+        text: 'Delegado 31',
+        value: 'Delegado 31',
       },
       {
-        text: 'Edward King 2',
-        value: 'Edward King 2',
+        text: 'Delegado 2',
+        value: 'Delegado 2',
       },
     ],
     filterMode: 'tree',
@@ -83,7 +83,7 @@ const dataSource = Array.from({
   length: 100,
 }).map((_, i) => ({
   key: i,
-  delegado: `Edward King ${i}`,
+  delegado: `Delegado ${i}`,
   distrito: `Distrito ${i}`,
   regiao: `Região ${i}`,      
   freguesia: `Freguesia ${i}`,
@@ -95,10 +95,6 @@ export default function Delegados() {
 
   const navigate = useNavigate()
   const location = useLocation();
-  // Memo improves performance by memoizing/caching this function's output. 
-  // This way the function is not re-calculated everytime this page re-renders.  
-  // It re-calculates only when the dependency (location.pathname) changes
-  const upload = React.useMemo(() => UploadFileProps(location.pathname), [location.pathname])
 
   const items = [
     {
@@ -113,7 +109,7 @@ export default function Delegados() {
     {
       key: '2',
       label: 
-      <Upload {...upload} maxCount={1}>
+      <Upload {...UploadFileProps(location.pathname)} maxCount={1}>
         <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
           Registo por Ficheiro
         </Button>

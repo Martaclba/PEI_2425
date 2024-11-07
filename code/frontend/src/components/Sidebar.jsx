@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { LuStethoscope, LuCross } from "react-icons/lu";
 import { IoPeopleOutline } from "react-icons/io5";
 import { TbLogout2 } from "react-icons/tb";
@@ -9,9 +9,18 @@ import { CgProfile } from "react-icons/cg";
 import { MdOutlineLocationOn } from "react-icons/md";
 
 import "../styles/sidebar.css"
+import { useAuth } from "../context/Auth";
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
+
+    const navigate = useNavigate();
+    const { logout } = useAuth()
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login");
+    }
 
     const toggleSidebar = () => {
       setIsOpen(!isOpen);
@@ -82,10 +91,10 @@ const Sidebar = () => {
                             <div className="job">Delegado</div>
                         </div>
                     </div>
-                    <Link to={`/login/`}>
+                    <div className="logout" onClick={handleLogout} style={{ cursor: 'pointer' }}>
                         <i className="bx bx-log-out" id="log_out"><TbLogout2 /></i>
                         <span className="links_name">Logout</span>
-                    </Link>
+                    </div>
                 </li>
             </ul>
       </div>
