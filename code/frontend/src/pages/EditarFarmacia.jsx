@@ -3,7 +3,7 @@ import { Form, Select, Card, Button, Input, Tag, Row, Col, List, ConfigProvider,
 import { useNavigate, useLocation } from "react-router-dom"
 
 import axios from 'axios'
-
+import {useAuth} from '../context/Auth';
 import AddProdutoComponent from '../components/AddProduto';
 import { getFormattedDate } from '../components/utils';
 import useConfirmModal from '../components/confirmModal';
@@ -66,7 +66,7 @@ const tagRender = (props) => {
 
 export default function EditarFarmacia() {
     const date = getFormattedDate();
-
+    const {isAdmin} = useAuth();
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -169,9 +169,9 @@ export default function EditarFarmacia() {
                                 </>
                                 ) : (
                                 <>
-                                <Button type="primary" onClick={() => setIsEditing(true)}>
+                                {isAdmin && <Button type="primary" onClick={() => setIsEditing(true)}>
                                     Editar
-                                </Button>
+                                </Button>}
                                 <Button danger onClick={() => navigate("/farmacias/")}>
                                     Voltar
                                 </Button>

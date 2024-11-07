@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Select, Card, Button, Input, Row, Col, Tag, ConfigProvider, message } from 'antd';
 import { useNavigate, useLocation } from "react-router-dom";
-
+import {useAuth} from '../context/Auth';
 import axios from 'axios'
 
 import { getFormattedDate } from '../components/utils';
@@ -50,7 +50,7 @@ const tagRender = (props) => {
 
 export default function EditarMedico() {
     const date = getFormattedDate();
-
+    const {isAdmin} = useAuth();
     const navigate = useNavigate();
     const location = useLocation()
 
@@ -143,9 +143,9 @@ export default function EditarMedico() {
                                 </>
                                 ) : (
                                 <>
-                                    <Button type="primary" onClick={() => setIsEditing(true)}>
+                                    {isAdmin && <Button type="primary" onClick={() => setIsEditing(true)}>
                                         Editar
-                                    </Button>
+                                    </Button>}
                                     <Button danger onClick={() => navigate("/medicos/")}>
                                         Voltar
                                     </Button>

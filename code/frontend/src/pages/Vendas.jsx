@@ -2,12 +2,77 @@ import React from 'react';
 import { IconContext } from "react-icons";
 import { HiOutlineUpload } from "react-icons/hi";
 import { IoAddCircleOutline } from "react-icons/io5";
-import { Dropdown, Space, Upload, Button, Table, ConfigProvider } from 'antd';
+import { Dropdown, Space, Upload, Button, Table, ConfigProvider, Select } from 'antd';
 import { useLocation } from "react-router-dom"
-
+import {useAuth} from '../context/Auth';
 import themeConfig from '../styles/themeConfigTable';
 import UploadFileProps from '../components/UploadFile';
 import { getFormattedDate } from '../components/utils';
+
+
+import { Column } from '@ant-design/plots';
+import { MdHorizontalDistribute } from 'react-icons/md';
+
+
+//Para os histogramas
+
+const data = [
+  { type: 'Jan', value: 0.16 },
+  { type: 'Fev', value: 0.125 },
+  { type: 'Mar', value: 0.24 },
+  { type: 'Apr', value: 0.19 },
+  { type: 'May', value: 0.22 },
+  { type: 'Jun', value: 0.05 },
+  { type: 'Jul', value: 0.01 },
+  { type: 'Aug', value: 0.015 },
+  { type: 'Sep', value: 0.05 },
+  { type: 'Nov', value: 0.01 },
+  { type: 'Dec', value: 0.015 },
+];
+
+const DemoColumn = () => {
+  const config = {
+    data,
+    xField: 'type',
+    yField: 'value',
+    style: {
+      fill: ({ type }) => {
+        if (type === 'Jul' || type === 'Aug') {
+          return '#22CBCC';
+        }
+        return '#2989FF';
+      },
+    },
+    label: {
+      text: (originData) => {
+        const val = parseFloat(originData.value);
+        if (val < 0.0) {
+          return (val * 100).toFixed(1) + '%';
+        }
+        return '';
+      },
+      offset: 10,
+    },
+    legend: false,
+  };
+  return <Column {...config} />;
+};
+
+const options= [
+  {
+  value: '1',
+  label: '2018',
+  },
+  {
+  value: '2',
+  label: '2019',
+  },
+  {
+  value: '3',
+  label: '2020',
+  },
+];
+
 
 // For the tables
 const columns_produto = [
@@ -250,8 +315,8 @@ const dados_brick = Array.from({
 
 export default function Vendas() {  
   const date = getFormattedDate();
-
   const location = useLocation();
+  const {isAdmin} = useAuth();
   // Memo improves performance by memoizing/caching this function's output. 
   // This way the function is not re-calculated everytime this page re-renders.  
   // It re-calculates only when the dependency (location.pathname) changes
@@ -277,21 +342,59 @@ export default function Vendas() {
           <div id="data-import">
             {date}
 
-            <Dropdown menu={{items}}>
+            {isAdmin && <Dropdown menu={{items}}>
               <Space>
                 <IconContext.Provider value={{ size: '1.5rem' }}>  
                   <IoAddCircleOutline onClick={(e) => e.preventDefault()}/>
                 </IconContext.Provider>
               </Space>
-            </Dropdown>
+            </Dropdown>}
           </div>
         </div>
         
         <div style={{padding: '1rem'}}>
+          <div className='dashboard-card'>
+            <div id='data-import'>
+              <p className="table-title">Histórico de Vendas</p>
+              <Select 
+                allowClear
+                placeholder="Escolha um ano"
+                options={options} 
+                filterOption={(input, option) => 
+                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+            </div>
+              <DemoColumn />
+          </div>
           <ConfigProvider theme={themeConfig}>  
 
             <div className='dashboard-card'>
               <p className="table-title">Consulta por Produto</p>
+              <div style={{display:'flex', gap:'1rem',marginBottom: '1rem'}}>
+                <Select 
+                  allowClear
+                  placeholder="Ano"
+                  options={options} 
+                  filterOption={(input, option) => 
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                <Select 
+                  allowClear
+                  placeholder="Delegado"
+                  options={options} 
+                  filterOption={(input, option) => 
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                <Select 
+                  allowClear
+                  placeholder="Empresa"
+                  options={options} 
+                  filterOption={(input, option) => 
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                <Select 
+                  allowClear
+                  placeholder="Brick"
+                  options={options} 
+                  filterOption={(input, option) => 
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+              </div>
               <Table 
                 columns={columns_produto}
                 dataSource={dados_produto}
@@ -303,6 +406,20 @@ export default function Vendas() {
 
             <div className='dashboard-card'>
               <p className="table-title">Consulta por Brick</p>
+              <div style={{display:'flex', gap:'1rem', marginBottom:'1rem'}}>
+                <Select 
+                  allowClear
+                  placeholder="Empresa"
+                  options={options} 
+                  filterOption={(input, option) => 
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                <Select 
+                  allowClear
+                  placeholder="Brick"
+                  options={options} 
+                  filterOption={(input, option) => 
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+              </div>
               <Table
                 columns={columns_brick}
                 dataSource={dados_brick}

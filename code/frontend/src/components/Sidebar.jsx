@@ -7,12 +7,12 @@ import { RxDashboard } from "react-icons/rx";
 import { HiOutlineMenu, HiOutlineMenuAlt3 } from "react-icons/hi";
 import { CgProfile } from "react-icons/cg";
 import { MdOutlineLocationOn } from "react-icons/md";
-
+import {useAuth} from '../context/Auth';
 import "../styles/sidebar.css"
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
-
+    const {isAdmin} = useAuth();
     const toggleSidebar = () => {
       setIsOpen(!isOpen);
     };
@@ -45,20 +45,20 @@ const Sidebar = () => {
                     </Link>
                     <span className="tooltip">Vendas</span>
                 </li>
-                <li>
+                {isAdmin && <li>
                     <Link to={`/delegados/`}>
                         <i className="bx bx-user"><IoPeopleOutline /></i>
                         <span className="links_name">Delegados</span>
                     </Link>
                     <span className="tooltip">Delegados</span>
-                </li>
-                <li>
+                </li>}
+                {!isAdmin && <li>
                     <Link to={`/visitas/`}>
                         <i className="bx bx-user"><MdOutlineLocationOn /></i>
                         <span className="links_name">Visitas</span>
                     </Link>
                     <span className="tooltip">Visitas</span>
-                </li>
+                </li>}
                 <li>
                     <Link to={`/medicos/`}>
                         <i className="bx bx-chat"><LuStethoscope /></i>

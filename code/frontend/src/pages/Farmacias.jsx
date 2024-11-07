@@ -4,7 +4,7 @@ import { LuCross } from "react-icons/lu";
 import { IoAddCircleOutline} from "react-icons/io5";
 import { Dropdown, Space, Button, Table, ConfigProvider } from 'antd';
 import { useNavigate } from "react-router-dom";
-
+import {useAuth} from '../context/Auth';
 import themeConfig from '../styles/themeConfigTable';
 import { getFormattedDate } from '../components/utils';
 
@@ -98,7 +98,7 @@ const dataSource = Array.from({
 
 export default function Farmacias() {  
   const date = getFormattedDate();
-  
+  const {isAdmin} = useAuth();
   const navigate = useNavigate()
   const items = [
     {
@@ -119,13 +119,13 @@ export default function Farmacias() {
         <div id="data-import">
           {date}
 
-          <Dropdown menu={{items}}>
+          {isAdmin && <Dropdown menu={{items}}>
               <Space>
                 <IconContext.Provider value={{ size: '1.5rem' }}>  
                   <IoAddCircleOutline onClick={(e) => e.preventDefault()}/>
                 </IconContext.Provider>
               </Space>
-          </Dropdown>
+          </Dropdown>}
         </div>
       </div>
 
