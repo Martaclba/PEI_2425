@@ -1,6 +1,8 @@
 import React from 'react';
-import { Form, Select, Card, Button, Input, Flex, Row, Col, Tag } from 'antd';
+import { Form, Select, Card, Button, Input, Flex, Row, Col, Tag, message } from 'antd';
 import { useNavigate } from "react-router-dom"
+
+import axios from 'axios'
 
 import { getFormattedDate } from '../components/utils';
 
@@ -36,8 +38,23 @@ const renderDisabledTag = (props) => {
     );
 };
 
-const onFinish = (values) => {
+const onFinish = async (values) => {
     console.log('Received values of form: ', values);
+
+    try {
+        const response = await axios.post("http://localhost:5000/medicos/registar/", values)
+    
+        if (response.status === 200){
+            message.success("Registado com sucesso")
+            console.log('Form submitted successfully:', response.data);
+        } else {
+            message.error("Oops! Ocorreu algum erro...")
+            console.error('Form submission failed:', response.status);
+        }
+    } catch (error) {
+        message.error("Oops! Ocorreu algum erro...")
+        console.error('Error submitting form:', error);
+    }
 };
 
 export default function RegistarMedico() {
@@ -227,7 +244,7 @@ export default function RegistarMedico() {
                                                     Confirmar
                                                 </Button>
                                                 <Button danger onClick={() => navigate("/medicos/")}>
-                                                    Cancelar
+                                                    Voltar
                                                 </Button>   
                                             </Flex>
                                         </Form.Item>

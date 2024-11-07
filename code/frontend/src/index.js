@@ -35,15 +35,15 @@ const router = createBrowserRouter([
       /* Routes */
       {
         path: "delegados/",
-        element: <ProtectedRoute requiredRole="admin"><Delegados /></ProtectedRoute>,
+        element: <ProtectedRoute isAdmin={true}><Delegados /></ProtectedRoute>,
       },
       {
         path: "delegados/registar/",
-        element: <ProtectedRoute requiredRole="admin"><RegistarDelegado /></ProtectedRoute>,
+        element: <ProtectedRoute isAdmin={true}><RegistarDelegado /></ProtectedRoute>,
       },
       {
         path: "delegados/:key",
-        element: <ProtectedRoute requiredRole="admin"><EditarDelegado /></ProtectedRoute>,
+        element: <ProtectedRoute isAdmin={true}><EditarDelegado /></ProtectedRoute>,
       },
 
       {
@@ -52,7 +52,7 @@ const router = createBrowserRouter([
       },
       {
         path: "medicos/registar/",
-        element: <ProtectedRoute requiredRole="admin"><RegistarMedico /></ProtectedRoute>,
+        element: <ProtectedRoute isAdmin={true}><RegistarMedico /></ProtectedRoute>,
       },
       {
         path: "medicos/:key",
@@ -65,7 +65,7 @@ const router = createBrowserRouter([
       },
       {
         path: "farmacias/registar/",
-        element: <ProtectedRoute requiredRole="admin"><RegistarFarmacia /></ProtectedRoute>,
+        element: <ProtectedRoute isAdmin={true}><RegistarFarmacia /></ProtectedRoute>,
       },
       {
         path: "farmacias/:key",
@@ -74,7 +74,7 @@ const router = createBrowserRouter([
       
       {
         path: "visitas/",
-        element: <ProtectedRoute requiredRole="user"><Visitas /></ProtectedRoute>
+        element: <ProtectedRoute isAdmin={false}><Visitas /></ProtectedRoute>
       },
     ],
   },

@@ -20,16 +20,16 @@ const columns = (navigate) => [
     className: 'fixed-column', 
     filters: [
       {
-        text: 'Edward King 1',
-        value: 'Edward King 1',
+        text: 'Médico 1',
+        value: 'Médico 1',
       },
       {
-        text: 'Edward King 31',
-        value: 'Edward King 31',
+        text: 'Médico 31',
+        value: 'Médico 31',
       },
       {
-        text: 'Edward King 2',
-        value: 'Edward King 2',
+        text: 'Médico 2',
+        value: 'Médico 2',
       },
     ],
     filterMode: 'tree',
@@ -98,7 +98,7 @@ const dataSource = Array.from({
   length: 100,
 }).map((_, i) => ({
   key: i,
-  medico: `Medico ${i}`,
+  medico: `Médico ${i}`,
   instituicao: `Hospital ${i}`,
   especialidade: `Especialidade ${i}`,
   estado: ['Ativo','Inativo','Indisponível'],
@@ -111,10 +111,6 @@ export default function Medicos() {
   const {isAdmin} = useAuth();
   const navigate = useNavigate()
   const location = useLocation()
-  // Memo improves performance by memoizing/caching this function's output. 
-  // This way the function is not re-calculated everytime this page re-renders.  
-  // It re-calculates only when the dependency (location.pathname) changes
-  const upload = React.useMemo(() => UploadFileProps(location.pathname), [location.pathname])
 
   const items = [
     {

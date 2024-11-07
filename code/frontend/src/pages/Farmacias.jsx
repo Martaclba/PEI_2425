@@ -18,21 +18,21 @@ const columns = (navigate) => [
     className: 'fixed-column', 
     filters: [
       {
-        text: 'Edward King 1',
-        value: 'Edward King 1',
+        text: 'Farmácia 1',
+        value: 'Farmácia 1',
       },
       {
-        text: 'Edward King 31',
-        value: 'Edward King 31',
+        text: 'Farmácia 31',
+        value: 'Farmácia 31',
       },
       {
-        text: 'Edward King 2',
-        value: 'Edward King 2',
+        text: 'Farmácia 2',
+        value: 'Farmácia 2',
       },
     ],
     filterMode: 'tree',
     filterSearch: true,
-    onFilter: (value, record) => record.name.startsWith(value),
+    onFilter: (value, record) => record.farmacia.startsWith(value),
     sorter: (a, b) => a.farmacia.localeCompare(b.farmacia)          
   },
   {

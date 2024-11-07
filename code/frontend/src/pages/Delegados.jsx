@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { IconContext } from "react-icons";
 import { HiOutlineUpload } from "react-icons/hi";
 import { IoAddCircleOutline, IoPersonOutline } from "react-icons/io5";
 import { Dropdown, Space, Upload, Button, Table, ConfigProvider } from 'antd';
 import { useNavigate, useLocation } from "react-router-dom"
+
+import axios from 'axios'
 
 import themeConfig from '../styles/themeConfigTable';
 import UploadFileProps from '../components/UploadFile';
@@ -20,16 +22,16 @@ const columns = (navigate) => [
     className: 'fixed-column', 
     filters: [
       {
-        text: 'Edward King 1',
-        value: 'Edward King 1',
+        text: 'Delegado 1',
+        value: 'Delegado 1',
       },
       {
-        text: 'Edward King 31',
-        value: 'Edward King 31',
+        text: 'Delegado 31',
+        value: 'Delegado 31',
       },
       {
-        text: 'Edward King 2',
-        value: 'Edward King 2',
+        text: 'Delegado 2',
+        value: 'Delegado 2',
       },
     ],
     filterMode: 'tree',
@@ -71,34 +73,30 @@ const columns = (navigate) => [
     width: '15%',
     render: (title, entry) => (
       <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%'}}>
-              <ConfigProvider theme={themeConfig}>
-                <Button onClick={() => navigate(`/delegados/${entry.key}`)}>Detalhes</Button>  
-              </ConfigProvider>
+        <ConfigProvider theme={themeConfig}>
+          <Button onClick={() => navigate(`/delegados/${entry.key}`)}>Detalhes</Button>  
+        </ConfigProvider>
       </Space>
     ),
   },
 ];
 
-const dataSource = Array.from({
-  length: 100,
-}).map((_, i) => ({
-  key: i,
-  delegado: `Edward King ${i}`,
-  distrito: `Distrito ${i}`,
-  regiao: `Região ${i}`,      
-  freguesia: `Freguesia ${i}`,
-  brick: `Brick ${i}`,
-}));
+// const dataSource = Array.from({
+//   length: 100,
+// }).map((_, i) => ({
+//   key: i,
+//   delegado: `Delegado ${i}`,
+//   distrito: `Distrito ${i}`,
+//   regiao: `Região ${i}`,      
+//   freguesia: `Freguesia ${i}`,
+//   brick: `Brick ${i}`,
+// }));
 
 export default function Delegados() {  
   const date = getFormattedDate();
 
   const navigate = useNavigate()
   const location = useLocation();
-  // Memo improves performance by memoizing/caching this function's output. 
-  // This way the function is not re-calculated everytime this page re-renders.  
-  // It re-calculates only when the dependency (location.pathname) changes
-  const upload = React.useMemo(() => UploadFileProps(location.pathname), [location.pathname])
 
   const items = [
     {
@@ -113,13 +111,46 @@ export default function Delegados() {
     {
       key: '2',
       label: 
-      <Upload {...upload} maxCount={1}>
+      <Upload {...UploadFileProps(location.pathname)} maxCount={1}>
         <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
           Registo por Ficheiro
         </Button>
       </Upload>
     },
   ];
+
+  // State to update table's content
+  const [data, setData] = useState([])
+
+  // Fetch data from the backend
+  const fetchData = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/delegados");
+
+      if (response.status === 200){
+        console.log('Form submitted successfully:', response.data);
+        setData(response.data)
+      } else {
+        console.error('Form submission failed:', response.status);
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    } 
+  }
+
+  // Load the table's content and update it when necessary
+  useEffect (() => {
+    // Track if the component is still mounted
+    let isMounted = true; 
+
+    // Fetch data if there's no data or if there's an update
+    if (isMounted && (!data.length || location.state?.shouldFetchData)) fetchData();
+
+    return () => {
+      // Cleanup flag when component unmounts
+      isMounted = false;
+    };
+  }, [data.length, location.state?.shouldFetchData]);
 
   return (
       <div id="contact">
@@ -143,7 +174,7 @@ export default function Delegados() {
           <ConfigProvider theme={themeConfig}>
             <Table 
               columns={columns(navigate)}
-              dataSource={dataSource}
+              dataSource={data}
               scroll={{x: 'max-content'}}
               pagination={{ pageSize: 7, showSizeChanger: false }}
               showSorterTooltip={false}                             

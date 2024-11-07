@@ -1,6 +1,8 @@
 import React, { useState, useEffect }  from 'react';
-import { Form, Select, Card, Button, Input, Flex, Tag, Row, Col, List } from 'antd';
+import { Form, Select, Card, Button, Input, Flex, Tag, Row, Col, List, message } from 'antd';
 import { useNavigate } from "react-router-dom"
+
+import axios from 'axios';
 
 import AddProdutoComponent from '../components/AddProduto';
 import { getFormattedDate } from '../components/utils';
@@ -37,8 +39,23 @@ const renderDisabledTag = (props) => {
     );
 };
 
-const onFinish = (values) => {
+const onFinish = async (values) => {
     console.log('Received values of form: ', values);
+
+    try {
+        const response = await axios.post("http://localhost:5000/farmacias/registar/", values)
+    
+        if (response.status === 200){
+            message.success("Registada com sucesso")
+            console.log('Form submitted successfully:', response.data);
+        } else {
+            message.error("Oops! Ocorreu algum erro...")
+            console.error('Form submission failed:', response.status);
+        }
+    } catch (error) {
+        message.error("Oops! Ocorreu algum erro...")
+        console.error('Error submitting form:', error);
+    }
 };
 
 export default function RegistarFarmacia() {
@@ -242,7 +259,7 @@ export default function RegistarFarmacia() {
                                                 Confirmar
                                             </Button>
                                             <Button danger onClick={() => navigate("/farmacias/")}>
-                                                Cancelar
+                                                Voltar
                                             </Button>   
                                         </Flex>
                                     </Form.Item>
