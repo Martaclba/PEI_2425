@@ -22,6 +22,7 @@ import EditarFarmacia from './pages/EditarFarmacia';
 import EditarMedico from './pages/EditarMedico';
 import Login from './pages/Login';
 import Visitas from './pages/Visitas';
+import Chatbot from './pages/Chatbot';
 
 const router = createBrowserRouter([
   {
@@ -75,6 +76,11 @@ const router = createBrowserRouter([
       {
         path: "visitas/",
         element: <ProtectedRoute isAdmin={false}><Visitas /></ProtectedRoute>
+      },
+
+      {
+        path: "chatbot/",
+        element: <ProtectedRoute isAdmin={false}><Chatbot /></ProtectedRoute>
       },
     ],
   },
