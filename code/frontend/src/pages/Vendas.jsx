@@ -12,7 +12,6 @@ import { getFormattedDate } from '../components/utils';
 import axios from 'axios'; 
 import {useAuth} from '../context/Auth';
 
-const formItemLayout = { labelCol: {span: 10,}, wrapperCol: { span: 14,}};
 
 //Para os histogramas
 const data = [
@@ -387,31 +386,27 @@ export default function Vendas() {
           <div className='dashboard-card'>
             <div id='data-import'>
               <p className="table-title">Histórico De Vendas</p>
-              {state.isAdmin && <div style={{display:'flex', gap:'1rem',marginBottom: '1rem'}}>
-                <Form
-                name="change_histogram"
-                // {...formItemLayout}
-                onFinish={onFinish}
-                layout="horizontal"
-                initialValues={predefinedValues}
-                form={form}
-                >
-                  <Form.Item
-                    label="Delegado"
-                    name="Delegado"
+
+              {state.isAdmin && 
+                <div style={{display:'flex', gap:'1rem', marginBottom: '1rem'}}>
+                  <Form
+                    name="histogram"
+                    onFinish={onFinish}
+                    layout="inline"
+                    initialValues={predefinedValues}
+                    form={form}
                   >
-                    <Select 
-                      allowClear
-                      placeholder="Delegado"
-                      options={options}
-                      onChange={() => form.submit()} 
-                      filterOption={(input, option) => 
-                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                    <Form.Item className="large-select">
+                      <Select 
+                        allowClear
+                        placeholder="Delegado"
+                        options={options}
+                        onChange={() => form.submit()} 
+                        filterOption={(input, option) => 
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
-                    <Form.Item
-                      label="Ano"
-                      name="Ano"
-                    >
+
+                    <Form.Item className="large-select">
                       <Select 
                         allowClear
                         placeholder="Ano"
@@ -420,72 +415,71 @@ export default function Vendas() {
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
-                </Form>
-              </div>}
+                  </Form>
+                </div>
+              }
             </div>
-              <DemoColumn/>
+            <DemoColumn/>
           </div>
 
           <ConfigProvider theme={themeConfig}>  
             <div className='dashboard-card'>
               <p className="table-title">Consulta por Produto</p>
-              <div style={{display:'flex', gap:'1rem',marginBottom: '1rem'}}>
-              <Form
-                name="change_teble1"
-                {...formItemLayout}
-                onFinish={onFinish}
-                layout="horizontal"
-                initialValues={predefinedValues1}
-                form={form1}
+
+              <div style={{display:'flex', gap:'1rem', marginBottom: '1rem'}}>
+                <Form
+                  name="table_product"
+                  onFinish={onFinish}
+                  layout="inline"
+                  initialValues={predefinedValues1}
+                  form={form1}
                 >
-                {state.isAdmin && 
-                <Form.Item
-                  label="Ano"
-                  name="Ano">
-                  <Select 
-                    allowClear
-                    placeholder="Ano"
-                    options={options} 
-                    onChange={() => form1.submit()}
-                    filterOption={(input, option) => 
-                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                </Form.Item>}
-                {state.isAdmin && 
-                <Form.Item
-                  label="Delegado"
-                  name="Delegado">
-                  <Select 
-                    allowClear
-                    placeholder="Delegado"
-                    options={options} 
-                    onChange={() => form1.submit()}
-                    filterOption={(input, option) => 
-                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                </Form.Item>}
-                <Form.Item
-                  label="Empresa"
-                  name="Empresa">
-                  <Select 
-                    allowClear
-                    placeholder="Empresa"
-                    options={options} 
-                    onChange={() => form1.submit()}
-                    filterOption={(input, option) => 
-                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                </Form.Item>
-                <Form.Item
-                    label="Brick"
-                    name="Brick">
-                  <Select 
-                    allowClear
-                    placeholder="Brick"
-                    options={options} 
-                    onChange={() => form1.submit()}
-                    filterOption={(input, option) => 
-                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                </Form.Item>
+                  {state.isAdmin && 
+                    <Form.Item className="large-select">
+                      <Select 
+                        allowClear
+                        placeholder="Ano"
+                        options={options} 
+                        onChange={() => form1.submit()}
+                        filterOption={(input, option) => 
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                    </Form.Item>
+                  }
+
+                  {state.isAdmin && 
+                    <Form.Item className="large-select">
+                      <Select 
+                        allowClear
+                        placeholder="Delegado"
+                        options={options} 
+                        onChange={() => form1.submit()}
+                        filterOption={(input, option) => 
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                    </Form.Item>
+                  }
+                  
+                  <Form.Item className="large-select">
+                    <Select 
+                      allowClear
+                      placeholder="Empresa"
+                      options={options} 
+                      onChange={() => form1.submit()}
+                      filterOption={(input, option) => 
+                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                  </Form.Item>
+
+                  <Form.Item className="large-select">
+                    <Select 
+                      allowClear
+                      placeholder="Brick"
+                      options={options} 
+                      onChange={() => form1.submit()}
+                      filterOption={(input, option) => 
+                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                  </Form.Item>
                 </Form>
               </div>
+
               <Table 
                 columns={columns_produto}
                 dataSource={dados_produto}
@@ -499,50 +493,48 @@ export default function Vendas() {
               <p className="table-title">Consulta por Brick</p>
               <div style={{display:'flex', gap:'1rem', marginBottom:'1rem'}}>
                 <Form
-                  name="change_teble1"
-                  {...formItemLayout}
+                  name="table_brick"
                   onFinish={onFinish}
-                  layout="horizontal"
+                  layout="inline"
                   initialValues={predefinedValues1}
                   form={form2}
                 >
                   {state.isAdmin && 
-                  <Form.Item
-                  label="Ano"
-                  name="Ano">
-                    <Select 
-                      allowClear
-                      placeholder="Ano"
-                      options={options}
-                      onChange={() => form2.submit()}
-                      filterOption={(input, option) => 
-                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                  </Form.Item>}
+                    <Form.Item className="large-select">
+                      <Select 
+                        allowClear
+                        placeholder="Ano"
+                        options={options}
+                        onChange={() => form2.submit()}
+                        filterOption={(input, option) => 
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                    </Form.Item>
+                  }
+
                   {state.isAdmin &&
-                  <Form.Item
-                  label="Delegado"
-                  name="Delegado"> 
+                    <Form.Item className="large-select"> 
+                      <Select 
+                        allowClear
+                        placeholder="Delegado"
+                        options={options} 
+                        onChange={() => form2.submit()}
+                        filterOption={(input, option) => 
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                    </Form.Item>
+                  }
+
+                  <Form.Item className="large-select"> 
                     <Select 
                       allowClear
-                      placeholder="Delegado"
+                      placeholder="Empresa"
                       options={options} 
                       onChange={() => form2.submit()}
                       filterOption={(input, option) => 
                           (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                  </Form.Item>}
-                  <Form.Item
-                  label="Empresa"
-                  name="Empresa"> 
-                  <Select 
-                    allowClear
-                    placeholder="Empresa"
-                    options={options} 
-                    onChange={() => form2.submit()}
-                    filterOption={(input, option) => 
-                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                   </Form.Item>
                 </Form>
               </div>
+
               <Table
                 columns={columns_brick}
                 dataSource={dados_brick}
