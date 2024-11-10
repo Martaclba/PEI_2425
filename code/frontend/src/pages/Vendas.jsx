@@ -1,16 +1,18 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { IconContext } from "react-icons";
 import { HiOutlineUpload } from "react-icons/hi";
 import { IoAddCircleOutline } from "react-icons/io5";
-import { Dropdown, Space, Upload, Button, Table, ConfigProvider, Select } from 'antd';
+import { Dropdown, Space, Upload, Button, Table, ConfigProvider, Select, Form } from 'antd';
 import { useLocation } from "react-router-dom"
 import { Column } from '@ant-design/plots';
 
 import themeConfig from '../styles/themeConfigTable';
 import UploadFileProps from '../components/UploadFile';
 import { getFormattedDate } from '../components/utils';
+import axios from 'axios'; 
 import {useAuth} from '../context/Auth';
 
+const formItemLayout = { labelCol: {span: 10,}, wrapperCol: { span: 14,}};
 
 //Para os histogramas
 const data = [
@@ -314,6 +316,42 @@ export default function Vendas() {
   const date = getFormattedDate();
   const location = useLocation();
   const {state} = useAuth();
+  const [form] = Form.useForm();
+  const [form1] = Form.useForm();
+  const [form2] = Form.useForm();
+
+  const predefinedValues = {
+    Delegado: 'Todos',
+    Ano: '2024',
+  };
+
+  const predefinedValues1 = {
+    Delegado: 'Todos',
+    Ano: '2024',
+    Empresa: 'Todas',
+    Brick: 'Todos',
+
+  };
+
+  const onFinish = async (values) => {
+    console.log('Received values of form: ', values);
+  
+    try {
+      const response = await axios.get("http://localhost:5000/", { params: values })
+    
+      if(response.status === 200){
+        console.log('Form submitted successfully:', response.data);
+      } else {
+        console.error('Form submission failed:', response.status);
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    }
+  };
+
+  const handleSubmith = () => {
+    form.submit(); 
+  };  
 
   const items = [
     {
@@ -350,51 +388,103 @@ export default function Vendas() {
             <div id='data-import'>
               <p className="table-title">Histórico De Vendas</p>
               {state.isAdmin && <div style={{display:'flex', gap:'1rem',marginBottom: '1rem'}}>
-                <Select 
-                  allowClear
-                  placeholder="Delegado"
-                  options={options} 
-                  filterOption={(input, option) => 
-                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                  <Select 
-                  allowClear
-                  placeholder="Ano"
-                  options={options} 
-                  filterOption={(input, option) => 
-                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                <Form
+                name="change_histogram"
+                // {...formItemLayout}
+                onFinish={onFinish}
+                layout="horizontal"
+                initialValues={predefinedValues}
+                form={form}
+                >
+                  <Form.Item
+                    label="Delegado"
+                    name="Delegado"
+                  >
+                    <Select 
+                      allowClear
+                      placeholder="Delegado"
+                      options={options}
+                      onChange={() => form.submit()} 
+                      filterOption={(input, option) => 
+                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                    </Form.Item>
+                    <Form.Item
+                      label="Ano"
+                      name="Ano"
+                    >
+                      <Select 
+                        allowClear
+                        placeholder="Ano"
+                        options={options}
+                        onChange={() => form.submit()}
+                        filterOption={(input, option) => 
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                    </Form.Item>
+                </Form>
               </div>}
             </div>
-            <DemoColumn />
+              <DemoColumn/>
           </div>
 
           <ConfigProvider theme={themeConfig}>  
             <div className='dashboard-card'>
               <p className="table-title">Consulta por Produto</p>
               <div style={{display:'flex', gap:'1rem',marginBottom: '1rem'}}>
-                {state.isAdmin && <Select 
-                  allowClear
-                  placeholder="Ano"
-                  options={options} 
-                  filterOption={(input, option) => 
-                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>}
-                {state.isAdmin && <Select 
-                  allowClear
-                  placeholder="Delegado"
-                  options={options} 
-                  filterOption={(input, option) => 
-                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>}
-                <Select 
-                  allowClear
-                  placeholder="Empresa"
-                  options={options} 
-                  filterOption={(input, option) => 
-                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                <Select 
-                  allowClear
-                  placeholder="Brick"
-                  options={options} 
-                  filterOption={(input, option) => 
-                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+              <Form
+                name="change_teble1"
+                {...formItemLayout}
+                onFinish={onFinish}
+                layout="horizontal"
+                initialValues={predefinedValues1}
+                form={form1}
+                >
+                {state.isAdmin && 
+                <Form.Item
+                  label="Ano"
+                  name="Ano">
+                  <Select 
+                    allowClear
+                    placeholder="Ano"
+                    options={options} 
+                    onChange={() => form1.submit()}
+                    filterOption={(input, option) => 
+                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                </Form.Item>}
+                {state.isAdmin && 
+                <Form.Item
+                  label="Delegado"
+                  name="Delegado">
+                  <Select 
+                    allowClear
+                    placeholder="Delegado"
+                    options={options} 
+                    onChange={() => form1.submit()}
+                    filterOption={(input, option) => 
+                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                </Form.Item>}
+                <Form.Item
+                  label="Empresa"
+                  name="Empresa">
+                  <Select 
+                    allowClear
+                    placeholder="Empresa"
+                    options={options} 
+                    onChange={() => form1.submit()}
+                    filterOption={(input, option) => 
+                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                </Form.Item>
+                <Form.Item
+                    label="Brick"
+                    name="Brick">
+                  <Select 
+                    allowClear
+                    placeholder="Brick"
+                    options={options} 
+                    onChange={() => form1.submit()}
+                    filterOption={(input, option) => 
+                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                </Form.Item>
+                </Form>
               </div>
               <Table 
                 columns={columns_produto}
@@ -408,24 +498,50 @@ export default function Vendas() {
             <div className='dashboard-card'>
               <p className="table-title">Consulta por Brick</p>
               <div style={{display:'flex', gap:'1rem', marginBottom:'1rem'}}>
-                {state.isAdmin && <Select 
-                  allowClear
-                  placeholder="Ano"
-                  options={options} 
-                  filterOption={(input, option) => 
-                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>}
-                {state.isAdmin && <Select 
-                  allowClear
-                  placeholder="Delegado"
-                  options={options} 
-                  filterOption={(input, option) => 
-                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>}
-                <Select 
-                  allowClear
-                  placeholder="Empresa"
-                  options={options} 
-                  filterOption={(input, option) => 
-                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                <Form
+                  name="change_teble1"
+                  {...formItemLayout}
+                  onFinish={onFinish}
+                  layout="horizontal"
+                  initialValues={predefinedValues1}
+                  form={form2}
+                >
+                  {state.isAdmin && 
+                  <Form.Item
+                  label="Ano"
+                  name="Ano">
+                    <Select 
+                      allowClear
+                      placeholder="Ano"
+                      options={options}
+                      onChange={() => form2.submit()}
+                      filterOption={(input, option) => 
+                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                  </Form.Item>}
+                  {state.isAdmin &&
+                  <Form.Item
+                  label="Delegado"
+                  name="Delegado"> 
+                    <Select 
+                      allowClear
+                      placeholder="Delegado"
+                      options={options} 
+                      onChange={() => form2.submit()}
+                      filterOption={(input, option) => 
+                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                  </Form.Item>}
+                  <Form.Item
+                  label="Empresa"
+                  name="Empresa"> 
+                  <Select 
+                    allowClear
+                    placeholder="Empresa"
+                    options={options} 
+                    onChange={() => form2.submit()}
+                    filterOption={(input, option) => 
+                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                  </Form.Item>
+                </Form>
               </div>
               <Table
                 columns={columns_brick}

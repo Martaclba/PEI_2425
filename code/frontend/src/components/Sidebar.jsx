@@ -9,6 +9,7 @@ import { CgProfile } from "react-icons/cg";
 import { MdOutlineLocationOn } from "react-icons/md";
 import {useAuth} from '../context/Auth';
 import "../styles/sidebar.css"
+import { RiRobot2Line } from "react-icons/ri";
 
 
 const Sidebar = () => {
@@ -83,7 +84,13 @@ const Sidebar = () => {
                     </Link>
                     <span className="tooltip">Farmácias</span>
                 </li>
-                
+                {!state.isAdmin && <li>
+                    <Link to={`/chatbot/`}>
+                        <i className="bx bx-pie-chart-alt-2"><RiRobot2Line /></i>
+                        <span className="links_name">Chatbot</span>
+                    </Link>
+                    <span className="tooltip">Farmácias</span>
+                </li>}
                 <li className="profile">
                     <div className="profile-details">                        
                         <i className="bx bx-pie-chart-alt-2"><CgProfile /></i>
