@@ -1,27 +1,14 @@
 import React, { useState } from 'react';
-import { Form, Select, Card, Button, Input, ConfigProvider, message } from 'antd';
+import { Form, Card, Button, Input, ConfigProvider, message, AutoComplete } from 'antd';
 import { useNavigate, useLocation } from "react-router-dom";
 
 import axios from 'axios'
 
 import themeConfig from '../styles/themeConfigForm';
 import { getFormattedDate } from '../components/utils';
-// const formItemLayout = { labelCol: { span: 6 }, wrapperCol: { span: 14 } };
+import useFormDataStore from '../context/FormData';
+import { useFetchFormData } from '../components/useFetchFormData';
 
-const options = [
-  {
-    value: '1',
-    label: 'Jack',
-  },
-  {
-    value: '2',
-    label: 'Lucy',
-  },
-  {
-    value: '3',
-    label: 'Tom',
-  },
-];
 
 export default function EditarDelegado() {
   const [form] = Form.useForm();
@@ -30,8 +17,15 @@ export default function EditarDelegado() {
   const navigate = useNavigate();
   const location = useLocation();
   
+  // Get state from Zustand store
+  const { hasFetched, districts, hmr_regions, parishes } = useFormDataStore((state) => state) 
+
+  // If the form data fetch didnt happen, then fetch the data, 
+  // update the store and set the form's selects
+  useFetchFormData(!hasFetched)
+
   // State to control edit mode
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false)
   const [fetchTrigger, setFetchTrigger] = useState(false)
 
   // Predefined data
@@ -67,10 +61,9 @@ export default function EditarDelegado() {
 
   const handleSubmitIsEdit = () => {
     setIsEditing(false); 
-    form.submit(); // Submit the form programmatically (execute onFinish)
+    // Submit the form programmatically (execute onFinish)
+    form.submit(); 
   };
-
-  
 
   return (
     <ConfigProvider theme={themeConfig}>
@@ -112,7 +105,6 @@ export default function EditarDelegado() {
           <Card>
             <Form
               name="validate_other"
-              // {...formItemLayout}
               onFinish={onFinish}
               layout="vertical"
               initialValues={predefinedValues}
@@ -144,14 +136,16 @@ export default function EditarDelegado() {
                 hasFeedback
                 rules={[{ required: true, message: 'Por favor insira um distrito' }]}
               >
-                <Select
+
+                <AutoComplete
                   allowClear
-                  showSearch
+                  options={districts}
                   placeholder="Insira um distrito"
-                  options={options}
                   disabled={!isEditing}
-                  filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
-                />
+                  filterOption={(inputValue, option) =>
+                      option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                  }
+                />  
               </Form.Item>
 
               <Form.Item
@@ -160,13 +154,16 @@ export default function EditarDelegado() {
                 hasFeedback
                 rules={[{ required: true, message: 'Por favor insira uma região' }]}
               >
-                <Select
+
+                <AutoComplete
                   allowClear
+                  options={hmr_regions}
                   placeholder="Insira uma região"
-                  options={options}
                   disabled={!isEditing}
-                  filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
-                />
+                  filterOption={(inputValue, option) =>
+                      option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                  }
+                />  
               </Form.Item>
 
               <Form.Item 
@@ -174,13 +171,16 @@ export default function EditarDelegado() {
                 name="Freguesia" 
                 hasFeedback
               >
-                <Select
+
+                <AutoComplete
                   allowClear
+                  options={parishes}
                   placeholder="Insira uma freguesia"
-                  options={options}
                   disabled={!isEditing}
-                  filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
-                />
+                  filterOption={(inputValue, option) =>
+                      option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                  }
+                /> 
               </Form.Item>
             </Form>
           </Card>

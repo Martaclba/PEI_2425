@@ -1,28 +1,14 @@
 import React, { useState, useEffect }  from 'react';
-import { Form, Select, Card, Button, Input, Flex, Tag, Row, Col, List, message } from 'antd';
+import { Form, Select, Card, Button, Input, Flex, Tag, Row, Col, List, message, AutoComplete } from 'antd';
 import { useNavigate } from "react-router-dom"
 
 import axios from 'axios';
 
 import AddProdutoComponent from '../components/AddProduto';
 import { getFormattedDate } from '../components/utils';
+import useFormDataStore from '../context/FormData';
+import { useFetchFormData } from '../components/useFetchFormData';
 
-// const formItemLayout = { labelCol: {span: 6,}, wrapperCol: { span: 14,},};
-
-const options= [
-    {
-        value: '1',
-        label: 'Jack',
-    },
-    {
-        value: '2',
-        label: 'Lucy',
-    },
-    {
-        value: '3',
-        label: 'Tom',
-    },
-];
 
 const renderDisabledTag = (props) => {
     const { label, value, closable, onClose } = props;
@@ -37,25 +23,6 @@ const renderDisabledTag = (props) => {
             {label}
         </Tag>
     );
-};
-
-const onFinish = async (values) => {
-    console.log('Received values of form: ', values);
-
-    try {
-        const response = await axios.post("http://localhost:5000/farmacias/registar/", values)
-    
-        if (response.status === 200){
-            message.success("Registada com sucesso")
-            console.log('Form submitted successfully:', response.data);
-        } else {
-            message.error("Oops! Ocorreu algum erro...")
-            console.error('Form submission failed:', response.status);
-        }
-    } catch (error) {
-        message.error("Oops! Ocorreu algum erro...")
-        console.error('Error submitting form:', error);
-    }
 };
 
 export default function RegistarFarmacia() {
@@ -73,7 +40,6 @@ export default function RegistarFarmacia() {
 
     // Predefined data
     const predefinedValues = {
-        Contacto: '2342213',
         Estado: [{label:'Ativo', value:'green'}],
     };
     
@@ -82,6 +48,36 @@ export default function RegistarFarmacia() {
     useEffect(() => {
         form.setFieldsValue({ Produtos: produtos });
     }, [produtos, form]);
+
+    // Get state from Zustand store
+    const { hasFetched, districts, hmr_regions, parishes } = useFormDataStore((state) => state) 
+
+    // If the form data fetch didnt happen, then fetch the data, 
+    // update the store and set the form's selects
+    useFetchFormData(!hasFetched)
+
+    const [fetchTrigger, setFetchTrigger] = useState(false)
+
+    const onFinish = async (values) => {
+        console.log('Received values of form: ', values);
+    
+        try {
+            const response = await axios.post("http://localhost:5000/farmacias/registar/", values)
+        
+            if (response.status === 200){
+                message.success("Registada com sucesso")
+                console.log('Form submitted successfully:', response.data);
+                setFetchTrigger(true);
+            } else {
+                message.error("Oops! Ocorreu algum erro...")
+                console.error('Form submission failed:', response.status);
+            }
+        } catch (error) {
+            message.error("Oops! Ocorreu algum erro...")
+            console.error('Error submitting form:', error);
+        }
+    };
+    
 
     return(
         <div id="contact" style={{height: '100%'}}>
@@ -97,7 +93,6 @@ export default function RegistarFarmacia() {
                     <Form  
                         form={form}
                         name="validate_other"
-                        // {...formItemLayout}
                         onFinish={onFinish}
                         layout='vertical'
                         initialValues={predefinedValues}
@@ -123,15 +118,16 @@ export default function RegistarFarmacia() {
                                         hasFeedback
                                         rules={[{
                                             required: true,
-                                            message: 'Por favor insira um distrito',},]}>
+                                            message: 'Por favor insira um distrito',}]}>
 
-                                        <Select 
+                                        <AutoComplete
                                             allowClear
-                                            showSearch
+                                            options={districts}
                                             placeholder="Insira um distrito"
-                                            options={options}
-                                            filterOption={(input, option) => 
-                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                            filterOption={(inputValue, option) =>
+                                                option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                            }
+                                        />  
                                     </Form.Item>
 
                                     <Form.Item
@@ -140,15 +136,16 @@ export default function RegistarFarmacia() {
                                         hasFeedback
                                         rules={[{
                                             required: true,
-                                            message: 'Por favor insira uma região',},]}>
+                                            message: 'Por favor insira uma região',}]}>
 
-                                        <Select 
+                                        <AutoComplete
                                             allowClear
-                                            showSearch
+                                            options={hmr_regions}
                                             placeholder="Insira uma região"
-                                            options={options}
-                                            filterOption={(input, option) => 
-                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                            filterOption={(inputValue, option) =>
+                                                option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                            }
+                                        />   
                                     </Form.Item>
 
                                     <Form.Item
@@ -157,14 +154,16 @@ export default function RegistarFarmacia() {
                                         hasFeedback
                                         rules={[{
                                             required: true,
-                                            message: 'Por favor insira uma freguesia',},]}>
-                                        <Select 
+                                            message: 'Por favor insira uma freguesia',}]}>
+                                        
+                                        <AutoComplete
                                             allowClear
-                                            showSearch
+                                            options={parishes}
                                             placeholder="Insira uma freguesia"
-                                            options={options}
-                                            filterOption={(input, option) => 
-                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                            filterOption={(inputValue, option) =>
+                                                option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                            }
+                                        />     
                                     </Form.Item>
 
                                     <Form.Item
@@ -173,15 +172,9 @@ export default function RegistarFarmacia() {
                                         hasFeedback
                                         rules={[{
                                             required: true,
-                                            message: 'Por favor insira uma morada',},]}>
-
-                                        <Select 
-                                            allowClear
-                                            showSearch
-                                            placeholder="Insira uma morada"
-                                            options={options}
-                                            filterOption={(input, option) => 
-                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                            message: 'Por favor insira uma morada',}]}>
+                                        
+                                        <Input allowClear placeholder="Insira uma morada"/>
                                     </Form.Item>
 
                                     <Form.Item
@@ -190,15 +183,9 @@ export default function RegistarFarmacia() {
                                         hasFeedback
                                         rules={[{
                                             required: true,
-                                            message: 'Por favor insira um contacto',},]}>
-
-                                        <Select 
-                                            allowClear
-                                            showSearch
-                                            placeholder="Insira uma morada"
-                                            options={options}
-                                            filterOption={(input, option) => 
-                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                            message: 'Por favor insira um contacto',}]}>
+                                        
+                                        <Input allowClear placeholder="Insira um contacto"/>
                                     </Form.Item>
 
                                     <Form.Item
@@ -258,7 +245,7 @@ export default function RegistarFarmacia() {
                                             <Button type="primary" htmlType="submit">
                                                 Confirmar
                                             </Button>
-                                            <Button danger onClick={() => navigate("/farmacias/")}>
+                                            <Button danger onClick={() => navigate("/farmacias/", { state: { shouldFetchData: fetchTrigger } })}>
                                                 Voltar
                                             </Button>   
                                         </Flex>

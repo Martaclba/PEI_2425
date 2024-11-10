@@ -3,10 +3,12 @@ import { IconContext } from "react-icons";
 import { LuCross } from "react-icons/lu";
 import { IoAddCircleOutline} from "react-icons/io5";
 import { Dropdown, Space, Button, Table, ConfigProvider } from 'antd';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+
 import {useAuth} from '../context/Auth';
 import themeConfig from '../styles/themeConfigTable';
 import { getFormattedDate } from '../components/utils';
+import { useFetchData } from '../components/useFetchData';
 
 const columns = (navigate) => [
   {
@@ -100,6 +102,8 @@ export default function Farmacias() {
   const date = getFormattedDate();
   const {state} = useAuth();
   const navigate = useNavigate()
+  const location = useLocation();
+
   const items = [
     {
       key: '1',
@@ -110,6 +114,8 @@ export default function Farmacias() {
         </Button>
     },
   ];
+
+  const {data} = useFetchData('/farmacias', location.state?.shouldFetchData)
 
   return (
     <div id="contact">

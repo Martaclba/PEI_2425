@@ -1,14 +1,16 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { IconContext } from "react-icons";
 import { HiOutlineUpload } from "react-icons/hi";
 import { LuStethoscope } from "react-icons/lu";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { Dropdown, Space, Upload, Button, Table,Tag,  ConfigProvider} from 'antd';
 import { useNavigate, useLocation } from "react-router-dom"
+
 import {useAuth} from '../context/Auth';
 import { getFormattedDate } from '../components/utils';
 import themeConfig from '../styles/themeConfigTable';
 import UploadFileProps from '../components/UploadFile';
+import { useFetchData } from '../components/useFetchData';
 
 const columns = (navigate) => [
   {
@@ -111,6 +113,8 @@ export default function Medicos() {
   const {state} = useAuth();
   const navigate = useNavigate()
   const location = useLocation()
+  
+  const [fetchTrigger, setFetchTrigger] = useState(false)
 
   const items = [
     {
@@ -125,7 +129,7 @@ export default function Medicos() {
     {
       key: '2',
       label: 
-      (state.isAdmin ? <Upload {...UploadFileProps} maxCount={1}>
+      (state.isAdmin ? <Upload {...UploadFileProps(location.pathname, setFetchTrigger)} maxCount={1}>
         <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
           Registo por Ficheiro
         </Button>
@@ -133,13 +137,7 @@ export default function Medicos() {
     },
   ];
   
-  const table = <Table 
-  columns={columns(navigate)}
-  dataSource={dataSource}
-  scroll={{x: 'max-content'}}
-  pagination={{ pageSize: 7, showSizeChanger: false }}
-  showSorterTooltip={false}                             // desativa o pop up que aparecia quando tentava ordenar uma coluna
-/>
+  const {data} = useFetchData('/medicos', location.state?.shouldFetchData || fetchTrigger)
 
   return (
     <div id="contact">
@@ -161,7 +159,13 @@ export default function Medicos() {
 
       <div style={{padding: '1rem'}}>
         <ConfigProvider theme={themeConfig}>
-          {table}  
+          <Table 
+            columns={columns(navigate)}
+            dataSource={dataSource}
+            scroll={{x: 'max-content'}}
+            pagination={{ pageSize: 7, showSizeChanger: false }}
+            showSorterTooltip={false}                             
+          />
         </ConfigProvider>
       </div>
     </div>

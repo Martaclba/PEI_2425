@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, {useState} from 'react';
 import { IconContext } from "react-icons";
 import { HiOutlineUpload } from "react-icons/hi";
 import { IoAddCircleOutline, IoPersonOutline } from "react-icons/io5";
 import { Dropdown, Space, Upload, Button, Table, ConfigProvider } from 'antd';
 import { useNavigate, useLocation } from "react-router-dom"
 
-import axios from 'axios'
-
 import themeConfig from '../styles/themeConfigTable';
 import UploadFileProps from '../components/UploadFile';
 import { getFormattedDate } from '../components/utils';
+import { useFetchData } from '../components/useFetchData';
+
 
 // For the table
 const columns = (navigate) => [
@@ -97,6 +97,7 @@ export default function Delegados() {
 
   const navigate = useNavigate()
   const location = useLocation();
+  const [fetchTrigger, setFetchTrigger] = useState(false)
 
   const items = [
     {
@@ -111,7 +112,7 @@ export default function Delegados() {
     {
       key: '2',
       label: 
-      <Upload {...UploadFileProps(location.pathname)} maxCount={1}>
+      <Upload {...UploadFileProps(location.pathname, setFetchTrigger)} maxCount={1}>
         <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
           Registo por Ficheiro
         </Button>
@@ -119,38 +120,7 @@ export default function Delegados() {
     },
   ];
 
-  // State to update table's content
-  const [data, setData] = useState([])
-
-  // Fetch data from the backend
-  const fetchData = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/delegados");
-
-      if (response.status === 200){
-        console.log('Form submitted successfully:', response.data);
-        setData(response.data)
-      } else {
-        console.error('Form submission failed:', response.status);
-      }
-    } catch (error) {
-      console.error('Error submitting form:', error);
-    } 
-  }
-
-  // Load the table's content and update it when necessary
-  useEffect (() => {
-    // Track if the component is still mounted
-    let isMounted = true; 
-
-    // Fetch data if there's no data or if there's an update
-    if (isMounted && (!data.length || location.state?.shouldFetchData)) fetchData();
-
-    return () => {
-      // Cleanup flag when component unmounts
-      isMounted = false;
-    };
-  }, [data.length, location.state?.shouldFetchData]);
+  const {data} = useFetchData('/delegados', location.state?.shouldFetchData || fetchTrigger)
 
   return (
       <div id="contact">

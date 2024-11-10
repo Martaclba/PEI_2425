@@ -1,27 +1,28 @@
 import React, { useState } from 'react';
-import { Form, Select, Card, Button, Input, Row, Col, Tag, ConfigProvider, message } from 'antd';
+import { Form, Select, Card, Button, Input, Row, Col, Tag, ConfigProvider, message, AutoComplete } from 'antd';
 import { useNavigate, useLocation } from "react-router-dom";
 import {useAuth} from '../context/Auth';
+
 import axios from 'axios'
 
 import { getFormattedDate } from '../components/utils';
 import useConfirmModal from '../components/confirmModal';
 import themeConfig from '../styles/themeConfigForm';
+import useFormDataStore from '../context/FormData';
+import { useFetchFormData } from '../components/useFetchFormData';
 
-// const formItemLayout = { labelCol: {span: 6,}, wrapperCol: { span: 14,},};
-
-const options= [
+const states = [
     {
-    value: 'blue',
-    label: 'Indisponível',
+        value: 'blue',
+        label: 'Indisponível',
     },
     {
-    value: 'volcano',
-    label: 'Inativo',
+        value: 'volcano',
+        label: 'Inativo',
     },
     {
-    value: 'green',
-    label: 'Ativo',
+        value: 'green',
+        label: 'Ativo',
     },
 ];
 
@@ -54,12 +55,18 @@ export default function EditarMedico() {
     const navigate = useNavigate();
     const location = useLocation()
 
+    // Get state from Zustand store
+    const { hasFetched, instituitions, specialties, districts, hmr_regions, parishes } = useFormDataStore((state) => state) 
+
+    // If the form data fetch didnt happen, then fetch the data, 
+    // update the store and set the form's selects
+    useFetchFormData(!hasFetched)
+
+    const [fetchTrigger, setFetchTrigger] = useState(false)
+
     // State to control edit mode
     const [isEditing, setIsEditing] = useState(false);
     
-    // State to control the field Estado
-    // const [isInativo, setIsInativo] = useState(false);
-
     // Predefined data for the form
     const predefinedValues = {
         Nome: 'John',
@@ -104,6 +111,7 @@ export default function EditarMedico() {
           if(response.status === 200){
             message.success("Editado com sucesso")
             console.log('Form submitted successfully:', response.data);
+            setFetchTrigger(true);
           } else {
             message.error("Oops! Ocorreu algum erro...")
             console.error('Form submission failed:', response.status);
@@ -115,10 +123,10 @@ export default function EditarMedico() {
     };
 
     const handleSubmitIsEdit = () => {
-        setIsEditing(false); 
-        form.submit(); // Submit the form programmatically
-      };
-
+        setIsEditing(false);
+        // Submit the form programmatically 
+        form.submit(); 
+    };
 
     return(
         <ConfigProvider theme={themeConfig}>
@@ -137,7 +145,7 @@ export default function EditarMedico() {
                                     <Button type="primary" onClick={handleSubmitIsEdit}>
                                         Guardar
                                     </Button>
-                                    <Button danger onClick={() => navigate("/medicos/")}>
+                                    <Button danger onClick={() => navigate("/medicos/", { state: { shouldFetchData: fetchTrigger } })}>
                                         Voltar
                                     </Button>
                                 </>
@@ -160,7 +168,6 @@ export default function EditarMedico() {
                     <Form 
                         form={form} 
                         name="validate_other"
-                        // {...formItemLayout}
                         onFinish={onFinish}
                         layout='vertical'
                         initialValues={predefinedValues}
@@ -186,16 +193,18 @@ export default function EditarMedico() {
                                         hasFeedback
                                         rules={[{
                                             required: true,
-                                            message: 'Por favor insira uma instituição',},]}>
+                                            message: 'Por favor insira uma instituição'}]}
+                                    >
 
-                                        <Select 
+                                        <AutoComplete
                                             allowClear
-                                            showSearch
+                                            options={instituitions}
                                             placeholder="Insira uma instituição"
-                                            options={options}
                                             disabled={!isEditing}
-                                            filterOption={(input, option) => 
-                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                            filterOption={(inputValue, option) =>
+                                                option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                            }
+                                        /> 
                                     </Form.Item>
 
                                     <Form.Item
@@ -204,16 +213,18 @@ export default function EditarMedico() {
                                         hasFeedback
                                         rules={[{
                                             required: true,
-                                            message: 'Por favor insira uma especialidade',},]}>
+                                            message: 'Por favor insira uma especialidade'}]}
+                                    >
 
-                                        <Select 
+                                        <AutoComplete
                                             allowClear
-                                            showSearch
+                                            options={specialties}
                                             placeholder="Insira uma especialidade"
-                                            options={options}
                                             disabled={!isEditing}
-                                            filterOption={(input, option) => 
-                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                            filterOption={(inputValue, option) =>
+                                                option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                            }
+                                        />  
                                     </Form.Item>
 
                                     <Form.Item
@@ -222,16 +233,17 @@ export default function EditarMedico() {
                                         hasFeedback
                                         rules={[{
                                             required: true,
-                                            message: 'Por favor insira um distrito',},]}>
+                                            message: 'Por favor insira um distrito'}]}>
 
-                                        <Select 
+                                        <AutoComplete
                                             allowClear
-                                            showSearch
+                                            options={districts}
                                             placeholder="Insira um distrito"
-                                            options={options}
                                             disabled={!isEditing}
-                                            filterOption={(input, option) => 
-                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                            filterOption={(inputValue, option) =>
+                                                option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                            }
+                                        /> 
                                     </Form.Item>
 
                                     <Form.Item
@@ -240,16 +252,18 @@ export default function EditarMedico() {
                                         hasFeedback
                                         rules={[{
                                             required: true,
-                                            message: 'Por favor insira uma região',},]}>
+                                            message: 'Por favor insira uma região',}]}
+                                    >
 
-                                        <Select 
+                                        <AutoComplete
                                             allowClear
-                                            showSearch
+                                            options={hmr_regions}
                                             placeholder="Insira uma região"
-                                            options={options}
                                             disabled={!isEditing}
-                                            filterOption={(input, option) => 
-                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                            filterOption={(inputValue, option) =>
+                                                option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                            }
+                                        />
                                     </Form.Item>
 
                                     <Form.Item
@@ -258,15 +272,18 @@ export default function EditarMedico() {
                                         hasFeedback
                                         rules={[{
                                             required: true,
-                                            message: 'Por favor insira uma freguesia',},]}>
-                                        <Select 
+                                            message: 'Por favor insira uma freguesia'}]}
+                                    >
+                                        
+                                        <AutoComplete
                                             allowClear
-                                            showSearch
+                                            options={parishes}
                                             placeholder="Insira uma freguesia"
-                                            options={options}
                                             disabled={!isEditing}
-                                            filterOption={(input, option) => 
-                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                            filterOption={(inputValue, option) =>
+                                                option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                            }
+                                        />
                                     </Form.Item>
                                 </Card>
                             </Col>
@@ -279,16 +296,10 @@ export default function EditarMedico() {
                                         hasFeedback
                                         rules={[{
                                             required: true,
-                                            message: 'Por favor insira uma morada',},]}>
+                                            message: 'Por favor insira uma morada'}]}
+                                    >
 
-                                        <Select 
-                                            allowClear
-                                            showSearch
-                                            placeholder="Insira uma morada"
-                                            options={options}
-                                            disabled={!isEditing}
-                                            filterOption={(input, option) => 
-                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                        <Input allowClear placeholder="Insira uma morada" disabled={!isEditing}/>
                                     </Form.Item>
 
                                     <Form.Item
@@ -297,16 +308,9 @@ export default function EditarMedico() {
                                         hasFeedback
                                         rules={[{
                                             required: true,
-                                            message: 'Por favor insira um contacto',},]}>
+                                            message: 'Por favor insira um contacto'}]}>
 
-                                        <Select 
-                                            allowClear
-                                            showSearch
-                                            placeholder="Insira um contacto"
-                                            options={options}
-                                            disabled={!isEditing}
-                                            filterOption={(input, option) => 
-                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                        <Input allowClear placeholder="Insira um contacto" disabled={!isEditing}/>
                                     </Form.Item>
 
                                     <Form.Item
@@ -322,7 +326,7 @@ export default function EditarMedico() {
                                             maxCount={1}                                       
                                             tagRender={tagRender}
                                             placeholder="Insira um estado"
-                                            options={options}
+                                            options={states}
                                             disabled={!isEditing}
                                             labelInValue
                                             onChange={changeState}

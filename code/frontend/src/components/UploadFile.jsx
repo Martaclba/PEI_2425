@@ -1,7 +1,7 @@
 import { message } from 'antd';
 
 // Upload a Excel file
-const UploadFileProps = (path) => ({    
+const UploadFileProps = (path, setFetchTrigger) => ({    
     listType: 'picture',
 
     // Only accepts Excel files
@@ -18,6 +18,7 @@ const UploadFileProps = (path) => ({
         if (status === 'done') {
             message.success("Ficheiro importado com sucesso");
             console.log(`"${info.file.name}" uploaded successfully.`);
+            setFetchTrigger(Date.now())            
         } else if (status === 'error') {
             message.error("Oops! Ocorreu algum erro durante o upload...");
             console.log(`"${info.file.name}" upload failed.`);

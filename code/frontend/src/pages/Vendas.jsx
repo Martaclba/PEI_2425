@@ -4,18 +4,15 @@ import { HiOutlineUpload } from "react-icons/hi";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { Dropdown, Space, Upload, Button, Table, ConfigProvider, Select } from 'antd';
 import { useLocation } from "react-router-dom"
-import {useAuth} from '../context/Auth';
+import { Column } from '@ant-design/plots';
+
 import themeConfig from '../styles/themeConfigTable';
 import UploadFileProps from '../components/UploadFile';
 import { getFormattedDate } from '../components/utils';
-
-
-import { Column } from '@ant-design/plots';
-import { MdHorizontalDistribute } from 'react-icons/md';
+import {useAuth} from '../context/Auth';
 
 
 //Para os histogramas
-
 const data = [
   { type: 'Jan', value: 0.16 },
   { type: 'Fev', value: 0.125 },
@@ -317,16 +314,12 @@ export default function Vendas() {
   const date = getFormattedDate();
   const location = useLocation();
   const {state} = useAuth();
-  // Memo improves performance by memoizing/caching this function's output. 
-  // This way the function is not re-calculated everytime this page re-renders.  
-  // It re-calculates only when the dependency (location.pathname) changes
-  const upload = React.useMemo(() => UploadFileProps(location.pathname), [location.pathname])
 
   const items = [
     {
       key: '1',
       label:  
-        <Upload {...upload} maxCount={1}>
+        <Upload {...UploadFileProps(location.pathname)} maxCount={1}>
           <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
             Importar Ficheiro
           </Button>
@@ -356,19 +349,7 @@ export default function Vendas() {
           <div className='dashboard-card'>
             <div id='data-import'>
               <p className="table-title">Histórico De Vendas</p>
-              {state.isAdmin && <Select 
-                allowClear
-                placeholder="Ano"
-                options={options} 
-                filterOption={(input, option) => 
-                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>}
-            </div>
-            <div style={{marginBottom:'2rem'}}>
-              <DemoColumn/>
-            </div>
-            {state.isAdmin && <div id='data-import'>
-              <p className="table-title">Histórico De Vendas Por Delegado</p>
-              <div style={{display:'flex', gap:'1rem',marginBottom: '1rem'}}>
+              {state.isAdmin && <div style={{display:'flex', gap:'1rem',marginBottom: '1rem'}}>
                 <Select 
                   allowClear
                   placeholder="Delegado"
@@ -381,12 +362,12 @@ export default function Vendas() {
                   options={options} 
                   filterOption={(input, option) => 
                       (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-              </div>
-            </div>}
-            {state.isAdmin && <DemoColumn />}
+              </div>}
+            </div>
+            <DemoColumn />
           </div>
-          <ConfigProvider theme={themeConfig}>  
 
+          <ConfigProvider theme={themeConfig}>  
             <div className='dashboard-card'>
               <p className="table-title">Consulta por Produto</p>
               <div style={{display:'flex', gap:'1rem',marginBottom: '1rem'}}>

@@ -1,14 +1,14 @@
-import React from 'react';
-import { Form, Select, Card, Button, Input, Flex, Row, Col, Tag, message } from 'antd';
+import React, {useState} from 'react';
+import { Form, Select, Card, Button, Input, Flex, Row, Col, Tag, message, AutoComplete } from 'antd';
 import { useNavigate } from "react-router-dom"
 
 import axios from 'axios'
 
 import { getFormattedDate } from '../components/utils';
+import useFormDataStore from '../context/FormData';
+import { useFetchFormData } from '../components/useFetchFormData';
 
-// const formItemLayout = { labelCol: {span: 6,}, wrapperCol: { span: 14,},};
-
-const options= [
+const states= [
     {
     value: 'blue',
     label: 'Indisponível',
@@ -38,29 +38,40 @@ const renderDisabledTag = (props) => {
     );
 };
 
-const onFinish = async (values) => {
-    console.log('Received values of form: ', values);
-
-    try {
-        const response = await axios.post("http://localhost:5000/medicos/registar/", values)
-    
-        if (response.status === 200){
-            message.success("Registado com sucesso")
-            console.log('Form submitted successfully:', response.data);
-        } else {
-            message.error("Oops! Ocorreu algum erro...")
-            console.error('Form submission failed:', response.status);
-        }
-    } catch (error) {
-        message.error("Oops! Ocorreu algum erro...")
-        console.error('Error submitting form:', error);
-    }
-};
 
 export default function RegistarMedico() {
     const date = getFormattedDate();
 
     const navigate = useNavigate()
+
+    // Get state from Zustand store
+    const { hasFetched, instituitions, specialties, districts, hmr_regions, parishes } = useFormDataStore((state) => state) 
+
+    // If the form data fetch didnt happen, then fetch the data, 
+    // update the store and set the form's selects
+    useFetchFormData(!hasFetched)
+
+    const [fetchTrigger, setFetchTrigger] = useState(false)
+
+    const onFinish = async (values) => {
+        console.log('Received values of form: ', values);
+    
+        try {
+            const response = await axios.post("http://localhost:5000/medicos/registar/", values)
+        
+            if (response.status === 200){
+                message.success("Registado com sucesso")
+                console.log('Form submitted successfully:', response.data);
+                setFetchTrigger(true);
+            } else {
+                message.error("Oops! Ocorreu algum erro...")
+                console.error('Form submission failed:', response.status);
+            }
+        } catch (error) {
+            message.error("Oops! Ocorreu algum erro...")
+            console.error('Error submitting form:', error);
+        }
+    };
 
     return(
         <div id="contact" style={{height: '100%'}}>
@@ -75,7 +86,6 @@ export default function RegistarMedico() {
             <div style={{width: '100%', height: '80%', justifySelf: 'center', alignContent: 'center'}}>
                         <Form  
                             name="validate_other"
-                            // {...formItemLayout}
                             onFinish={onFinish}
                             layout='vertical'
                             initialValues={{Estado: [{label:'Ativo', value:'green'}],}}
@@ -101,15 +111,16 @@ export default function RegistarMedico() {
                                             hasFeedback
                                             rules={[{
                                                 required: true,
-                                                message: 'Por favor insira uma instituição',},]}>
-
-                                            <Select 
+                                                message: 'Por favor insira uma instituição'}]}>
+                                            
+                                            <AutoComplete
                                                 allowClear
-                                                showSearch
+                                                options={instituitions}
                                                 placeholder="Insira uma instituição"
-                                                options={options}
-                                                filterOption={(input, option) => 
-                                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                                filterOption={(inputValue, option) =>
+                                                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                                }
+                                            />   
                                         </Form.Item>
 
                                         <Form.Item
@@ -118,15 +129,16 @@ export default function RegistarMedico() {
                                             hasFeedback
                                             rules={[{
                                                 required: true,
-                                                message: 'Por favor insira uma especialidade',},]}>
+                                                message: 'Por favor insira uma especialidade'}]}>
 
-                                            <Select 
+                                            <AutoComplete
                                                 allowClear
-                                                showSearch
+                                                options={specialties}
                                                 placeholder="Insira uma especialidade"
-                                                options={options}
-                                                filterOption={(input, option) => 
-                                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                                filterOption={(inputValue, option) =>
+                                                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                                }
+                                            />                                            
                                         </Form.Item>
 
                                         <Form.Item
@@ -135,15 +147,16 @@ export default function RegistarMedico() {
                                             hasFeedback
                                             rules={[{
                                                 required: true,
-                                                message: 'Por favor insira um distrito',},]}>
-
-                                            <Select 
+                                                message: 'Por favor insira um distrito'}]}>
+                                            
+                                            <AutoComplete
                                                 allowClear
-                                                showSearch
+                                                options={districts}
                                                 placeholder="Insira um distrito"
-                                                options={options}
-                                                filterOption={(input, option) => 
-                                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                                filterOption={(inputValue, option) =>
+                                                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                                }
+                                            />                                            
                                         </Form.Item>
 
                                         <Form.Item
@@ -152,15 +165,16 @@ export default function RegistarMedico() {
                                             hasFeedback
                                             rules={[{
                                                 required: true,
-                                                message: 'Por favor insira uma região',},]}>
-
-                                            <Select 
+                                                message: 'Por favor insira uma região'}]}>
+                                            
+                                            <AutoComplete
                                                 allowClear
-                                                showSearch
+                                                options={hmr_regions}
                                                 placeholder="Insira uma região"
-                                                options={options}
-                                                filterOption={(input, option) => 
-                                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                                filterOption={(inputValue, option) =>
+                                                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                                }
+                                            />                                                
                                         </Form.Item>
 
                                         <Form.Item
@@ -169,14 +183,16 @@ export default function RegistarMedico() {
                                             hasFeedback
                                             rules={[{
                                                 required: true,
-                                                message: 'Por favor insira uma freguesia',},]}>
-                                            <Select 
+                                                message: 'Por favor insira uma freguesia'}]}>
+
+                                            <AutoComplete
                                                 allowClear
-                                                showSearch
+                                                options={parishes}
                                                 placeholder="Insira uma freguesia"
-                                                options={options}
-                                                filterOption={(input, option) => 
-                                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                                filterOption={(inputValue, option) =>
+                                                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                                }
+                                            />          
                                         </Form.Item>
                                     </Card>
                                 </Col>
@@ -189,15 +205,10 @@ export default function RegistarMedico() {
                                             hasFeedback
                                             rules={[{
                                                 required: true,
-                                                message: 'Por favor insira uma morada',},]}>
+                                                message: 'Por favor insira uma morada'}]}
+                                        >
 
-                                            <Select 
-                                                allowClear
-                                                showSearch
-                                                placeholder="Insira uma morada"
-                                                options={options}
-                                                filterOption={(input, option) => 
-                                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                            <Input allowClear placeholder="Insira uma morada"/>
                                         </Form.Item>
 
                                         <Form.Item
@@ -206,15 +217,10 @@ export default function RegistarMedico() {
                                             hasFeedback
                                             rules={[{
                                                 required: true,
-                                                message: 'Por favor insira um contacto',},]}>
+                                                message: 'Por favor insira um contacto'}]}
+                                        >
 
-                                            <Select 
-                                                allowClear
-                                                showSearch
-                                                placeholder="Insira um contacto"
-                                                options={options}
-                                                filterOption={(input, option) => 
-                                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                            <Input allowClear placeholder="Insira um contacto"/>
                                         </Form.Item>
 
                                         <Form.Item
@@ -227,7 +233,7 @@ export default function RegistarMedico() {
                                                 disabled                                     
                                                 tagRender={renderDisabledTag}                                 
                                                 placeholder="Insira um estado"
-                                                options={options}
+                                                options={states}
                                                 filterOption={(input, option) => 
                                                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                                         </Form.Item>
@@ -243,7 +249,7 @@ export default function RegistarMedico() {
                                                 <Button type="primary" htmlType="submit">
                                                     Confirmar
                                                 </Button>
-                                                <Button danger onClick={() => navigate("/medicos/")}>
+                                                <Button danger onClick={() => navigate("/medicos/", { state: { shouldFetchData: fetchTrigger } })}>
                                                     Voltar
                                                 </Button>   
                                             </Flex>

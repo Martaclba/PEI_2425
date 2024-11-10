@@ -1,43 +1,29 @@
 import React, { useState, useEffect }  from 'react';
-import { Form, Select, Card, Button, Input, Tag, Row, Col, List, ConfigProvider, message } from 'antd';
+import { Form, Select, Card, Button, Input, Tag, Row, Col, List, ConfigProvider, message, AutoComplete } from 'antd';
 import { useNavigate, useLocation } from "react-router-dom"
 
 import axios from 'axios'
+
 import {useAuth} from '../context/Auth';
 import AddProdutoComponent from '../components/AddProduto';
 import { getFormattedDate } from '../components/utils';
 import useConfirmModal from '../components/confirmModal';
 import themeConfig from '../styles/themeConfigForm';
+import useFormDataStore from '../context/FormData';
+import { useFetchFormData } from '../components/useFetchFormData';
 
-// const formItemLayout = { labelCol: {span: 6,}, wrapperCol: { span: 14,},};
-
-const options= [
+const states= [
     {
-        value: '1',
-        label: 'Jack',
+        value: 'blue',
+        label: 'Indisponível',
     },
     {
-        value: '2',
-        label: 'Lucy',
+        value: 'volcano',
+        label: 'Inativo',
     },
     {
-        value: '3',
-        label: 'Tom',
-    },
-];
-
-const options2= [
-    {
-    value: 'blue',
-    label: 'Indisponível',
-    },
-    {
-    value: 'volcano',
-    label: 'Inativo',
-    },
-    {
-    value: 'green',
-    label: 'Ativo',
+        value: 'green',
+        label: 'Ativo',
     },
 ];
 
@@ -70,6 +56,15 @@ export default function EditarFarmacia() {
     const navigate = useNavigate()
     const location = useLocation()
 
+    // Get state from Zustand store
+    const { hasFetched, districts, hmr_regions, parishes } = useFormDataStore((state) => state) 
+
+    // If the form data fetch didnt happen, then fetch the data, 
+    // update the store and set the form's selects
+    useFetchFormData(!hasFetched)
+
+    const [fetchTrigger, setFetchTrigger] = useState(false)
+
     // State for the product list
     const [produtos, setProdutos] = useState([{ key: '1', label: 'Produto 1' }]); 
 
@@ -81,15 +76,12 @@ export default function EditarFarmacia() {
     // State to control edit mode
     const [isEditing, setIsEditing] = useState(false);
 
-    // State to control the field Estado
-    // const [isInativo, setIsInativo] = useState(false);
-
     // Predefined data
     const predefinedValues = {
         Nome: 'Farmácia A',
-        Distrito: '1',
-        Regiao: ['1', '2'],
-        Freguesia: ['3'],
+        Distrito: 'Braga',
+        Regiao: 'Braga',
+        Freguesia: 'Lousado',
         Morada: ['rua 123'],
         Contacto: ['973493749'],
         Estado: [{label:'Ativo', value:'green'}],
@@ -111,8 +103,6 @@ export default function EditarFarmacia() {
                 // Wait for the user’s response
                 const confirmed = await showConfirm();
                 if (confirmed) {
-                    // Disable the field if confirmed
-                    // setIsInativo(true)  
                     console.log("Inactive state.");
                 }
             } catch (error) {
@@ -131,6 +121,7 @@ export default function EditarFarmacia() {
           if(response.status === 200){
             message.success("Editado com sucesso")
             console.log('Form submitted successfully:', response.data);
+            setFetchTrigger(true);
           } else {
             message.error("Oops! Ocorreu algum erro...")
             console.error('Form submission failed:', response.status);
@@ -142,8 +133,9 @@ export default function EditarFarmacia() {
     };
 
     const handleSubmitIsEdit = () => {
-        setIsEditing(false); 
-        form.submit(); // Submit the form programmatically
+        setIsEditing(false);
+        // Submit the form programmatically 
+        form.submit(); 
       };
 
     return(
@@ -172,7 +164,7 @@ export default function EditarFarmacia() {
                                 {state.isAdmin && <Button type="primary" onClick={() => setIsEditing(true)}>
                                     Editar
                                 </Button>}
-                                <Button danger onClick={() => navigate("/farmacias/")}>
+                                <Button danger onClick={() => navigate("/farmacias/", { state: { shouldFetchData: fetchTrigger } })}>
                                     Voltar
                                 </Button>
                                 </>
@@ -186,7 +178,6 @@ export default function EditarFarmacia() {
                         <Form  
                             form={form}
                             name="validate_other"
-                            // {...formItemLayout}
                             onFinish={onFinish}
                             layout='vertical'
                             initialValues={predefinedValues}
@@ -212,16 +203,18 @@ export default function EditarFarmacia() {
                                             hasFeedback
                                             rules={[{
                                                 required: true,
-                                                message: 'Por favor insira um distrito',},]}>
+                                                message: 'Por favor insira um distrito',},]}
+                                        >
 
-                                            <Select 
+                                            <AutoComplete
                                                 allowClear
-                                                showSearch
+                                                options={districts}
                                                 placeholder="Insira um distrito"
                                                 disabled={!isEditing}
-                                                options={options}
-                                                filterOption={(input, option) => 
-                                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                                filterOption={(inputValue, option) =>
+                                                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                                }
+                                            /> 
                                         </Form.Item>
 
                                         <Form.Item
@@ -230,16 +223,18 @@ export default function EditarFarmacia() {
                                             hasFeedback
                                             rules={[{
                                                 required: true,
-                                                message: 'Por favor insira uma região',},]}>
+                                                message: 'Por favor insira uma região',},]}
+                                        >
 
-                                            <Select 
+                                            <AutoComplete
                                                 allowClear
-                                                showSearch
+                                                options={hmr_regions}
                                                 placeholder="Insira uma região"
-                                                options={options}
                                                 disabled={!isEditing}
-                                                filterOption={(input, option) => 
-                                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                                filterOption={(inputValue, option) =>
+                                                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                                }
+                                            />  
                                         </Form.Item>
 
                                         <Form.Item
@@ -248,15 +243,19 @@ export default function EditarFarmacia() {
                                             hasFeedback
                                             rules={[{
                                                 required: true,
-                                                message: 'Por favor insira uma freguesia',},]}>
-                                            <Select 
+                                                message: 'Por favor insira uma freguesia',},]}
+                                        >
+
+                                            <AutoComplete
                                                 allowClear
-                                                showSearch
+                                                options={parishes}
                                                 placeholder="Insira uma freguesia"
-                                                options={options}
                                                 disabled={!isEditing}
-                                                filterOption={(input, option) => 
-                                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                                filterOption={(inputValue, option) =>
+                                                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                                }
+                                            /> 
+
                                         </Form.Item>
 
                                         <Form.Item
@@ -265,16 +264,10 @@ export default function EditarFarmacia() {
                                             hasFeedback
                                             rules={[{
                                                 required: true,
-                                                message: 'Por favor insira uma morada',},]}>
+                                                message: 'Por favor insira uma morada',}]}
+                                        >
 
-                                            <Select 
-                                                allowClear
-                                                showSearch
-                                                placeholder="Insira uma morada"
-                                                options={options}
-                                                disabled={!isEditing}
-                                                filterOption={(input, option) => 
-                                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                            <Input allowClear placeholder="Insira uma morada" disabled={!isEditing}/>
                                         </Form.Item>
 
                                         <Form.Item
@@ -283,16 +276,10 @@ export default function EditarFarmacia() {
                                             hasFeedback
                                             rules={[{
                                                 required: true,
-                                                message: 'Por favor insira um contacto',},]}>
+                                                message: 'Por favor insira um contacto',}]}
+                                        >
 
-                                            <Select 
-                                                allowClear
-                                                showSearch
-                                                placeholder="Insira uma morada"
-                                                options={options}
-                                                disabled={!isEditing}
-                                                filterOption={(input, option) => 
-                                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                            <Input allowClear placeholder="Insira um contacto" disabled={!isEditing}/>
                                         </Form.Item>
 
                                         <Form.Item
@@ -306,7 +293,7 @@ export default function EditarFarmacia() {
                                                 maxCount={1}       
                                                 disabled={!isEditing}                                      
                                                 tagRender={tagRender}
-                                                options={options2}
+                                                options={states}
                                                 labelInValue
                                                 onChange={changeState}/>
                                         </Form.Item>

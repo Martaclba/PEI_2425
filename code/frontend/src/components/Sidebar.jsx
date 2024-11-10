@@ -13,10 +13,10 @@ import "../styles/sidebar.css"
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const {state} = useAuth();
 
     const navigate = useNavigate();
-    const { logout } = useAuth()
+
+    const { state, logout } = useAuth();
 
     const handleLogout = () => {
         logout();

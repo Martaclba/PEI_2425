@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { IconContext } from "react-icons";
 import { IoAddCircleOutline } from "react-icons/io5";
-import { Modal, Form, DatePicker, Select, Button, Table, ConfigProvider, Flex } from 'antd';
+import { Modal, Form, DatePicker, Select, Button, Table, ConfigProvider, Flex, message } from 'antd';
+
+import axios from 'axios'
 
 import themeConfig from '../styles/themeConfigTable';
 import { getFormattedDate } from '../components/utils';
+import { useFetchData } from '../components/useFetchData';
 
 // For the table
 const columns = [
@@ -87,17 +90,17 @@ const columns = [
   },
 ];
 
-const dataSource = Array.from({
-  length: 100,
-}).map((_, i) => ({
-  key: i,
-  data: `12/01/2025 ${i}`,
-  comprador: `Médico ${i}`,
-  distrito: `Distrito ${i}`,
-  regiao: `Região ${i}`,      
-  freguesia: `Freguesia ${i}`,
-  morada: `Rua ${i}`,
-}));
+// const dataSource = Array.from({
+//   length: 100,
+// }).map((_, i) => ({
+//   key: i,
+//   data: `12/01/2025 ${i}`,
+//   comprador: `Médico ${i}`,
+//   distrito: `Distrito ${i}`,
+//   regiao: `Região ${i}`,      
+//   freguesia: `Freguesia ${i}`,
+//   morada: `Rua ${i}`,
+// }));
 
 const compradores = [
     {
@@ -141,18 +144,38 @@ export default function Visitas() {
     const [tipoComprador, setTipoComprador] = useState()
     const [options, setOptions] = useState([])
     const [placeholder, setPlaceholder] = useState()
+    const [fetchTrigger, setFetchTrigger] = useState(false)
 
     const [form] = Form.useForm();
+
+    const {data} = useFetchData('/visitas', fetchTrigger)
     
     const openModal = () => {
         setModalState(true)
     }
 
-    const handleModalConfirm = (values) => {
+    const handleModalConfirm = async (values) => {
         console.log('Received values of form: ', values)
         setModalState(false)
         setComprador(false)
         form.resetFields()
+
+        try {
+            const response = await axios.post("http://localhost:5000/visitas", values)
+
+            if(response.status === 200) {
+                message.success("Registado com sucesso")
+                console.log('Form submitted successfully:', response.data);
+                setFetchTrigger(true);
+            } else {
+                message.error("Oops! Ocorreu algum erro...")
+                console.error('Form submission failed:', response.status);
+            }
+
+        } catch (error) {
+            message.error("Oops! Ocorreu algum erro...")
+            console.error('Error submitting form:', error);
+        }
     }
 
     const handleModalCancel = () => {
@@ -172,6 +195,7 @@ export default function Visitas() {
             setOptions(value === 'Médico' ? medicos : farmacias);
         }
     }
+
 
     return (
         <div id="contact">
@@ -246,7 +270,7 @@ export default function Visitas() {
                 <ConfigProvider theme={themeConfig}>
                     <Table 
                         columns={columns}
-                        dataSource={dataSource}
+                        dataSource={data}
                         scroll={{x: 'max-content'}}
                         pagination={{ pageSize: 7, showSizeChanger: false }}
                         showSorterTooltip={false}                             

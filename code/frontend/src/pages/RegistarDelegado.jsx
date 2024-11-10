@@ -1,37 +1,27 @@
 import React, { useState } from 'react';
-import { Form, Select, Card, Button, Input, Flex, message } from 'antd';
+import { Form, Card, Button, Input, Flex, message, AutoComplete } from 'antd';
 import { useNavigate } from "react-router-dom"
 
 import axios from 'axios';
 
 import { getFormattedDate } from '../components/utils';
-
-// const formItemLayout = { labelCol: {span: 6,}, wrapperCol: { span: 14,},};
-
-const options= [
-    {
-    value: '1',
-    label: 'Jack',
-    },
-    {
-    value: '2',
-    label: 'Lucy',
-    },
-    {
-    value: '3',
-    label: 'Tom',
-    },
-];
-
+import useFormDataStore from '../context/FormData';
+import { useFetchFormData } from '../components/useFetchFormData';
 
 
 export default function RegistarDelegado() {
-    const date = getFormattedDate();
-
+    const date = getFormattedDate()
     const navigate = useNavigate()
-    
-    const [fetchTrigger, setFetchTrigger] = useState(false)
 
+    // Get state from Zustand store
+    const { hasFetched, districts, hmr_regions, parishes } = useFormDataStore((state) => state) 
+
+    // If the form data fetch didnt happen, then fetch the data, 
+    // update the store and set the form's selects
+    useFetchFormData(!hasFetched)
+
+    // Triger to update the table when the user returns to the previous page (Delegados)
+    const [fetchTrigger, setFetchTrigger] = useState(false)
     const onFinish = async (values) => {
         console.log('Received values of form: ', values);
     
@@ -66,7 +56,6 @@ export default function RegistarDelegado() {
                 <Card>
                         <Form  
                             name="validate_other"
-                            // {...formItemLayout}
                             onFinish={onFinish}
                             layout='vertical'
                         >
@@ -95,33 +84,34 @@ export default function RegistarDelegado() {
                                 label="Distrito"
                                 name="Distrito"
                                 hasFeedback
-                                rules={[{
-                                    required: true,
-                                    message: 'Por favor insira um distrito',},]}>
+                                rules={[{required: true, message: 'Por favor insira um distrito',},]}
+                            >
 
-                                <Select 
+                                <AutoComplete
                                     allowClear
-                                    showSearch
+                                    options={districts}
                                     placeholder="Insira um distrito"
-                                    options={options}
-                                    filterOption={(input, option) => 
-                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                    filterOption={(inputValue, option) =>
+                                        option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                    }
+                                />  
                             </Form.Item>
 
                             <Form.Item
                                 label="Região HMR"
                                 name="Regiao"
                                 hasFeedback
-                                rules={[{
-                                    required: true,
-                                    message: 'Por favor insira uma região',},]}>
+                                rules={[{required: true, message: 'Por favor insira uma região',},]}
+                            >
 
-                                <Select 
+                                <AutoComplete
                                     allowClear
+                                    options={hmr_regions}
                                     placeholder="Insira uma região"
-                                    options={options}
-                                    filterOption={(input, option) => 
-                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                    filterOption={(inputValue, option) =>
+                                        option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                    }
+                                />   
                             </Form.Item>
 
                             <Form.Item
@@ -129,12 +119,14 @@ export default function RegistarDelegado() {
                                 name="Freguesia"
                                 hasFeedback>
                                 
-                                <Select 
+                                <AutoComplete
                                     allowClear
+                                    options={parishes}
                                     placeholder="Insira uma freguesia"
-                                    options={options}
-                                    filterOption={(input, option) => 
-                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                    filterOption={(inputValue, option) =>
+                                        option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                    }
+                                />  
                             </Form.Item>
 
                             <Form.Item>
