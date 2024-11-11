@@ -161,7 +161,7 @@ export default function Visitas() {
         form.resetFields()
 
         try {
-            const response = await axios.post("http://localhost:5000/visitas", values)
+            const response = await axios.post(process.env.REACT_APP_API_PATH + "/visitas", values)
 
             if(response.status === 200) {
                 message.success("Registado com sucesso")

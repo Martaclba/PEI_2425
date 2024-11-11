@@ -8,7 +8,7 @@ function Root() {
 
   // Temporary
   useEffect(() => {
-    axios.get("http://localhost:5000/")
+    axios.get(process.env.REACT_APP_API_PATH  + "/")
       .then((res) => {
         console.log("Fetched data:", res.data);
       })

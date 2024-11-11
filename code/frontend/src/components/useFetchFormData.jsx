@@ -15,7 +15,7 @@ const initialState = [{
             value: 'Aveiro',
         },
     ],
-    hmr_regions: [
+    regions: [
         {
             value: 'Trofa',
         },
@@ -26,7 +26,7 @@ const initialState = [{
             value: 'Braga',
         },
     ],
-    parishes: [
+    towns: [
         {
             value: 'Ribeirão',
         },
@@ -71,7 +71,7 @@ export function useFetchFormData(fetchTrigger) {
         // Fetch data from the backend
         const fetchData = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/forms");
+                const response = await axios.get(process.env.REACT_APP_API_PATH + "/forms");
 
                 if (response.status === 200){
                     console.log('Data loaded successfully:', response.data);

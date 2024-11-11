@@ -1,14 +1,52 @@
 import React, { useState } from 'react';
-import { Form, Card, Button, Input, ConfigProvider, message, AutoComplete } from 'antd';
+import { Form, Select, Tag, Card, Button, Input, ConfigProvider, message, AutoComplete } from 'antd';
 import { useNavigate, useLocation } from "react-router-dom";
 
 import axios from 'axios'
 
 import themeConfig from '../styles/themeConfigForm';
 import { getFormattedDate } from '../components/utils';
+import useConfirmModal from '../components/confirmModal';
 import useFormDataStore from '../context/FormData';
 import { useFetchFormData } from '../components/useFetchFormData';
 
+const states = [
+  {
+      value: 'blue',
+      label: 'Indisponível',
+  },
+  {
+      value: 'volcano',
+      label: 'Inativo',
+  },
+  {
+      value: 'green',
+      label: 'Ativo',
+  },
+];
+
+const tagRender = (props) => {
+  const { label, value, closable, onClose } = props;
+  
+  const onPreventMouseDown = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  return (
+    <Tag
+      color={value}
+      onMouseDown={onPreventMouseDown}
+      closable={closable}
+      onClose={onClose}
+      style={{
+        marginInlineEnd: 4,
+      }}
+    >
+      {label}
+    </Tag>
+  );
+};
 
 export default function EditarDelegado() {
   const [form] = Form.useForm();
@@ -18,7 +56,7 @@ export default function EditarDelegado() {
   const location = useLocation();
   
   // Get state from Zustand store
-  const { hasFetched, districts, hmr_regions, parishes } = useFormDataStore((state) => state) 
+  const { hasFetched, districts, regions, towns } = useFormDataStore((state) => state) 
 
   // If the form data fetch didnt happen, then fetch the data, 
   // update the store and set the form's selects
@@ -37,13 +75,33 @@ export default function EditarDelegado() {
     Distrito: '1',
     Regiao: ['1', '2'],
     Freguesia: ['3'],
+    Estado: [{label:'Ativo', value:'green'}],
   };
+
+  // This is needed because of the use of ConfigProvider
+  const { showConfirm, contextHolder } = useConfirmModal();
+  const changeState = async (value) => {    
+    if (value.length !== 0 && value[0].label === 'Inativo'){
+        try{
+            // Wait for the user’s response
+            const confirmed = await showConfirm();
+            if (confirmed) {
+                // Disable the field if confirmed
+                // setIsInativo(true)  
+                console.log("Inactive state.");
+            }
+        } catch (error) {
+            console.log("User cancelled the action.");
+            form.setFieldsValue({ Estado: [] });
+        }
+    }
+}
 
   const onFinish = async (values) => {
     console.log('Received values of form: ', values);
   
     try {
-      const response = await axios.put("http://localhost:5000"+location.pathname, values)
+      const response = await axios.put(process.env.REACT_APP_API_PATH + location.pathname, values)
     
       if(response.status === 200){
         message.success("Editado com sucesso")
@@ -67,6 +125,7 @@ export default function EditarDelegado() {
 
   return (
     <ConfigProvider theme={themeConfig}>
+    {contextHolder}
       <div id="contact" style={{ height: '100%' }}>
         <div>
           <div id="title-edit">
@@ -110,24 +169,27 @@ export default function EditarDelegado() {
               initialValues={predefinedValues}
               form={form}
             >
-              <Form.Item label="Nome" style={{ marginBottom: 0 }}>
-                <Form.Item
-                  name={['Nome', 'Primeiro']}
-                  hasFeedback
-                  rules={[{ required: true, message: "Insira o primeiro nome" }]}
-                  style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
-                >
-                  <Input allowClear placeholder="Primeiro" disabled={!isEditing} />
-                </Form.Item>
 
-                <Form.Item
-                  name={['Nome', 'Ultimo']}
-                  hasFeedback
-                  rules={[{ required: true, message: "Insira o último nome" }]}
-                  style={{ display: 'inline-block', width: 'calc(50% - 8px)', margin: '0 8px' }}
-                >
-                  <Input allowClear placeholder="Último" disabled={!isEditing}/>
-                </Form.Item>
+              <Form.Item label="Nome" style={{ marginBottom: 0 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+                      <Form.Item
+                          name="Primeiro"
+                          hasFeedback
+                          rules={[{ required: true, message: "Insira o primeiro nome" }]}
+                          style={{ flex: 1}}
+                      >
+                          <Input allowClear placeholder="Primeiro" disabled={!isEditing}/>
+                      </Form.Item>
+
+                      <Form.Item
+                          name="Ultimo"
+                          hasFeedback
+                          rules={[{ required: true, message: "Insira o último nome" }]}
+                          style={{ flex: 1}}
+                      >
+                          <Input allowClear placeholder="Último" disabled={!isEditing}/>
+                      </Form.Item>
+                  </div>
               </Form.Item>
 
               <Form.Item
@@ -157,7 +219,7 @@ export default function EditarDelegado() {
 
                 <AutoComplete
                   allowClear
-                  options={hmr_regions}
+                  options={regions}
                   placeholder="Insira uma região"
                   disabled={!isEditing}
                   filterOption={(inputValue, option) =>
@@ -174,7 +236,7 @@ export default function EditarDelegado() {
 
                 <AutoComplete
                   allowClear
-                  options={parishes}
+                  options={towns}
                   placeholder="Insira uma freguesia"
                   disabled={!isEditing}
                   filterOption={(inputValue, option) =>
@@ -182,6 +244,27 @@ export default function EditarDelegado() {
                   }
                 /> 
               </Form.Item>
+
+              <Form.Item
+                label="Estado"
+                name="Estado"
+                rules={[{
+                    required: true,                                                                        
+                    message: 'Por favor defina um estado'}]}>
+
+                <Select 
+                    allowClear
+                    mode='multiple'         
+                    maxCount={1}                                       
+                    tagRender={tagRender}
+                    placeholder="Insira um estado"
+                    options={states}
+                    disabled={!isEditing}
+                    labelInValue
+                    onChange={changeState}
+                    filterOption={(input, option) => 
+                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+            </Form.Item>
             </Form>
           </Card>
         </div>

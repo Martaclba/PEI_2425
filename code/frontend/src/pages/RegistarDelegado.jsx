@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Card, Button, Input, Flex, message, AutoComplete } from 'antd';
+import { Form, Select, Tag, Card, Button, Input, Flex, message, AutoComplete } from 'antd';
 import { useNavigate } from "react-router-dom"
 
 import axios from 'axios';
@@ -8,13 +8,42 @@ import { getFormattedDate } from '../components/utils';
 import useFormDataStore from '../context/FormData';
 import { useFetchFormData } from '../components/useFetchFormData';
 
+const states= [
+    {
+        value: 'blue',
+        label: 'Indisponível',
+    },
+    {
+        value: 'volcano',
+        label: 'Inativo',
+    },
+    {
+        value: 'green',
+        label: 'Ativo',
+    },
+];
+
+const renderDisabledTag = (props) => {
+    const { label, value, closable, onClose } = props;
+
+    return (
+      <Tag
+        color={value}
+        closable={closable}
+        onClose={onClose}
+        style={{ marginInlineEnd: 4 }}
+      >
+        {label}
+      </Tag>
+    );
+};
 
 export default function RegistarDelegado() {
     const date = getFormattedDate()
     const navigate = useNavigate()
 
     // Get state from Zustand store
-    const { hasFetched, districts, hmr_regions, parishes } = useFormDataStore((state) => state) 
+    const { hasFetched, districts, regions, towns } = useFormDataStore((state) => state) 
 
     // If the form data fetch didnt happen, then fetch the data, 
     // update the store and set the form's selects
@@ -26,7 +55,7 @@ export default function RegistarDelegado() {
         console.log('Received values of form: ', values);
     
         try {
-            const response = await axios.post("http://localhost:5000/delegados/registar/", values)
+            const response = await axios.post(process.env.REACT_APP_API_PATH  + "/delegados/registar/", values)
         
             if (response.status === 200){
                 message.success("Registado com sucesso")
@@ -58,26 +87,29 @@ export default function RegistarDelegado() {
                             name="validate_other"
                             onFinish={onFinish}
                             layout='vertical'
+                            initialValues={{Estado: [{label:'Ativo', value:'green'}]}}
                         >
 
                             <Form.Item label="Nome" style={{ marginBottom: 0 }}>
-                                <Form.Item
-                                    name="Primeiro"
-                                    hasFeedback
-                                    rules={[{ required: true, message: "Insira o primeiro nome" }]}
-                                    style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
-                                >
-                                    <Input allowClear placeholder="Primeiro" />
-                                </Form.Item>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+                                    <Form.Item
+                                        name="Primeiro"
+                                        hasFeedback
+                                        rules={[{ required: true, message: "Insira o primeiro nome" }]}
+                                        style={{ flex: 1}}
+                                    >
+                                        <Input allowClear placeholder="Primeiro" />
+                                    </Form.Item>
 
-                                <Form.Item
-                                    name="Ultimo"
-                                    hasFeedback
-                                    rules={[{ required: true, message: "Insira o último nome" }]}
-                                    style={{ display: 'inline-block', width: 'calc(50% - 8px)', margin: '0 8px' }}
-                                >
-                                    <Input allowClear placeholder="Último" />
-                                </Form.Item>
+                                    <Form.Item
+                                        name="Ultimo"
+                                        hasFeedback
+                                        rules={[{ required: true, message: "Insira o último nome" }]}
+                                        style={{ flex: 1}}
+                                    >
+                                        <Input allowClear placeholder="Último" />
+                                    </Form.Item>
+                                </div>
                             </Form.Item>
 
                             <Form.Item
@@ -106,7 +138,7 @@ export default function RegistarDelegado() {
 
                                 <AutoComplete
                                     allowClear
-                                    options={hmr_regions}
+                                    options={regions}
                                     placeholder="Insira uma região"
                                     filterOption={(inputValue, option) =>
                                         option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
@@ -121,12 +153,27 @@ export default function RegistarDelegado() {
                                 
                                 <AutoComplete
                                     allowClear
-                                    options={parishes}
+                                    options={towns}
                                     placeholder="Insira uma freguesia"
                                     filterOption={(inputValue, option) =>
                                         option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                     }
                                 />  
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Estado"
+                                name="Estado">
+
+                                <Select 
+                                    allowClear
+                                    mode='multiple'         
+                                    disabled                                     
+                                    tagRender={renderDisabledTag}                                 
+                                    placeholder="Insira um estado"
+                                    options={states}
+                                    filterOption={(input, option) => 
+                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                             </Form.Item>
 
                             <Form.Item>

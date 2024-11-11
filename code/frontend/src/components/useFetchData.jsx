@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-export function useFetchData(path, fetchTrigger) {
-    const [data, setData] = useState([]);
+export function useFetchData(path, fetchTrigger) {                                     // -----------------------> provavelmente iremos renomear depois para fazer o fetch dos users apenas; 
+    const [data, setData] = useState([]);                                              // -----------------------> passar o tipo de user
 
     // Load the table's content and update it when necessary
     useEffect (() => {
@@ -11,7 +11,7 @@ export function useFetchData(path, fetchTrigger) {
         // Fetch data from the backend
         const fetchData = async () => {
             try {
-                const response = await axios.get("http://localhost:5000" + path);
+                const response = await axios.get(process.env.REACT_APP_API_PATH + path);
 
                 if (response.status === 200){
                     console.log('Data loaded successfully:', response.data);
@@ -26,9 +26,8 @@ export function useFetchData(path, fetchTrigger) {
 
         console.log("Should Fetch Data: ", fetchTrigger)
         
-        // If the fetch condition isn't met, skip the fetch
-        // if (isMounted && (!data.lenght || fetchTrigger)) fetchData();
-        if (isMounted && (fetchTrigger)) fetchData();
+        // Fetch data if there's no data or if there's a trigger (update, for example)
+        if (isMounted && (!data.lenght || fetchTrigger)) fetchData();
 
         return () => {
             isMounted = false;

@@ -336,7 +336,7 @@ export default function Vendas() {
     console.log('Received values of form: ', values);
   
     try {
-      const response = await axios.get("http://localhost:5000/", { params: values })
+      const response = await axios.get(process.env.REACT_APP_API_PATH  + "/", { params: values })
     
       if(response.status === 200){
         console.log('Form submitted successfully:', response.data);

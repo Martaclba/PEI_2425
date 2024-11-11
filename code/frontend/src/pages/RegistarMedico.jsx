@@ -10,16 +10,16 @@ import { useFetchFormData } from '../components/useFetchFormData';
 
 const states= [
     {
-    value: 'blue',
-    label: 'Indisponível',
+        value: 'blue',
+        label: 'Indisponível',
     },
     {
-    value: 'volcano',
-    label: 'Inativo',
+        value: 'volcano',
+        label: 'Inativo',
     },
     {
-    value: 'green',
-    label: 'Ativo',
+        value: 'green',
+        label: 'Ativo',
     },
 ];
 
@@ -45,7 +45,7 @@ export default function RegistarMedico() {
     const navigate = useNavigate()
 
     // Get state from Zustand store
-    const { hasFetched, instituitions, specialties, districts, hmr_regions, parishes } = useFormDataStore((state) => state) 
+    const { hasFetched, instituitions, specialties, districts, regions, towns } = useFormDataStore((state) => state) 
 
     // If the form data fetch didnt happen, then fetch the data, 
     // update the store and set the form's selects
@@ -57,7 +57,7 @@ export default function RegistarMedico() {
         console.log('Received values of form: ', values);
     
         try {
-            const response = await axios.post("http://localhost:5000/medicos/registar/", values)
+            const response = await axios.post(process.env.REACT_APP_API_PATH  + "/medicos/registar/", values)
         
             if (response.status === 200){
                 message.success("Registado com sucesso")
@@ -88,7 +88,7 @@ export default function RegistarMedico() {
                             name="validate_other"
                             onFinish={onFinish}
                             layout='vertical'
-                            initialValues={{Estado: [{label:'Ativo', value:'green'}],}}
+                            initialValues={{Estado: [{label:'Ativo', value:'green'}]}}
                         >
 
                             <Row gutter={16} style={{ display: 'flex' }}>
@@ -169,7 +169,7 @@ export default function RegistarMedico() {
                                             
                                             <AutoComplete
                                                 allowClear
-                                                options={hmr_regions}
+                                                options={regions}
                                                 placeholder="Insira uma região"
                                                 filterOption={(inputValue, option) =>
                                                     option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
@@ -187,7 +187,7 @@ export default function RegistarMedico() {
 
                                             <AutoComplete
                                                 allowClear
-                                                options={parishes}
+                                                options={towns}
                                                 placeholder="Insira uma freguesia"
                                                 filterOption={(inputValue, option) =>
                                                     option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
@@ -199,28 +199,58 @@ export default function RegistarMedico() {
 
                                 <Col xs={24} sm={24} md={12} style={{ display: 'flex', flexDirection: 'column' }}>
                                     <Card style={{ flex: 1}}>        
-                                        <Form.Item
-                                            label="Morada"
-                                            name="Morada"
-                                            hasFeedback
-                                            rules={[{
-                                                required: true,
-                                                message: 'Por favor insira uma morada'}]}
-                                        >
+                                        <Form.Item label="Morada" style={{ marginBottom: 0 }}>                                        
+                                            <Form.Item
+                                                name="Rua"
+                                                hasFeedback
+                                                rules={[{
+                                                    required: true,
+                                                    message: 'Por favor insira uma rua'}]}
+                                            >
+                                                <Input allowClear placeholder="Insira uma rua" />
+                                            </Form.Item>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+                                                <Form.Item
+                                                    name="Codigo_postal"
+                                                    hasFeedback
+                                                    rules={[{
+                                                        required: true,
+                                                        message: 'Por favor insira um código postal'}]}
+                                                    style={{ flex: 0.4 }}
+                                                >
+                                                    <Input maxLength={8} allowClear placeholder="Insira um código postal" />
+                                                </Form.Item>
 
-                                            <Input allowClear placeholder="Insira uma morada"/>
+                                                <Form.Item
+                                                    name="Edificio"
+                                                    hasFeedback
+                                                    style={{ flex: 0.6 }}
+                                                >
+                                                    <Input allowClear placeholder="Insira um edifício" />
+                                                </Form.Item>  
+                                            </div>                                  
                                         </Form.Item>
 
-                                        <Form.Item
-                                            label="Contacto"
-                                            name="Contacto"
-                                            hasFeedback
-                                            rules={[{
-                                                required: true,
-                                                message: 'Por favor insira um contacto'}]}
-                                        >
+                                        <Form.Item label="Contacto" style={{ marginBottom: 0 }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+                                                <Form.Item
+                                                    name="Telefone"
+                                                    hasFeedback
+                                                    style={{ flex: 0.4}}
+                                                >
+                                                    <Input allowClear placeholder="Insira um telefone" />
+                                                </Form.Item>
 
-                                            <Input allowClear placeholder="Insira um contacto"/>
+                                                <Form.Item
+                                                    name="Email"
+                                                    hasFeedback
+                                                    rules={[{type: 'email', message: 'Formato inválido'}]}                            
+                                                    style={{ flex: 0.6}}
+
+                                                >
+                                                    <Input allowClear placeholder="Insira um email" />
+                                                </Form.Item>
+                                            </div>
                                         </Form.Item>
 
                                         <Form.Item

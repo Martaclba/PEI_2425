@@ -57,7 +57,7 @@ export default function EditarFarmacia() {
     const location = useLocation()
 
     // Get state from Zustand store
-    const { hasFetched, districts, hmr_regions, parishes } = useFormDataStore((state) => state) 
+    const { hasFetched, districts, regions, towns } = useFormDataStore((state) => state) 
 
     // If the form data fetch didnt happen, then fetch the data, 
     // update the store and set the form's selects
@@ -82,10 +82,13 @@ export default function EditarFarmacia() {
         Distrito: 'Braga',
         Regiao: 'Braga',
         Freguesia: 'Lousado',
-        Morada: ['rua 123'],
-        Contacto: ['973493749'],
+        Rua: 'Rua bla bla bla',
+        Codigo_postal: '1234-567',
+        Edificio: '1º Esq',
+        Telefone: '123456789',
+        Email: 'example@hotmail.com',
         Estado: [{label:'Ativo', value:'green'}],
-        Notas: ['janknffnkn kajsndkjfn kjsndknfna kajndfnsn'],
+        Notas: 'janknffnkn kajsndkjfn kjsndknfna kajndfnsn',
         Produtos: [{ key: '1', label: 'Produto 1' }]
     };
 
@@ -116,7 +119,7 @@ export default function EditarFarmacia() {
         console.log('Received values of form: ', values);
   
         try {
-          const response = await axios.put("http://localhost:5000"+location.pathname, values)
+          const response = await axios.put(process.env.REACT_APP_API_PATH + location.pathname, values)
         
           if(response.status === 200){
             message.success("Editado com sucesso")
@@ -228,7 +231,7 @@ export default function EditarFarmacia() {
 
                                             <AutoComplete
                                                 allowClear
-                                                options={hmr_regions}
+                                                options={regions}
                                                 placeholder="Insira uma região"
                                                 disabled={!isEditing}
                                                 filterOption={(inputValue, option) =>
@@ -248,7 +251,7 @@ export default function EditarFarmacia() {
 
                                             <AutoComplete
                                                 allowClear
-                                                options={parishes}
+                                                options={towns}
                                                 placeholder="Insira uma freguesia"
                                                 disabled={!isEditing}
                                                 filterOption={(inputValue, option) =>
@@ -258,30 +261,64 @@ export default function EditarFarmacia() {
 
                                         </Form.Item>
 
-                                        <Form.Item
-                                            label="Morada"
-                                            name="Morada"
-                                            hasFeedback
-                                            rules={[{
-                                                required: true,
-                                                message: 'Por favor insira uma morada',}]}
-                                        >
+                                        <Form.Item label="Morada" style={{ marginBottom: 0 }}>                                
+                                            <Form.Item
+                                                name="Rua"
+                                                hasFeedback
+                                                rules={[{
+                                                    required: true,
+                                                    message: 'Por favor insira uma rua'}]}
+                                            >
+                                                <Input allowClear placeholder="Insira uma rua" disabled={!isEditing}/>
+                                            </Form.Item>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+                                                <Form.Item
+                                                    name="Codigo_postal"
+                                                    hasFeedback
+                                                    rules={[{
+                                                        required: true,
+                                                        message: 'Por favor insira um código postal'}]}
+                                                    style={{ flex: 0.4 }}
+                                                >
+                                                    <Input maxLength={8} allowClear placeholder="Insira um código postal" disabled={!isEditing}/>
+                                                </Form.Item>
 
-                                            <Input allowClear placeholder="Insira uma morada" disabled={!isEditing}/>
+                                                <Form.Item
+                                                    name="Edificio"
+                                                    hasFeedback
+                                                    style={{ flex: 0.6 }}
+                                                >
+                                                    <Input allowClear placeholder="Insira um edifício" disabled={!isEditing}/>
+                                                </Form.Item>  
+                                            </div>                                  
                                         </Form.Item>
 
-                                        <Form.Item
-                                            label="Contacto"
-                                            name="Contacto"
-                                            hasFeedback
-                                            rules={[{
-                                                required: true,
-                                                message: 'Por favor insira um contacto',}]}
-                                        >
+                                        <Form.Item label="Contacto" style={{ marginBottom: 0 }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+                                                <Form.Item
+                                                    name="Telefone"
+                                                    hasFeedback
+                                                    style={{ flex: 0.4}}
+                                                >
+                                                    <Input allowClear placeholder="Insira um telefone" disabled={!isEditing}/>
+                                                </Form.Item>
 
-                                            <Input allowClear placeholder="Insira um contacto" disabled={!isEditing}/>
-                                        </Form.Item>
+                                                <Form.Item
+                                                    name="Email"
+                                                    hasFeedback
+                                                    rules={[{type: 'email', message: 'Formato inválido'}]}                            
+                                                    style={{ flex: 0.6}}
 
+                                                >
+                                                    <Input allowClear placeholder="Insira um email" disabled={!isEditing}/>
+                                                </Form.Item>
+                                            </div>
+                                        </Form.Item>                                        
+                                    </Card>
+                                </Col>
+
+                                <Col xs={24} sm={24} md={12} style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <Card style={{ flex: 1}}>     
                                         <Form.Item
                                             label="Estado"
                                             name="Estado"
@@ -297,11 +334,7 @@ export default function EditarFarmacia() {
                                                 labelInValue
                                                 onChange={changeState}/>
                                         </Form.Item>
-                                    </Card>
-                                </Col>
 
-                                <Col xs={24} sm={24} md={12} style={{ display: 'flex', flexDirection: 'column' }}>
-                                    <Card style={{ flex: 1}}>        
                                         <Form.Item
                                             label="Notas"
                                             name="Notas">
