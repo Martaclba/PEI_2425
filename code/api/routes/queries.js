@@ -16,7 +16,7 @@ module.exports.getSale = (db, res, req) => {
 // Add sale
 // TODO - NOT TESTED
 module.exports.createSale= (db, res, req) => {
-  const { sale } = request.body;
+  const { sale } = req.body;
 
   db.query('INSERT INTO sale (notes, registry_date, fk_brick, fk_doctor, fk_pharmacy) VALUES ($1, $2, $3, $4, $5)', [sale.notes, sale.registry_date, sale.fk_brick, sale.fk_doctor, sale.fk_pharmacy], (err,results) => {
     if (err) {
@@ -41,7 +41,7 @@ module.exports.getDelegates = (db, res, req) => {
 // TODO - NOT TESTED 
 // TODO - adicionar contacto
 module.exports.createDelegate= (db, res, req) => {
-  const { del } = request.body;
+  const { del } = req.body;
   db.query('INSERT INTO delegate (name, registry_date, state, fk_id_contact) VALUES ($1, $2, $3, $4)', [del.name, del.registry_date, true, del.fk_id_contact], (err,results) => {
     if (err) {
       throw res.status(503).json({error: err, msg: "Could not add new Delegate"});
@@ -65,7 +65,7 @@ module.exports.getDelegateById = (db, delegate_id, res, req) => {
 // Update delegate by id
 // TODO - NOT TESTED 
 module.exports.updateDelegate= (db, delegate_id, res, req) => {
-  const { del } = request.body;
+  const { del } = req.body;
   db.query('UPDATE delegate SET name = $1, state = $2, fk_id_contact = $3 WHERE id = ${delegate_id}', [del.name, del.state, del.fk_id_contact], (err,results) => {
     if (err) {
       throw res.status(505).json({error: err, msg: "Could not update Delegate with ID: ${results.insertId}"});
@@ -95,7 +95,7 @@ module.exports.getVisits = (db, res, req) => {
 // Add visit
 // TODO - NOT TESTED
 module.exports.createVisit = (db, res, req) => {
-  const { visit } = request.body;
+  const { visit } = req.body;
 
   db.query('INSERT INTO visit (date, visit_state, fk_Brick, fk_doctor, fk_pharmacy) VALUES ($1, $2, $3, $4, $5)', [visit.date, visit.visit_state, visit.fk_Brick, visit.fk_doctor, visit.fk_pharmacy], (err,results) => {
     if (err) {
@@ -104,9 +104,6 @@ module.exports.createVisit = (db, res, req) => {
     res.status(201).json({msg: "Visit successfully added with ID: ${results.insertId}"})
   })
 }
-
-
-
 
 
 // QUERY TEST
