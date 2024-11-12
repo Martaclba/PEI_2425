@@ -13,6 +13,7 @@ import axios from 'axios';
 import {useAuth} from '../context/Auth';
 
 
+
 //Para os histogramas
 const data = [
   { type: 'Jan', value: 0.16 },
@@ -318,6 +319,8 @@ export default function Vendas() {
   const [form] = Form.useForm();
   const [form1] = Form.useForm();
   const [form2] = Form.useForm();
+  const [form3] = Form.useForm();
+  const [fetchTrigger, setFetchTrigger] = useState(false)
 
   const predefinedValues = {
     Delegado: 'Todos',
@@ -329,17 +332,29 @@ export default function Vendas() {
     Ano: '2024',
     Empresa: 'Todas',
     Brick: 'Todos',
-
   };
 
-  const onFinish = async (values) => {
-    console.log('Received values of form: ', values);
+  const predefinedValues2 = {
+    Ano: '2024',
+    Delegado: 'Todos',
+    Empresa: 'Todas',
+  };
+
+  const predefinedValues3 = {
+    Delegado: 'Todos',
+    Empresa: 'Todas',
+    Brick: 'Todos',
+  };
+
+  const onFinish = (type) => async (values) => {
+    console.log('Received values of form: ', values)
+    console.log('TYPE: ', type)
   
     try {
       const response = await axios.get(process.env.REACT_APP_API_PATH  + "/", { params: values })
     
       if(response.status === 200){
-        console.log('Form submitted successfully:', response.data);
+        console.log('Form submitted successfully:', response.data);      
       } else {
         console.error('Form submission failed:', response.status);
       }
@@ -347,10 +362,6 @@ export default function Vendas() {
       console.error('Error submitting form:', error);
     }
   };
-
-  const handleSubmith = () => {
-    form.submit(); 
-  };  
 
   const items = [
     {
@@ -363,6 +374,8 @@ export default function Vendas() {
         </Upload>
     },
   ];
+
+  //const {data} = useFetchData('/vendas', location.state?.shouldFetchData || fetchTrigger)
 
   return (
       <div id="contact">
@@ -391,7 +404,7 @@ export default function Vendas() {
                 <div style={{display:'flex', gap:'1rem', marginBottom: '1rem'}}>
                   <Form
                     name="histogram"
-                    onFinish={onFinish}
+                    onFinish={onFinish("HISTOGRAM")}
                     layout="inline"
                     initialValues={predefinedValues}
                     form={form}
@@ -429,7 +442,7 @@ export default function Vendas() {
               <div style={{display:'flex', gap:'1rem', marginBottom: '1rem'}}>
                 <Form
                   name="table_product"
-                  onFinish={onFinish}
+                  onFinish={onFinish("TABLE_1")}
                   layout="inline"
                   initialValues={predefinedValues1}
                   form={form1}
@@ -494,9 +507,9 @@ export default function Vendas() {
               <div style={{display:'flex', gap:'1rem', marginBottom:'1rem'}}>
                 <Form
                   name="table_brick"
-                  onFinish={onFinish}
+                  onFinish={onFinish("TABLE_2")}
                   layout="inline"
-                  initialValues={predefinedValues1}
+                  initialValues={predefinedValues2}
                   form={form2}
                 >
                   {state.isAdmin && 
@@ -529,6 +542,61 @@ export default function Vendas() {
                       placeholder="Empresa"
                       options={options} 
                       onChange={() => form2.submit()}
+                      filterOption={(input, option) => 
+                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                  </Form.Item>
+                </Form>
+              </div>
+
+              <Table
+                columns={columns_brick}
+                dataSource={dados_brick}
+                scroll={{x: 'max-content'}}
+                pagination={{ pageSize: 7, showSizeChanger: false }}
+                showSorterTooltip={false}                             
+              />
+            </div>
+
+            <div className='dashboard-card'>
+              <p className="table-title">Consulta por Brick</p>
+              <div style={{display:'flex', gap:'1rem', marginBottom:'1rem'}}>
+                <Form
+                  name="table_brick"
+                  onFinish={onFinish("TABLE_3")}
+                  layout="inline"
+                  initialValues={predefinedValues3}
+                  form={form3}
+                >
+                  {state.isAdmin && 
+                    <Form.Item className="large-select">
+                      <Select 
+                        allowClear
+                        placeholder="Delegado"
+                        options={options}
+                        onChange={() => form3.submit()}
+                        filterOption={(input, option) => 
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                    </Form.Item>
+                  }
+
+                  {state.isAdmin &&
+                    <Form.Item className="large-select"> 
+                      <Select 
+                        allowClear
+                        placeholder="Empresa"
+                        options={options} 
+                        onChange={() => form3.submit()}
+                        filterOption={(input, option) => 
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                    </Form.Item>
+                  }
+
+                  <Form.Item className="large-select"> 
+                    <Select 
+                      allowClear
+                      placeholder="Brick"
+                      options={options} 
+                      onChange={() => form3.submit()}
                       filterOption={(input, option) => 
                           (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                   </Form.Item>
