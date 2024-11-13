@@ -6,52 +6,52 @@ CREATE TABLE Specialty (
 CREATE TABLE Institution (
     id_Institution SERIAL PRIMARY KEY,
     name VARCHAR NOT NULL,
-    state BOOLEAN NOT NULL
+    state BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE Company (
     id_Company SERIAL PRIMARY KEY,
     name VARCHAR NOT NULL,
-    state BOOLEAN NOT NULL
+    state BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE Contact (
     id_Contact SERIAL PRIMARY KEY,
     email VARCHAR NULL,
     phone VARCHAR NULL,
-    state BOOLEAN NOT NULL
+    state BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE District (
     id_District SERIAL PRIMARY KEY,
-    state BOOLEAN NOT NULL,
+    state BOOLEAN NOT NULL DEFAULT TRUE,
     name VARCHAR NOT NULL
 );
 
 CREATE TABLE Region (
     id_Region SERIAL PRIMARY KEY,
-    state BOOLEAN NOT NULL,
+    state BOOLEAN NOT NULL DEFAULT TRUE,
     name VARCHAR NOT NULL
 );
 
 CREATE TABLE Town (
     id_Town SERIAL PRIMARY KEY,
-    state BOOLEAN NOT NULL,
+    state BOOLEAN NOT NULL DEFAULT TRUE,
     name VARCHAR NOT NULL
 );
 
 CREATE TABLE Doctor (
     professional_id_card INTEGER PRIMARY KEY,
-    state BOOLEAN NOT NULL,
+    state BOOLEAN NOT NULL DEFAULT TRUE,
     name VARCHAR NOT NULL
 );
 
 CREATE TABLE Delegate (
     id_Delegate SERIAL PRIMARY KEY,
     name VARCHAR NOT NULL,
-    registry_date TIMESTAMP NOT NULL,
-    state BOOLEAN NOT NULL,
-    fk_id_Contact INTEGER NOT NULL,
+    registry_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    state BOOLEAN NOT NULL DEFAULT TRUE,
+    fk_id_Contact INTEGER NULL,
 
 	CONSTRAINT fk_id_Contact FOREIGN KEY (fk_id_Contact) REFERENCES Contact(id_Contact) ON DELETE NO ACTION
 );
@@ -59,7 +59,7 @@ CREATE TABLE Delegate (
 
 CREATE TABLE HMR_Zone (
     brick INTEGER PRIMARY KEY,
-    state BOOLEAN NOT NULL,
+    state BOOLEAN NOT NULL DEFAULT TRUE,
     fk_id_Delegate INTEGER NULL,
     fk_id_Region INTEGER NOT NULL,
     fk_id_District INTEGER NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE Address (
     street VARCHAR NOT NULL,
     zip_code VARCHAR NOT NULL,
     building VARCHAR NULL,
-    state BOOLEAN NOT NULL,
+    state BOOLEAN NOT NULL DEFAULT TRUE,
     fk_brick INTEGER NOT NULL,
 
 	CONSTRAINT fk_brick FOREIGN KEY (fk_brick) REFERENCES HMR_Zone(brick) ON DELETE NO ACTION
@@ -87,7 +87,7 @@ CREATE TABLE Representative (
     id_Representative SERIAL PRIMARY KEY,
     notes VARCHAR NULL,
     name VARCHAR NOT NULL,
-    state BOOLEAN NOT NULL,
+    state BOOLEAN NOT NULL DEFAULT TRUE,
     fk_id_Contact INTEGER NOT NULL,
 
 	CONSTRAINT fk_id_Contact FOREIGN KEY (fk_id_Contact) REFERENCES Contact(id_Contact) ON DELETE NO ACTION
@@ -95,8 +95,8 @@ CREATE TABLE Representative (
 
 CREATE TABLE Pharmacy (
     id_Pharmacy SERIAL PRIMARY KEY,
-    state BOOLEAN NOT NULL,
-    registry_date TIMESTAMP NOT NULL,
+    state BOOLEAN NOT NULL DEFAULT TRUE,
+    registry_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     notes VARCHAR NULL,
     name VARCHAR NOT NULL,
 	fk_id_Address INTEGER NULL,
@@ -108,7 +108,7 @@ CREATE TABLE Pharmacy (
 
 CREATE TABLE Visit (
     id_Visit SERIAL PRIMARY KEY,
-    date TIMESTAMP NOT NULL,
+    date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     visit_state INTEGER NOT NULL,
     fk_brick INTEGER NOT NULL,
     fk_Doctor INTEGER NULL,
@@ -131,7 +131,7 @@ CREATE TABLE Product (
     how_to_consume VARCHAR NULL,
     properties VARCHAR NULL,
     amount VARCHAR NULL,
-    state BOOLEAN NOT NULL,
+    state BOOLEAN NOT NULL DEFAULT TRUE,
     fk_id_Company INTEGER NULL,
 	
 	CONSTRAINT fk_id_Company FOREIGN KEY (fk_id_Company) REFERENCES Company(id_Company) ON DELETE NO ACTION
@@ -140,7 +140,7 @@ CREATE TABLE Product (
 CREATE TABLE Sale (
     id_Sale SERIAL PRIMARY KEY,
     notes VARCHAR NULL,
-    registry_date TIMESTAMP NOT NULL,
+    registry_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     fk_brick INTEGER NULL,
     fk_Doctor INTEGER NULL,
     fk_Pharmacy INTEGER NULL,
@@ -161,8 +161,8 @@ CREATE TABLE Manager (
 
 CREATE TABLE Doctor_Activity (
     id_Activity SERIAL PRIMARY KEY,
-    registry_date TIMESTAMP NOT NULL,
-    state BOOLEAN NOT NULL,
+    registry_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    state BOOLEAN NOT NULL DEFAULT TRUE,
     notes VARCHAR NULL,
     fk_id_Address INTEGER NULL,
     fk_Doctor INTEGER NOT NULL,

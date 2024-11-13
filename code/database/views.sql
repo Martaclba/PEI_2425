@@ -1,4 +1,4 @@
-CREATE VIEW Sum_Sales_Month_Delegate_ManagerView AS
+CREATE MATERIALIZED VIEW Sum_Sales_Month_Delegate_ManagerView AS
 SELECT delegate.id_delegate AS delegate_id,
 		delegate.name AS delegate_name,
 		DATE_PART('year', sale.registry_date) AS cur_year,
@@ -21,7 +21,7 @@ GROUP BY
     DATE_PART('year', sale.registry_date);
 
 
-CREATE VIEW Sum_Sales_Month_Product_ManagerView AS
+CREATE MATERIALIZED VIEW Sum_Sales_Month_Product_ManagerView AS
 SELECT product.cnp AS product_cnp,
 		product.name AS product_name,
 		DATE_PART('year', sale.registry_date) AS cur_year,
@@ -44,7 +44,7 @@ GROUP BY
     DATE_PART('year', sale.registry_date);
 
 
-CREATE VIEW Sum_Sales_Month_Brick_ManagerView AS
+CREATE MATERIALIZED VIEW Sum_Sales_Month_Brick_ManagerView AS
 SELECT hmr_zone.brick AS id_brick,
 		region.name AS region_name,
 		district.name AS district_name,
