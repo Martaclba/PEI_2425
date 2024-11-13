@@ -2,8 +2,18 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/Auth';
 
-export function useFetchData(path, fetchTrigger) {                                     
+/*
+options = {
+    type: (histogram/table_product/table_total_product/table_brick)
+    filterDelegates: (true/false)
+    filterYears: (true/false)
+    filterCompanies: (true/false)
+    filterBricks: (true/false)
+}
+*/
+export function useFetchSales(path, fetchTrigger, options) {                                     
     const [data, setData] = useState([]);                                              
+    const [filters, setFilters] = useState([])
     const { state } = useAuth()
  
     // Send the user's id if the role is not admin
@@ -13,11 +23,12 @@ export function useFetchData(path, fetchTrigger) {
     useEffect (() => {
         let isMounted = true
 
+        console.log("FILTERS NEEDED: ", options)
 
         // Fetch data from the backend
         const fetchData = async () => {
             try {
-                const response = await axios.get(url);
+                const response = await axios.get(url, { params: options });
 
                 if (response.status === 200){
                     console.log('Data loaded successfully:', response.data);
@@ -39,7 +50,7 @@ export function useFetchData(path, fetchTrigger) {
         return () => {
             isMounted = false;
         };
-    }, [data.lenght, fetchTrigger, url]);
+    }, [data.lenght, fetchTrigger, options, url]);
 
-    return data
+    return { data, filters }
 }

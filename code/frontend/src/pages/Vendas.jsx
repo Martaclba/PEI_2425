@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { IconContext } from "react-icons";
 import { HiOutlineUpload } from "react-icons/hi";
 import { IoAddCircleOutline } from "react-icons/io5";
@@ -11,11 +11,70 @@ import UploadFileProps from '../components/UploadFile';
 import { getFormattedDate } from '../components/utils';
 import axios from 'axios'; 
 import {useAuth} from '../context/Auth';
+import { useFetchSales } from '../components/useFetchSales';
+import { getColumnsProdutoTotal } from '../components/utils';
+
+                                    // TODO: REMOVER ESTES DEFAULTSSSSSSSSSSSSSSSSSSSSSSSS
+const years_default = [
+  { value: '2018' },
+  { value: '2019' },
+  { value: '2020' },
+];
+
+const delegates_default = [
+  { value: "Rui Correia" },
+  { value: "André Barros" },
+  { value: "Matilde Santos"}
+]
+
+const companies_default = [
+  { value: 'MyPharma' },
+  { value: 'Pharma1000' },
+  { value: 'Empresa 3'}
+] 
+
+const bricks_default = [
+  { value: "brick 0"},
+  { value: "brick 1"},
+  { value: "brick 2"}
+]
+
+const products_default = [
+  { value: "product 0"},
+  { value: "product 1"},
+  { value: "product 2"}
+]
+
+
+const predefinedValues_histogram = {
+  Ano_H: new Date().getFullYear(),
+  Delegado_H: 'Todos',
+};
+
+const predefinedValues_table_product = {
+  Ano_P: new Date().getFullYear(),
+  Delegado_P: 'Todos',
+  Empresa_P: 'Todos',
+  Brick_P: 'Todos',
+  Product_P: 'Todos'
+};
+
+const predefinedValues_table_total = {
+  Delegado_TP: 'Todos',
+  Empresa_TP: 'Todos',
+  Brick_TP: 'Todos',
+  Product_TP: 'Todos'
+};
+
+const predefinedValues_table_brick = {
+  Ano_B: new Date().getFullYear(),
+  Delegado_B: 'Todos',
+  Empresa_B: 'Todos',
+};
 
 
 
-//Para os histogramas
-const data = [
+const data = [                      // TODO: REMOVER DEPOISSSSSSSSSS
   { type: 'Jan', value: 0.16 },
   { type: 'Fev', value: 0.125 },
   { type: 'Mar', value: 0.24 },
@@ -29,9 +88,9 @@ const data = [
   { type: 'Dec', value: 0.015 },
 ];
 
-const DemoColumn = () => {
+const DemoColumn = ({ dataHistogram }) => {
   const config = {
-    data,
+    data: dataHistogram,
     xField: 'type',
     yField: 'value',
     style: {
@@ -57,47 +116,13 @@ const DemoColumn = () => {
   return <Column {...config} />;
 };
 
-const options= [
-  {
-  value: '1',
-  label: '2018',
-  },
-  {
-  value: '2',
-  label: '2019',
-  },
-  {
-  value: '3',
-  label: '2020',
-  },
-];
-
-
-// For the tables
 const columns_produto = [
   {
     key: 'produto',
     title: 'Produto',
     dataIndex: 'produto',
     fixed: 'left',
-    className: 'fixed-column', 
-    filters: [
-      {
-        text: 'Produto 1',
-        value: 'Produto 1',
-      },
-      {
-        text: 'Produto 31',
-        value: 'Produto 31',
-      },
-      {
-        text: 'Produto 2',
-        value: 'Produto 2',
-      },
-    ],
-    filterMode: 'tree',
-    filterSearch: true,
-    onFilter: (value, record) => record.produto.startsWith(value),
+    className: 'fixed-column',
     sorter: (a, b) => a.produto.localeCompare(b.produto)          
   },
   {
@@ -174,7 +199,7 @@ const columns_produto = [
   },
 ];
 
-const dados_produto = Array.from({
+const dados_produto = Array.from({    // TODO: REMOVER DEPOISSSSSSSSSS
   length: 100,
 }).map((_, i) => ({
   key: i,
@@ -193,30 +218,15 @@ const dados_produto = Array.from({
   dezembro: i,
 }));
 
+const columns_produto_total = getColumnsProdutoTotal()
+
 const columns_brick = [
   {
     key: 'brick',
     title: 'Brick',
     dataIndex: 'brick',
     fixed: 'left',
-    className: 'fixed-column', 
-    filters: [
-      {
-        text: 'Produto 1',
-        value: 'Produto 1',
-      },
-      {
-        text: 'Produto 31',
-        value: 'Produto 31',
-      },
-      {
-        text: 'Produto 2',
-        value: 'Produto 2',
-      },
-    ],
-    filterMode: 'tree',
-    filterSearch: true,
-    onFilter: (value, record) => record.brick.startsWith(value),
+    className: 'fixed-column',
     sorter: (a, b) => a.brick.localeCompare(b.brick)          
   },
   {
@@ -293,7 +303,7 @@ const columns_brick = [
   },
 ];
 
-const dados_brick = Array.from({
+const dados_brick = Array.from({    // TODO: REMOVER DEPOISSSSSSSSSS
   length: 100,
 }).map((_, i) => ({
   key: i,
@@ -312,46 +322,53 @@ const dados_brick = Array.from({
   dezembro: i,
 }));
 
+
+
 export default function Vendas() {  
   const date = getFormattedDate();
+  const { state } = useAuth();
   const location = useLocation();
-  const {state} = useAuth();
-  const [form] = Form.useForm();
-  const [form1] = Form.useForm();
-  const [form2] = Form.useForm();
-  const [form3] = Form.useForm();
+
+  // Set a trigger after uploading a file successfully
   const [fetchTrigger, setFetchTrigger] = useState(false)
+  const items = [
+    {
+      key: '1',
+      label:  
+        <Upload {...UploadFileProps(location.pathname, setFetchTrigger)} maxCount={1}>
+          <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
+            Importar Ficheiro
+          </Button>
+        </Upload>
+    },
+  ];
 
-  const predefinedValues = {
-    Delegado: 'Todos',
-    Ano: '2024',
-  };
+  // Filters forms
+  const [form_histogram] = Form.useForm();
+  const [form_table_product] = Form.useForm();
+  const [form_table_total] = Form.useForm();
+  const [form_table_brick] = Form.useForm();
 
-  const predefinedValues1 = {
-    Delegado: 'Todos',
-    Ano: '2024',
-    Empresa: 'Todas',
-    Brick: 'Todos',
-  };
+  // Filters variables
+  const [years, setYears] = useState(years_default);
+  const [delegates, setDelegates] = useState(delegates_default);
+  const [companies, setCompanies] = useState(companies_default);
+  const [bricks, setBricks] = useState(bricks_default);
+  const [products, setProducts] = useState(products_default);
 
-  const predefinedValues2 = {
-    Ano: '2024',
-    Delegado: 'Todos',
-    Empresa: 'Todas',
-  };
+  // Graph's data variables
+  const [dataHistogram, setDataHistogram] = useState([])
+  const [dataProducts, setDataProducts] = useState([])
+  const [dataProductsTotal, setDataProductsTotal] = useState([])
+  const [dataBricks, setDataBricks] = useState([])
 
-  const predefinedValues3 = {
-    Delegado: 'Todos',
-    Empresa: 'Todas',
-    Brick: 'Todos',
-  };
-
+  // This function will request the data after selecting an option on any form
   const onFinish = (type) => async (values) => {
     console.log('Received values of form: ', values)
     console.log('TYPE: ', type)
   
     try {
-      const response = await axios.get(process.env.REACT_APP_API_PATH  + "/", { params: values })
+      const response = await axios.get(process.env.REACT_APP_API_PATH + "/", { params: values })
     
       if(response.status === 200){
         console.log('Form submitted successfully:', response.data);      
@@ -363,19 +380,97 @@ export default function Vendas() {
     }
   };
 
-  const items = [
-    {
-      key: '1',
-      label:  
-        <Upload {...UploadFileProps(location.pathname)} maxCount={1}>
-          <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
-            Importar Ficheiro
-          </Button>
-        </Upload>
-    },
-  ];
+  // Memoized filter configurations for each fetch
+  const options_histogram = useMemo(
+    () => (state.isAdmin ? { type: 'HISTOGRAM', delegates: true, years: true, companies: false, bricks: false,products:false } : { type: 'HISTOGRAM', delegates: false, years: false, companies: false, bricks: false, products: false}),
+    [state.isAdmin]
+  );
 
-  //const {data} = useFetchData('/vendas', location.state?.shouldFetchData || fetchTrigger)
+  const options_product = useMemo(
+    () => (state.isAdmin ? { type: 'PRODUCT', delegates: true, years: true, companies: true, bricks: true, products:true} : { type: 'PRODUCT', delegates: false, years: false, companies: true, bricks: true, products: true}),
+    [state.isAdmin]
+  );
+
+  const options_total = useMemo(
+    () => (state.isAdmin ? { type: 'TOTAL_PRODUCT', delegates: true, years: false, companies: true, bricks: true, products:true} : { type: 'TOTAL_PRODUCT', delegates: false, years: false, companies: false, bricks: false, products: false}),
+    [state.isAdmin]
+  );
+
+  const options_brick = useMemo(
+    () => (state.isAdmin ? { type: 'BRICK', delegates: true, years: true, companies: true, bricks: true, products: false} : { type: 'BRICK', delegates: false, years: false, companies: true, bricks:true, products: false}),
+    [state.isAdmin]
+  );
+
+  // Fetch data for each graph on loading the page. Should also return the filter's options 
+  const { data_histogram, filters_histogram } = useFetchSales('/', fetchTrigger, options_histogram)
+  const { data_table_product, filters_product } = useFetchSales('/', fetchTrigger, options_product)
+  const { data_table_total, filters_table_total } = useFetchSales('/', fetchTrigger, options_total)
+  const { data_table_brick, filters_table_brick } = useFetchSales('/', fetchTrigger, options_brick)
+
+  // Update filter variables each time filters are fetched
+  useEffect(() => {
+    if (filters_histogram) {
+        setYears(filters_histogram.years);
+        setDelegates(filters_histogram.delegates);
+        setCompanies(filters_histogram.companies);
+        setBricks(filters_histogram.bricks);
+    }
+  }, [filters_histogram]);
+
+  useEffect(() => {
+    if (filters_product) {
+        setYears(filters_product.years);
+        setDelegates(filters_product.delegates);
+        setCompanies(filters_product.companies);
+        setBricks(filters_product.bricks);
+        setProducts(filters_product.products)
+    }
+  }, [filters_product]);
+
+  useEffect(() => {
+    if (filters_table_total) {
+        setYears(filters_table_total.years);
+        setDelegates(filters_table_total.delegates);
+        setCompanies(filters_table_total.companies);
+        setBricks(filters_table_total.bricks);
+        setProducts(filters_table_total.products)
+    }
+  }, [filters_table_total]);
+
+  useEffect(() => {
+    if (filters_table_brick) {
+        setYears(filters_table_brick.years);
+        setDelegates(filters_table_brick.delegates);
+        setCompanies(filters_table_brick.companies);
+        setBricks(filters_table_brick.bricks);
+    }
+  }, [filters_table_brick]);
+
+
+  // Set graph's content
+  useEffect(()=> {
+    if (data_histogram){
+      setDataHistogram(data_histogram);
+    }
+  },[data_histogram])
+
+  useEffect(()=> {
+    if (data_table_product){
+      setDataProducts(data_table_product);
+    }
+  },[data_table_product])
+
+  useEffect(()=> {
+    if (data_table_total){
+      setDataProductsTotal(data_table_total);
+    }
+  },[data_table_total])
+
+  useEffect(()=> {
+    if (data_table_brick){
+      setDataBricks(data_table_brick);
+    }
+  },[data_table_brick])
 
   return (
       <div id="contact">
@@ -406,25 +501,23 @@ export default function Vendas() {
                     name="histogram"
                     onFinish={onFinish("HISTOGRAM")}
                     layout="inline"
-                    initialValues={predefinedValues}
-                    form={form}
+                    initialValues={predefinedValues_histogram}
+                    form={form_histogram}
                   >
-                    <Form.Item className="large-select">
+                    <Form.Item className="large-select" name='Ano_H'>
                       <Select 
-                        allowClear
-                        placeholder="Delegado"
-                        options={options}
-                        onChange={() => form.submit()} 
+                        placeholder="Ano"
+                        options={years}
+                        onChange={() => form_histogram.submit()}
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
 
-                    <Form.Item className="large-select">
-                      <Select 
-                        allowClear
-                        placeholder="Ano"
-                        options={options}
-                        onChange={() => form.submit()}
+                    <Form.Item className="large-select" name='Delegado_H'>
+                      <Select                         
+                        placeholder="Delegado"
+                        options={delegates}
+                        onChange={() => form_histogram.submit()} 
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
@@ -432,7 +525,7 @@ export default function Vendas() {
                 </div>
               }
             </div>
-            <DemoColumn/>
+            <DemoColumn dataHistogram={dataHistogram} />
           </div>
 
           <ConfigProvider theme={themeConfig}>  
@@ -442,51 +535,56 @@ export default function Vendas() {
               <div style={{display:'flex', gap:'1rem', marginBottom: '1rem'}}>
                 <Form
                   name="table_product"
-                  onFinish={onFinish("TABLE_1")}
+                  onFinish={onFinish("TABLE_PRODUCT")}
                   layout="inline"
-                  initialValues={predefinedValues1}
-                  form={form1}
+                  initialValues={predefinedValues_table_product}
+                  form={form_table_product}
                 >
                   {state.isAdmin && 
-                    <Form.Item className="large-select">
-                      <Select 
-                        allowClear
+                    <Form.Item className="large-select" name='Ano_P'>
+                      <Select                       
                         placeholder="Ano"
-                        options={options} 
-                        onChange={() => form1.submit()}
+                        options={years} 
+                        onChange={() => form_table_product.submit()}
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
                   }
 
                   {state.isAdmin && 
-                    <Form.Item className="large-select">
-                      <Select 
-                        allowClear
+                    <Form.Item className="large-select" name='Delegado_P'>
+                      <Select                       
                         placeholder="Delegado"
-                        options={options} 
-                        onChange={() => form1.submit()}
+                        options={delegates} 
+                        onChange={() => form_table_product.submit()}
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
                   }
                   
-                  <Form.Item className="large-select">
-                    <Select 
-                      allowClear
+                  <Form.Item className="large-select" name='Empresa_P'>
+                    <Select                     
                       placeholder="Empresa"
-                      options={options} 
-                      onChange={() => form1.submit()}
+                      options={companies} 
+                      onChange={() => form_table_product.submit()}
                       filterOption={(input, option) => 
                           (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                   </Form.Item>
 
-                  <Form.Item className="large-select">
-                    <Select 
-                      allowClear
+                  <Form.Item className="large-select" name='Brick_P'>
+                    <Select                     
                       placeholder="Brick"
-                      options={options} 
-                      onChange={() => form1.submit()}
+                      options={bricks} 
+                      onChange={() => form_table_product.submit()}
+                      filterOption={(input, option) => 
+                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                  </Form.Item>
+
+                  <Form.Item className="large-select" name='Product_P'>
+                    <Select                     
+                      placeholder="Product"
+                      options={products} 
+                      onChange={() => form_table_product.submit()}
                       filterOption={(input, option) => 
                           (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                   </Form.Item>
@@ -495,108 +593,111 @@ export default function Vendas() {
 
               <Table 
                 columns={columns_produto}
-                dataSource={dados_produto}
+                // dataSource={dados_produto}
+                dataSource={dataProducts}
                 scroll={{x: 'max-content'}}
                 pagination={{ pageSize: 7, showSizeChanger: false }}
                 showSorterTooltip={false}                             
               />
             </div>
 
-            <div className='dashboard-card'>
-              <p className="table-title">Consulta por Brick</p>
+            {state.isAdmin && <div className='dashboard-card'>
+              <p className="table-title">Consulta Total por Produto</p>
               <div style={{display:'flex', gap:'1rem', marginBottom:'1rem'}}>
                 <Form
                   name="table_brick"
-                  onFinish={onFinish("TABLE_2")}
+                  onFinish={onFinish("TABLE_TOTAL")}
                   layout="inline"
-                  initialValues={predefinedValues2}
-                  form={form2}
+                  initialValues={predefinedValues_table_total}
+                  form={form_table_total}
                 >
-                  {state.isAdmin && 
-                    <Form.Item className="large-select">
-                      <Select 
-                        allowClear
-                        placeholder="Ano"
-                        options={options}
-                        onChange={() => form2.submit()}
-                        filterOption={(input, option) => 
-                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                    </Form.Item>
-                  }
-
-                  {state.isAdmin &&
-                    <Form.Item className="large-select"> 
-                      <Select 
-                        allowClear
+                    <Form.Item className="large-select" name='Delegado_TP'>
+                      <Select                       
                         placeholder="Delegado"
-                        options={options} 
-                        onChange={() => form2.submit()}
+                        options={delegates}
+                        onChange={() => form_table_total.submit()}
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
-                  }
+                  
 
-                  <Form.Item className="large-select"> 
-                    <Select 
-                      allowClear
-                      placeholder="Empresa"
-                      options={options} 
-                      onChange={() => form2.submit()}
-                      filterOption={(input, option) => 
-                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                  </Form.Item>
-                </Form>
-              </div>
-
-              <Table
-                columns={columns_brick}
-                dataSource={dados_brick}
-                scroll={{x: 'max-content'}}
-                pagination={{ pageSize: 7, showSizeChanger: false }}
-                showSorterTooltip={false}                             
-              />
-            </div>
-
-            <div className='dashboard-card'>
-              <p className="table-title">Consulta por Brick</p>
-              <div style={{display:'flex', gap:'1rem', marginBottom:'1rem'}}>
-                <Form
-                  name="table_brick"
-                  onFinish={onFinish("TABLE_3")}
-                  layout="inline"
-                  initialValues={predefinedValues3}
-                  form={form3}
-                >
-                  {state.isAdmin && 
-                    <Form.Item className="large-select">
-                      <Select 
-                        allowClear
-                        placeholder="Delegado"
-                        options={options}
-                        onChange={() => form3.submit()}
-                        filterOption={(input, option) => 
-                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                    </Form.Item>
-                  }
-
-                  {state.isAdmin &&
-                    <Form.Item className="large-select"> 
-                      <Select 
-                        allowClear
+                  
+                    <Form.Item className="large-select" name='Empresa_TP'> 
+                      <Select                       
                         placeholder="Empresa"
-                        options={options} 
-                        onChange={() => form3.submit()}
+                        options={companies} 
+                        onChange={() => form_table_total.submit()}
+                        filterOption={(input, option) => 
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                    </Form.Item>
+                  
+
+                  <Form.Item className="large-select" name='Brick_TP'> 
+                    <Select                     
+                      placeholder="Brick"
+                      options={bricks} 
+                      onChange={() => form_table_total.submit()}
+                      filterOption={(input, option) => 
+                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                  </Form.Item>
+
+                  <Form.Item className="large-select" name='Product_TP'> 
+                    <Select                     
+                      placeholder="Product"
+                      options={products} 
+                      onChange={() => form_table_total.submit()}
+                      filterOption={(input, option) => 
+                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                  </Form.Item>
+                </Form>
+              </div>
+
+              <Table
+                columns={columns_produto_total}
+                dataSource={dataProductsTotal}
+                scroll={{x: 'max-content'}}
+                pagination={{ pageSize: 7, showSizeChanger: false }}
+                showSorterTooltip={false}                             
+              />
+            </div>}
+
+            <div className='dashboard-card'>
+              <p className="table-title">Consulta por Brick</p>
+              <div style={{display:'flex', gap:'1rem', marginBottom:'1rem'}}>
+                <Form
+                  name="table_total"
+                  onFinish={onFinish("TABLE_BRICK")}
+                  layout="inline"
+                  initialValues={predefinedValues_table_brick}
+                  form={form_table_brick}
+                >
+                  {state.isAdmin && 
+                    <Form.Item className="large-select" name='Ano_B'>
+                      <Select                       
+                        placeholder="Ano"
+                        options={years}
+                        onChange={() => form_table_brick.submit()}
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
                   }
 
-                  <Form.Item className="large-select"> 
-                    <Select 
-                      allowClear
-                      placeholder="Brick"
-                      options={options} 
-                      onChange={() => form3.submit()}
+                  {state.isAdmin &&
+                    <Form.Item className="large-select" name='Delegado_B'> 
+                      <Select                       
+                        placeholder="Delegado"
+                        options={delegates} 
+                        onChange={() => form_table_brick.submit()}
+                        filterOption={(input, option) => 
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                    </Form.Item>
+                  }
+
+                  <Form.Item className="large-select" name='Empresa_B'> 
+                    <Select                     
+                      placeholder="Empresa"
+                      options={companies} 
+                      onChange={() => form_table_brick.submit()}
                       filterOption={(input, option) => 
                           (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                   </Form.Item>
@@ -605,12 +706,14 @@ export default function Vendas() {
 
               <Table
                 columns={columns_brick}
-                dataSource={dados_brick}
+                dataSource={dataBricks}
                 scroll={{x: 'max-content'}}
                 pagination={{ pageSize: 7, showSizeChanger: false }}
                 showSorterTooltip={false}                             
               />
             </div>
+
+            
           </ConfigProvider>
         </div>
       </div>
