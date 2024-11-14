@@ -86,7 +86,7 @@ with psycopg.connect(conn_string) as conn:
                 cur.execute(f"SELECT * FROM product WHERE name = '{row[6].strip()}' AND fk_id_company = {company_id};")
                 product = cur.fetchone()
                 if product is None:
-                    cur.execute(f"INSERT INTO product (cnp, name, fk_id_company) VALUES ({random.randint(1,100000)},'{row[6].strip()}', {company_id}) RETURNING cnp;")
+                    cur.execute(f"INSERT INTO product (cnp, name, fk_id_company) VALUES ({random.randint(1,1000000000)},'{row[6].strip()}', {company_id}) RETURNING cnp;")
                     product = cur.fetchone()
                 product_id = product[0]
                 #print(product)
