@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { IconContext } from "react-icons";
 import { HiOutlineUpload } from "react-icons/hi";
 import { IoAddCircleOutline } from "react-icons/io5";
@@ -9,40 +9,10 @@ import { Column } from '@ant-design/plots';
 import themeConfig from '../styles/themeConfigTable';
 import UploadFileProps from '../components/UploadFile';
 import { getFormattedDate } from '../components/utils';
-import {useAuth} from '../context/Auth';
+import { useAuth } from '../context/Auth';
 import { useFetchSales } from '../components/useFetchSales';
 import { getColumnsProdutoTotal } from '../components/utils';
-
-                              // TODO: REMOVER ESTES DEFAULTSSSSSSSSSSSSSSSSSSSSSSSS
-const years_default = [
-  { label: '2018', value: '2018' },
-  { label: '2019', value: '2019' },
-  { label: '2020', value: '2020' },
-];
-
-const delegates_default = [
-  { label: "Rui Correia", value: "Rui Correia" },
-  { label: "André Barros", value: "André Barros" },
-  { label: "Matilde Santos", value: "Matilde Santos" }
-]
-
-const companies_default = [
-  { label: 'MyPharme', value: 'MyPharma' },
-  { label: 'Pharma1000', value: 'Pharma1000' },
-  { label: 'Empresa 3', value: 'Empresa 3'}
-] 
-
-const bricks_default = [
-  { label: "brick 0", value: "brick 0"},
-  { label: "brick 1", value: "brick 1"},
-  { label: "brick 2", value: "brick 2"}
-]
-
-const products_default = [
-  { label: "product 0", value: "product 0" },
-  { label: "product 1", value: "product 1" },
-  { label: "product 2", value: "product 2" }
-]
+import useSalesDataStore from '../context/SalesData';
 
 
 
@@ -278,14 +248,8 @@ export default function Vendas() {
   const { state } = useAuth();
   const location = useLocation();
 
-
-  // Set a trigger after uploading a file successfully
-  const [fetchTriggers, setFetchTriggers] = useState({
-    histogram: false,
-    products: false,
-    totalProducts: false,
-    bricks: false,
-  });
+  const { triggers, data, filters } = useSalesDataStore((state) => state)
+  const updateFetchTriggers = useSalesDataStore((state) => state.updateFetchTriggers)
 
 
   // Dropdown menu item for uploading files
@@ -293,7 +257,8 @@ export default function Vendas() {
     {
       key: '1',
       label:  
-        <Upload {...UploadFileProps(location.pathname, setFetchTriggers)} maxCount={1}>
+        // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        <Upload {...UploadFileProps(location.pathname, )} maxCount={1}>
           <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
             Importar Ficheiro
           </Button>
@@ -317,28 +282,12 @@ export default function Vendas() {
   });
 
 
-  // Filters variables          
-  const [filters, setFilters] = useState({
-    histogram: { years: years_default, delegates: delegates_default },
-    products: { years: years_default, delegates: delegates_default, companies: companies_default, bricks: bricks_default, products: products_default },
-    totalProducts: { delegates: delegates_default, companies: companies_default, bricks: bricks_default, products: products_default },
-    bricks: { years: years_default, delegates: delegates_default, companies: companies_default }
-  });
-  
-  
-  // Graph's data variables
-  const [dataHistogram, setDataHistogram] = useState([])
-  const [dataProducts, setDataProducts] = useState([])
-  const [dataProductsTotal, setDataProductsTotal] = useState([])
-  const [dataBricks, setDataBricks] = useState([])
-
-
   // Memoized filter configurations for each fetch
   const options = useMemo(() => ({
-    histogram: { option_selected: formValues.histogram, type: 'HISTOGRAM', delegates: state.isAdmin, years: state.isAdmin, companies: false, bricks: false, products: false },
-    products: { option_selected: formValues.products, type: 'PRODUCT', delegates: state.isAdmin, years: state.isAdmin, companies: true, bricks: true, products: true },
-    totalProducts: { option_selected: formValues.totalProducts, type: 'TOTAL_PRODUCT', delegates: state.isAdmin, years: false, companies: state.isAdmin, bricks: state.isAdmin, products: state.isAdmin },
-    bricks: { option_selected: formValues.bricks, type: 'BRICK', delegates: state.isAdmin, years: state.isAdmin, companies: true, bricks: true, products: false },
+    histogram: { option_selected: formValues.histogram, type: 'histogram', delegates: state.isAdmin, years: state.isAdmin, companies: false, bricks: false, products: false },
+    products: { option_selected: formValues.products, type: 'products', delegates: state.isAdmin, years: state.isAdmin, companies: true, bricks: true, products: true },
+    totalProducts: { option_selected: formValues.totalProducts, type: 'totalProducts', delegates: state.isAdmin, years: false, companies: state.isAdmin, bricks: state.isAdmin, products: state.isAdmin },
+    bricks: { option_selected: formValues.bricks, type: 'bricks', delegates: state.isAdmin, years: state.isAdmin, companies: true, bricks: true, products: false },
   }), [state.isAdmin, formValues]);
 
 
@@ -348,44 +297,17 @@ export default function Vendas() {
     setFormValues((prev) => ({ ...prev, [type]: values }));
   
     // Set a trigger to fetch data
-    setFetchTriggers((prev) => ({ ...prev, [type]: Date.now() }));
+    console.log("AAAAAAAAAAAAA", type)
+    updateFetchTriggers("histogram");
   };
 
 
   // Fetch data for each graph on loading the page. Should also return the filter's options 
-  const { data_histogram, filters_histogram } = useFetchSales('/', fetchTriggers.histogram, options.histogram)
-  const { data_table_product, filters_product } = useFetchSales('/', fetchTriggers.products, options.products)
-  const { data_table_total, filters_table_total } = useFetchSales('/', fetchTriggers.totalProducts, options.totalProducts)
-  const { data_table_brick, filters_table_brick } = useFetchSales('/', fetchTriggers.bricks, options.bricks)
+  useFetchSales('/', !triggers.histogram, options.histogram)
+  useFetchSales('/', !triggers.products, options.products)
+  useFetchSales('/', !triggers.totalProducts, options.totalProducts)
+  useFetchSales('/', !triggers.bricks, options.bricks)
 
-
-  // Update filter variables each time filters are fetched
-  useEffect(() => {
-    if (filters_histogram) {
-      setFilters((prev) => ({
-        ...prev,
-        histogram: { 
-          years: filters_histogram.years, 
-          delegates: filters_histogram.delegates 
-        },
-      }));
-    }
-  }, [filters_histogram]);
-
-  useEffect(() => {
-    if (filters_product) {
-      setFilters((prev) => ({
-        ...prev,
-        products: {
-          years: filters_product.years,
-          delegates: filters_product.delegates,
-          companies: filters_product.companies,
-          bricks: filters_product.bricks,
-          products: filters_product.products,
-        },
-      }));
-    }
-  }, [filters_product]);
 
   // VER DEPOIS SE NÃO DÁ ERRO PORQUE SE NÃO FOR ADMIN ISTO VEM VAZIO
   // useEffect(() => {
@@ -398,58 +320,14 @@ export default function Vendas() {
   //   }
   // }, [filters_product]);
 
-  useEffect(() => {
-    if (filters_table_total) {
-      setFilters((prev) => ({
-        ...prev,
-        totalProducts: {
-          delegates: filters_table_total.delegates,
-          companies: filters_table_total.companies,
-          bricks: filters_table_total.bricks,
-          products: filters_table_total.products,
-        },
-      }));
-    }
-  }, [filters_table_total]);
-
-  useEffect(() => {
-    if (filters_table_brick) {
-      setFilters((prev) => ({
-        ...prev,
-        bricks: {
-          years: filters_table_brick.years,
-          delegates: filters_table_brick.delegates,
-          companies: filters_table_brick.companies,
-        },
-      }));
-    }
-  }, [filters_table_brick]);
-
 
   // Set graph's content
-  useEffect(()=> {
-    if (data_histogram){
-      setDataHistogram(data_histogram);
-    }
-  },[data_histogram])
+  // useEffect(()=> {
+  //   if (data_histogram){
+  //     setDataHistogram(data_histogram);
+  //   }
+  // },[data_histogram])
 
-  useEffect(()=> {
-    if (data_table_product){
-      setDataProducts(data_table_product);
-    }
-  },[data_table_product])
-
-  useEffect(()=> {
-    if (data_table_total){
-      setDataProductsTotal(data_table_total);
-    }
-  },[data_table_total])
-
-  useEffect(()=> {
-    if (data_table_brick){
-      setDataBricks(data_table_brick);
-    }
-  },[data_table_brick])
 
   return (
       <div id="contact">
@@ -506,7 +384,7 @@ export default function Vendas() {
                 </div>
               }
             </div>
-            <DemoColumn dataHistogram={dataHistogram} />
+            <DemoColumn dataHistogram={data.histogram} />
           </div>
 
           <ConfigProvider theme={themeConfig}>  
@@ -579,7 +457,7 @@ export default function Vendas() {
 
               <Table 
                 columns={columns_produto}
-                dataSource={dataProducts}
+                dataSource={data.products}
                 scroll={{x: 'max-content'}}
                 pagination={{ pageSize: 7, showSizeChanger: false }}
                 showSorterTooltip={false}                             
@@ -643,7 +521,7 @@ export default function Vendas() {
 
               <Table
                 columns={columns_produto_total}
-                dataSource={dataProductsTotal}
+                dataSource={data.totalProducts}
                 scroll={{x: 'max-content'}}
                 pagination={{ pageSize: 7, showSizeChanger: false }}
                 showSorterTooltip={false}                             
@@ -698,7 +576,7 @@ export default function Vendas() {
 
               <Table
                 columns={columns_brick}
-                dataSource={dataBricks}
+                dataSource={data.bricks}
                 scroll={{x: 'max-content'}}
                 pagination={{ pageSize: 7, showSizeChanger: false }}
                 showSorterTooltip={false}                             

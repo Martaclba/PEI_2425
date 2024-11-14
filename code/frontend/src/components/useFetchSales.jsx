@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import axios from 'axios';
+
 import { useAuth } from '../context/Auth';
+import useSalesDataStore from '../context/SalesData';
 
 /*
 
@@ -15,11 +17,15 @@ options = {
     bricks: (true/false)
     products: (true/false)
 }
+    
 */
+
 export function useFetchSales(path, fetchTrigger, options) {                                     
-    const [data, setData] = useState([]);                                              
-    const [filters, setFilters] = useState([])
     const { state } = useAuth()
+
+    const updateFetchTriggers = useSalesDataStore((state) => state.updateFetchTriggers)
+    const updateSalesData = useSalesDataStore((state) => state.updateSalesData)
+    const updateFiltersData = useSalesDataStore((state) => state.updateFiltersData)
  
     // Send the user's id if the role is not admin
     const url = state.isAdmin ? process.env.REACT_APP_API_PATH + path : process.env.REACT_APP_API_PATH + path + `${state.userID}`
@@ -40,8 +46,11 @@ export function useFetchSales(path, fetchTrigger, options) {
 
                 if (response.status === 200){
                     console.log('Data loaded successfully:', response.data);
-                    setData(response.data)
-                    //setFilters(response.data.filters)
+                    
+                    updateFetchTriggers(options.type)
+                    // updateSalesData(options.type, response.data[0])
+                    // updateFiltersData(options.type, response.data[1])
+
                 } else {
                     console.error('Data loaded failed:', response.status);
                 }
@@ -59,7 +68,5 @@ export function useFetchSales(path, fetchTrigger, options) {
         return () => {
             isMounted = false;
         };
-    }, [fetchTrigger, options, url]);
-
-    return { data, filters }
+    }, [url, fetchTrigger, options, updateFetchTriggers, updateSalesData, updateFiltersData]);
 }
