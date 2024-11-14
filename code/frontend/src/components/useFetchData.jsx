@@ -11,8 +11,10 @@ export function useFetchData(path, fetchTrigger) {
 
     // Load the table's content and update it when necessary
     useEffect (() => {
-        let isMounted = true
 
+        if (!fetchTrigger) return 
+
+        let isMounted = true
 
         // Fetch data from the backend
         const fetchData = async () => {
@@ -34,12 +36,13 @@ export function useFetchData(path, fetchTrigger) {
         console.log("Should Fetch Data: ", fetchTrigger)
         
         // Fetch data if there's no data or if there's a trigger (update, for example)
-        if (isMounted && (!data.lenght || fetchTrigger)) fetchData();
+        // if (isMounted && (!data.lenght || fetchTrigger)) fetchData();
+        if (isMounted && fetchTrigger) fetchData();
 
         return () => {
             isMounted = false;
         };
-    }, [data.lenght, fetchTrigger, url]);
+    }, [fetchTrigger, url]);
 
     return data
 }

@@ -3,12 +3,17 @@ import axios from 'axios';
 import { useAuth } from '../context/Auth';
 
 /*
+
+// This variable tells the backend wich filters we want for each graph. 
+// Should return a list with every option for the selected form
 options = {
-    type: (histogram/table_product/table_total_product/table_brick)
-    filterDelegates: (true/false)
-    filterYears: (true/false)
-    filterCompanies: (true/false)
-    filterBricks: (true/false)
+    option_selected: { year: '2024', delegate: 'André Barros' }       (example; if {empty} fetch everything (default))
+    type: (histogram/table_product/table_total_product/table_brick)   (to know what to put on "data")
+    delegates: (true/false)
+    years: (true/false)
+    companies: (true/false)
+    bricks: (true/false)
+    products: (true/false)
 }
 */
 export function useFetchSales(path, fetchTrigger, options) {                                     
@@ -17,10 +22,13 @@ export function useFetchSales(path, fetchTrigger, options) {
     const { state } = useAuth()
  
     // Send the user's id if the role is not admin
-    const url = state.isAdmin ? process.env.REACT_APP_API_PATH + path : process.env.REACT_APP_API_PATH + path + `/${state.userID}`
+    const url = state.isAdmin ? process.env.REACT_APP_API_PATH + path : process.env.REACT_APP_API_PATH + path + `${state.userID}`
 
     // Load the table's content and update it when necessary
     useEffect (() => {
+
+        if (!fetchTrigger) return 
+
         let isMounted = true
 
         console.log("FILTERS NEEDED: ", options)
@@ -42,15 +50,16 @@ export function useFetchSales(path, fetchTrigger, options) {
             }
         }
 
-        console.log("Should Fetch Data: ", fetchTrigger)
+        console.log("Should Fetch SALES: ", fetchTrigger)
         
         // Fetch data if there's no data or if there's a trigger (update, for example)
-        if (isMounted && (!data.lenght || fetchTrigger)) fetchData();
+        // if (isMounted && (!data.lenght || fetchTrigger)) fetchData();
+        if (isMounted && fetchTrigger) fetchData();
 
         return () => {
             isMounted = false;
         };
-    }, [data.lenght, fetchTrigger, options, url]);
+    }, [fetchTrigger, options, url]);
 
     return { data, filters }
 }

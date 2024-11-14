@@ -18,6 +18,18 @@ const UploadFileProps = (path, setFetchTrigger) => ({
         if (status === 'done') {
             message.success("Ficheiro importado com sucesso");
             console.log(`"${info.file.name}" uploaded successfully.`);
+
+            // Check if setFetchTrigger is a single trigger or an object trigger
+            if (typeof setFetchTrigger === 'function') {
+                setFetchTrigger(Date.now());
+            } else if (typeof setFetchTrigger === 'function') {
+                // Multiple triggers case: Set all triggers with the current timestamp
+                setFetchTrigger((prev) => Object.keys(prev).reduce((acc, key) => ({
+                    ...acc,
+                    [key]: Date.now(),
+                }), {}));
+            }
+
             setFetchTrigger(Date.now())            
         } else if (status === 'error') {
             message.error("Oops! Ocorreu algum erro durante o upload...");

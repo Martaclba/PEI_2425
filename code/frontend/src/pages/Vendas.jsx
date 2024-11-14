@@ -9,41 +9,41 @@ import { Column } from '@ant-design/plots';
 import themeConfig from '../styles/themeConfigTable';
 import UploadFileProps from '../components/UploadFile';
 import { getFormattedDate } from '../components/utils';
-import axios from 'axios'; 
 import {useAuth} from '../context/Auth';
 import { useFetchSales } from '../components/useFetchSales';
 import { getColumnsProdutoTotal } from '../components/utils';
 
-                                    // TODO: REMOVER ESTES DEFAULTSSSSSSSSSSSSSSSSSSSSSSSS
+                              // TODO: REMOVER ESTES DEFAULTSSSSSSSSSSSSSSSSSSSSSSSS
 const years_default = [
-  { value: '2018' },
-  { value: '2019' },
-  { value: '2020' },
+  { label: '2018', value: '2018' },
+  { label: '2019', value: '2019' },
+  { label: '2020', value: '2020' },
 ];
 
 const delegates_default = [
-  { value: "Rui Correia" },
-  { value: "André Barros" },
-  { value: "Matilde Santos"}
+  { label: "Rui Correia", value: "Rui Correia" },
+  { label: "André Barros", value: "André Barros" },
+  { label: "Matilde Santos", value: "Matilde Santos" }
 ]
 
 const companies_default = [
-  { value: 'MyPharma' },
-  { value: 'Pharma1000' },
-  { value: 'Empresa 3'}
+  { label: 'MyPharme', value: 'MyPharma' },
+  { label: 'Pharma1000', value: 'Pharma1000' },
+  { label: 'Empresa 3', value: 'Empresa 3'}
 ] 
 
 const bricks_default = [
-  { value: "brick 0"},
-  { value: "brick 1"},
-  { value: "brick 2"}
+  { label: "brick 0", value: "brick 0"},
+  { label: "brick 1", value: "brick 1"},
+  { label: "brick 2", value: "brick 2"}
 ]
 
 const products_default = [
-  { value: "product 0"},
-  { value: "product 1"},
-  { value: "product 2"}
+  { label: "product 0", value: "product 0" },
+  { label: "product 1", value: "product 1" },
+  { label: "product 2", value: "product 2" }
 ]
+
 
 
 const predefinedValues_histogram = {
@@ -73,20 +73,6 @@ const predefinedValues_table_brick = {
 };
 
 
-
-const data = [                      // TODO: REMOVER DEPOISSSSSSSSSS
-  { type: 'Jan', value: 0.16 },
-  { type: 'Fev', value: 0.125 },
-  { type: 'Mar', value: 0.24 },
-  { type: 'Apr', value: 0.19 },
-  { type: 'May', value: 0.22 },
-  { type: 'Jun', value: 0.05 },
-  { type: 'Jul', value: 0.01 },
-  { type: 'Aug', value: 0.015 },
-  { type: 'Sep', value: 0.05 },
-  { type: 'Nov', value: 0.01 },
-  { type: 'Dec', value: 0.015 },
-];
 
 const DemoColumn = ({ dataHistogram }) => {
   const config = {
@@ -199,24 +185,6 @@ const columns_produto = [
   },
 ];
 
-const dados_produto = Array.from({    // TODO: REMOVER DEPOISSSSSSSSSS
-  length: 100,
-}).map((_, i) => ({
-  key: i,
-  produto: `Produto ${i}`,
-  janeiro: i,
-  fevereiro: i,
-  marco: i,
-  abril: i,
-  maio: i,
-  junho: i,
-  julho: i,
-  agosto: i,
-  setembro: i,
-  outubro: i,
-  novembro: i,
-  dezembro: i,
-}));
 
 const columns_produto_total = getColumnsProdutoTotal()
 
@@ -303,25 +271,6 @@ const columns_brick = [
   },
 ];
 
-const dados_brick = Array.from({    // TODO: REMOVER DEPOISSSSSSSSSS
-  length: 100,
-}).map((_, i) => ({
-  key: i,
-  brick: `Brick ${i}`,
-  janeiro: i,
-  fevereiro: i,
-  marco: i,
-  abril: i,
-  maio: i,
-  junho: i,
-  julho: i,
-  agosto: i,
-  setembro: i,
-  outubro: i,
-  novembro: i,
-  dezembro: i,
-}));
-
 
 
 export default function Vendas() {  
@@ -329,13 +278,22 @@ export default function Vendas() {
   const { state } = useAuth();
   const location = useLocation();
 
+
   // Set a trigger after uploading a file successfully
-  const [fetchTrigger, setFetchTrigger] = useState(false)
+  const [fetchTriggers, setFetchTriggers] = useState({
+    histogram: false,
+    products: false,
+    totalProducts: false,
+    bricks: false,
+  });
+
+
+  // Dropdown menu item for uploading files
   const items = [
     {
       key: '1',
       label:  
-        <Upload {...UploadFileProps(location.pathname, setFetchTrigger)} maxCount={1}>
+        <Upload {...UploadFileProps(location.pathname, setFetchTriggers)} maxCount={1}>
           <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
             Importar Ficheiro
           </Button>
@@ -343,106 +301,127 @@ export default function Vendas() {
     },
   ];
 
+
   // Filters forms
   const [form_histogram] = Form.useForm();
   const [form_table_product] = Form.useForm();
   const [form_table_total] = Form.useForm();
   const [form_table_brick] = Form.useForm();
 
-  // Filters variables
-  const [years, setYears] = useState(years_default);
-  const [delegates, setDelegates] = useState(delegates_default);
-  const [companies, setCompanies] = useState(companies_default);
-  const [bricks, setBricks] = useState(bricks_default);
-  const [products, setProducts] = useState(products_default);
+  // Store filters form's values to be able to pass them to the fetch hook
+  const [formValues, setFormValues] = useState({
+    histogram: {},
+    products: {},
+    totalProducts: {},
+    bricks: {}
+  });
 
+
+  // Filters variables          
+  const [filters, setFilters] = useState({
+    histogram: { years: years_default, delegates: delegates_default },
+    products: { years: years_default, delegates: delegates_default, companies: companies_default, bricks: bricks_default, products: products_default },
+    totalProducts: { delegates: delegates_default, companies: companies_default, bricks: bricks_default, products: products_default },
+    bricks: { years: years_default, delegates: delegates_default, companies: companies_default }
+  });
+  
+  
   // Graph's data variables
   const [dataHistogram, setDataHistogram] = useState([])
   const [dataProducts, setDataProducts] = useState([])
   const [dataProductsTotal, setDataProductsTotal] = useState([])
   const [dataBricks, setDataBricks] = useState([])
 
-  // This function will request the data after selecting an option on any form
-  const onFinish = (type) => async (values) => {
-    console.log('Received values of form: ', values)
-    console.log('TYPE: ', type)
-  
-    try {
-      const response = await axios.get(process.env.REACT_APP_API_PATH + "/", { params: values })
-    
-      if(response.status === 200){
-        console.log('Form submitted successfully:', response.data);      
-      } else {
-        console.error('Form submission failed:', response.status);
-      }
-    } catch (error) {
-      console.error('Error submitting form:', error);
-    }
-  };
 
   // Memoized filter configurations for each fetch
-  const options_histogram = useMemo(
-    () => (state.isAdmin ? { type: 'HISTOGRAM', delegates: true, years: true, companies: false, bricks: false,products:false } : { type: 'HISTOGRAM', delegates: false, years: false, companies: false, bricks: false, products: false}),
-    [state.isAdmin]
-  );
+  const options = useMemo(() => ({
+    histogram: { option_selected: formValues.histogram, type: 'HISTOGRAM', delegates: state.isAdmin, years: state.isAdmin, companies: false, bricks: false, products: false },
+    products: { option_selected: formValues.products, type: 'PRODUCT', delegates: state.isAdmin, years: state.isAdmin, companies: true, bricks: true, products: true },
+    totalProducts: { option_selected: formValues.totalProducts, type: 'TOTAL_PRODUCT', delegates: state.isAdmin, years: false, companies: state.isAdmin, bricks: state.isAdmin, products: state.isAdmin },
+    bricks: { option_selected: formValues.bricks, type: 'BRICK', delegates: state.isAdmin, years: state.isAdmin, companies: true, bricks: true, products: false },
+  }), [state.isAdmin, formValues]);
 
-  const options_product = useMemo(
-    () => (state.isAdmin ? { type: 'PRODUCT', delegates: true, years: true, companies: true, bricks: true, products:true} : { type: 'PRODUCT', delegates: false, years: false, companies: true, bricks: true, products: true}),
-    [state.isAdmin]
-  );
 
-  const options_total = useMemo(
-    () => (state.isAdmin ? { type: 'TOTAL_PRODUCT', delegates: true, years: false, companies: true, bricks: true, products:true} : { type: 'TOTAL_PRODUCT', delegates: false, years: false, companies: false, bricks: false, products: false}),
-    [state.isAdmin]
-  );
+  // This function will request the data after selecting an option on any form
+  const onFinish = (type) => (values) => {
+    // Update formValues with the latest form input
+    setFormValues((prev) => ({ ...prev, [type]: values }));
+  
+    // Set a trigger to fetch data
+    setFetchTriggers((prev) => ({ ...prev, [type]: Date.now() }));
+  };
 
-  const options_brick = useMemo(
-    () => (state.isAdmin ? { type: 'BRICK', delegates: true, years: true, companies: true, bricks: true, products: false} : { type: 'BRICK', delegates: false, years: false, companies: true, bricks:true, products: false}),
-    [state.isAdmin]
-  );
 
   // Fetch data for each graph on loading the page. Should also return the filter's options 
-  const { data_histogram, filters_histogram } = useFetchSales('/', fetchTrigger, options_histogram)
-  const { data_table_product, filters_product } = useFetchSales('/', fetchTrigger, options_product)
-  const { data_table_total, filters_table_total } = useFetchSales('/', fetchTrigger, options_total)
-  const { data_table_brick, filters_table_brick } = useFetchSales('/', fetchTrigger, options_brick)
+  const { data_histogram, filters_histogram } = useFetchSales('/', fetchTriggers.histogram, options.histogram)
+  const { data_table_product, filters_product } = useFetchSales('/', fetchTriggers.products, options.products)
+  const { data_table_total, filters_table_total } = useFetchSales('/', fetchTriggers.totalProducts, options.totalProducts)
+  const { data_table_brick, filters_table_brick } = useFetchSales('/', fetchTriggers.bricks, options.bricks)
+
 
   // Update filter variables each time filters are fetched
   useEffect(() => {
     if (filters_histogram) {
-        setYears(filters_histogram.years);
-        setDelegates(filters_histogram.delegates);
-        setCompanies(filters_histogram.companies);
-        setBricks(filters_histogram.bricks);
+      setFilters((prev) => ({
+        ...prev,
+        histogram: { 
+          years: filters_histogram.years, 
+          delegates: filters_histogram.delegates 
+        },
+      }));
     }
   }, [filters_histogram]);
 
   useEffect(() => {
     if (filters_product) {
-        setYears(filters_product.years);
-        setDelegates(filters_product.delegates);
-        setCompanies(filters_product.companies);
-        setBricks(filters_product.bricks);
-        setProducts(filters_product.products)
+      setFilters((prev) => ({
+        ...prev,
+        products: {
+          years: filters_product.years,
+          delegates: filters_product.delegates,
+          companies: filters_product.companies,
+          bricks: filters_product.bricks,
+          products: filters_product.products,
+        },
+      }));
     }
   }, [filters_product]);
 
+  // VER DEPOIS SE NÃO DÁ ERRO PORQUE SE NÃO FOR ADMIN ISTO VEM VAZIO
+  // useEffect(() => {
+  //   if (filters_product) {
+  //       setYearsP(filters_product.years);                                    
+  //       setDelegatesP(filters_product.delegates);
+  //       setCompaniesP(filters_product.companies);
+  //       setBricksP(filters_product.bricks);
+  //       setProductsP(filters_product.products)
+  //   }
+  // }, [filters_product]);
+
   useEffect(() => {
     if (filters_table_total) {
-        setYears(filters_table_total.years);
-        setDelegates(filters_table_total.delegates);
-        setCompanies(filters_table_total.companies);
-        setBricks(filters_table_total.bricks);
-        setProducts(filters_table_total.products)
+      setFilters((prev) => ({
+        ...prev,
+        totalProducts: {
+          delegates: filters_table_total.delegates,
+          companies: filters_table_total.companies,
+          bricks: filters_table_total.bricks,
+          products: filters_table_total.products,
+        },
+      }));
     }
   }, [filters_table_total]);
 
   useEffect(() => {
     if (filters_table_brick) {
-        setYears(filters_table_brick.years);
-        setDelegates(filters_table_brick.delegates);
-        setCompanies(filters_table_brick.companies);
-        setBricks(filters_table_brick.bricks);
+      setFilters((prev) => ({
+        ...prev,
+        bricks: {
+          years: filters_table_brick.years,
+          delegates: filters_table_brick.delegates,
+          companies: filters_table_brick.companies,
+        },
+      }));
     }
   }, [filters_table_brick]);
 
@@ -499,16 +478,17 @@ export default function Vendas() {
                 <div style={{display:'flex', gap:'1rem', marginBottom: '1rem'}}>
                   <Form
                     name="histogram"
-                    onFinish={onFinish("HISTOGRAM")}
+                    onFinish={onFinish("histogram")}
                     layout="inline"
                     initialValues={predefinedValues_histogram}
                     form={form_histogram}
                   >
                     <Form.Item className="large-select" name='Ano_H'>
                       <Select 
-                        placeholder="Ano"
-                        options={years}
+                        placeholder="Ano"                        
+                        options={filters.histogram.years}
                         onChange={() => form_histogram.submit()}
+                        showSearch
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
@@ -516,8 +496,9 @@ export default function Vendas() {
                     <Form.Item className="large-select" name='Delegado_H'>
                       <Select                         
                         placeholder="Delegado"
-                        options={delegates}
+                        options={filters.histogram.delegates}
                         onChange={() => form_histogram.submit()} 
+                        showSearch
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
@@ -535,7 +516,7 @@ export default function Vendas() {
               <div style={{display:'flex', gap:'1rem', marginBottom: '1rem'}}>
                 <Form
                   name="table_product"
-                  onFinish={onFinish("TABLE_PRODUCT")}
+                  onFinish={onFinish("products")}
                   layout="inline"
                   initialValues={predefinedValues_table_product}
                   form={form_table_product}
@@ -544,8 +525,9 @@ export default function Vendas() {
                     <Form.Item className="large-select" name='Ano_P'>
                       <Select                       
                         placeholder="Ano"
-                        options={years} 
+                        options={filters.products.years} 
                         onChange={() => form_table_product.submit()}
+                        showSearch
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
@@ -555,8 +537,9 @@ export default function Vendas() {
                     <Form.Item className="large-select" name='Delegado_P'>
                       <Select                       
                         placeholder="Delegado"
-                        options={delegates} 
+                        options={filters.products.delegates} 
                         onChange={() => form_table_product.submit()}
+                        showSearch
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
@@ -565,8 +548,9 @@ export default function Vendas() {
                   <Form.Item className="large-select" name='Empresa_P'>
                     <Select                     
                       placeholder="Empresa"
-                      options={companies} 
+                      options={filters.products.companies} 
                       onChange={() => form_table_product.submit()}
+                      showSearch
                       filterOption={(input, option) => 
                           (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                   </Form.Item>
@@ -574,8 +558,9 @@ export default function Vendas() {
                   <Form.Item className="large-select" name='Brick_P'>
                     <Select                     
                       placeholder="Brick"
-                      options={bricks} 
+                      options={filters.products.bricks} 
                       onChange={() => form_table_product.submit()}
+                      showSearch
                       filterOption={(input, option) => 
                           (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                   </Form.Item>
@@ -583,8 +568,9 @@ export default function Vendas() {
                   <Form.Item className="large-select" name='Product_P'>
                     <Select                     
                       placeholder="Product"
-                      options={products} 
+                      options={filters.products.products} 
                       onChange={() => form_table_product.submit()}
+                      showSearch
                       filterOption={(input, option) => 
                           (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                   </Form.Item>
@@ -593,7 +579,6 @@ export default function Vendas() {
 
               <Table 
                 columns={columns_produto}
-                // dataSource={dados_produto}
                 dataSource={dataProducts}
                 scroll={{x: 'max-content'}}
                 pagination={{ pageSize: 7, showSizeChanger: false }}
@@ -606,7 +591,7 @@ export default function Vendas() {
               <div style={{display:'flex', gap:'1rem', marginBottom:'1rem'}}>
                 <Form
                   name="table_brick"
-                  onFinish={onFinish("TABLE_TOTAL")}
+                  onFinish={onFinish("totalProducts")}
                   layout="inline"
                   initialValues={predefinedValues_table_total}
                   form={form_table_total}
@@ -614,8 +599,9 @@ export default function Vendas() {
                     <Form.Item className="large-select" name='Delegado_TP'>
                       <Select                       
                         placeholder="Delegado"
-                        options={delegates}
+                        options={filters.totalProducts.delegates}
                         onChange={() => form_table_total.submit()}
+                        showSearch
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
@@ -625,8 +611,9 @@ export default function Vendas() {
                     <Form.Item className="large-select" name='Empresa_TP'> 
                       <Select                       
                         placeholder="Empresa"
-                        options={companies} 
+                        options={filters.totalProducts.companies} 
                         onChange={() => form_table_total.submit()}
+                        showSearch
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
@@ -635,8 +622,9 @@ export default function Vendas() {
                   <Form.Item className="large-select" name='Brick_TP'> 
                     <Select                     
                       placeholder="Brick"
-                      options={bricks} 
+                      options={filters.totalProducts.bricks} 
                       onChange={() => form_table_total.submit()}
+                      showSearch
                       filterOption={(input, option) => 
                           (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                   </Form.Item>
@@ -644,8 +632,9 @@ export default function Vendas() {
                   <Form.Item className="large-select" name='Product_TP'> 
                     <Select                     
                       placeholder="Product"
-                      options={products} 
+                      options={filters.totalProducts.products} 
                       onChange={() => form_table_total.submit()}
+                      showSearch
                       filterOption={(input, option) => 
                           (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                   </Form.Item>
@@ -666,7 +655,7 @@ export default function Vendas() {
               <div style={{display:'flex', gap:'1rem', marginBottom:'1rem'}}>
                 <Form
                   name="table_total"
-                  onFinish={onFinish("TABLE_BRICK")}
+                  onFinish={onFinish("bricks")}
                   layout="inline"
                   initialValues={predefinedValues_table_brick}
                   form={form_table_brick}
@@ -675,8 +664,9 @@ export default function Vendas() {
                     <Form.Item className="large-select" name='Ano_B'>
                       <Select                       
                         placeholder="Ano"
-                        options={years}
+                        options={filters.bricks.years}
                         onChange={() => form_table_brick.submit()}
+                        showSearch
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
@@ -686,8 +676,9 @@ export default function Vendas() {
                     <Form.Item className="large-select" name='Delegado_B'> 
                       <Select                       
                         placeholder="Delegado"
-                        options={delegates} 
+                        options={filters.bricks.delegates} 
                         onChange={() => form_table_brick.submit()}
+                        showSearch
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
@@ -696,8 +687,9 @@ export default function Vendas() {
                   <Form.Item className="large-select" name='Empresa_B'> 
                     <Select                     
                       placeholder="Empresa"
-                      options={companies} 
+                      options={filters.bricks.companies} 
                       onChange={() => form_table_brick.submit()}
+                      showSearch
                       filterOption={(input, option) => 
                           (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                   </Form.Item>
