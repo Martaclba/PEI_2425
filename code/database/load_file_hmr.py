@@ -114,4 +114,4 @@ with psycopg.connect(conn_string) as conn:
             print("Error: ", e)
             cur.execute('ROLLBACK')
         
-        #conn.execute('COMMIT')
+        conn.execute('COMMIT')
