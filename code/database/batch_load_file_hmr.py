@@ -98,6 +98,17 @@ with psycopg2.connect(conn_string) as conn:
                         row['Date'],
                         row['Value']
                     ))
+                    sale_id = None  # Replace with logic to obtain `sale_id` if needed
+
+                    # Check and insert into `sale_product`
+                    cur.execute("SELECT * FROM sale_product WHERE fk_id_sale = %s AND fk_cnp = %s AND product_amount = %s", (sale_id, product_id, row[8]))
+                    sale_product = cur.fetchone()
+                    if sale_product is None:
+                        cur.execute("""
+                            INSERT INTO sale_product (fk_id_sale, fk_cnp, product_amount)
+                            VALUES (%s, %s, %s) RETURNING (fk_id_sale, fk_cnp);
+                            """, (sale_id, product_id, row[8]))
+                    sale_product = cur.fetchone()
 
                 # Insert data in batches
                 insert_query = """
