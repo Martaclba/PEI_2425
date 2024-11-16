@@ -55,6 +55,14 @@ const useSalesDataStore = create((set) => ({
         bricks: { years: years_default, delegates: delegates_default, companies: companies_default },
     },
 
+    // Store filters form's values to be able to pass them to the fetch hook
+    selectedOption: {
+        histogram: {},
+        products: {},
+        totalProducts: {},
+        bricks: {}
+    },
+
     updateFetchTriggers: (type) => {
         set((state) => {
             const updatedTriggers = type
@@ -75,13 +83,22 @@ const useSalesDataStore = create((set) => ({
             },
         })),
 
-    updateSalesDataStore: (type, data) => {
+    updateSalesData: (type, data) => {
         set((state) => ({
             data: {
                 ...state.data,
                 [type]: { ...state.data[type], ...data },
             },
         }))
+    },
+
+    updateSelectedOption: (type, option) => {
+        set((state) => ({
+            selectedOption:{
+                ...state.selectedOption,
+                [type]: { ...state.selectedOption[type], ...option },
+            }
+        }));
     },
 
     reset: () => set({
@@ -103,7 +120,12 @@ const useSalesDataStore = create((set) => ({
           totalProducts: { delegates: delegates_default, companies: companies_default, bricks: bricks_default, products: products_default },
           bricks: { years: years_default, delegates: delegates_default, companies: companies_default },
         },
-        selectedOption: {}                   
+        selectedOption: {
+            histogram: {},
+            products: {},
+            totalProducts: {},
+            bricks: {}
+        }                   
       }),
 }))
 

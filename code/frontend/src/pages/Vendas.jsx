@@ -15,7 +15,6 @@ import { getColumnsProdutoTotal } from '../components/utils';
 import useSalesDataStore from '../context/SalesData';
 
 
-
 const predefinedValues_histogram = {
   Ano_H: new Date().getFullYear(),
   Delegado_H: 'Todos',
@@ -248,8 +247,9 @@ export default function Vendas() {
   const { state } = useAuth();
   const location = useLocation();
 
-  const { triggers, data, filters } = useSalesDataStore((state) => state)
+  const { triggers, data, filters, selectedOption } = useSalesDataStore((state) => state)
   const updateFetchTriggers = useSalesDataStore((state) => state.updateFetchTriggers)
+  const updateSelectedOption = useSalesDataStore((state) => state.updateSelectedOption)
 
 
   // Dropdown menu item for uploading files
@@ -272,29 +272,21 @@ export default function Vendas() {
   const [form_table_total] = Form.useForm();
   const [form_table_brick] = Form.useForm();
 
-  // Store filters form's values to be able to pass them to the fetch hook
-  const [formValues, setFormValues] = useState({
-    histogram: {},
-    products: {},
-    totalProducts: {},
-    bricks: {}
-  });
-
-
+  
   // Memoized filter configurations for each fetch
   const options = useMemo(() => ({
-    histogram: { option_selected: formValues.histogram, type: 'histogram', delegates: state.isAdmin, years: state.isAdmin, companies: false, bricks: false, products: false },
-    products: { option_selected: formValues.products, type: 'products', delegates: state.isAdmin, years: state.isAdmin, companies: true, bricks: true, products: true },
-    totalProducts: { option_selected: formValues.totalProducts, type: 'totalProducts', delegates: state.isAdmin, years: false, companies: state.isAdmin, bricks: state.isAdmin, products: state.isAdmin },
-    bricks: { option_selected: formValues.bricks, type: 'bricks', delegates: state.isAdmin, years: state.isAdmin, companies: true, bricks: true, products: false },
-  }), [state.isAdmin, formValues]);
+    histogram: { option_selected: selectedOption.histogram, type: 'histogram', delegates: state.isAdmin, years: state.isAdmin, companies: false, bricks: false, products: false },
+    products: { option_selected: selectedOption.products, type: 'products', delegates: state.isAdmin, years: state.isAdmin, companies: true, bricks: true, products: true },
+    totalProducts: { option_selected: selectedOption.totalProducts, type: 'totalProducts', delegates: state.isAdmin, years: false, companies: state.isAdmin, bricks: state.isAdmin, products: state.isAdmin },
+    bricks: { option_selected: selectedOption.bricks, type: 'bricks', delegates: state.isAdmin, years: state.isAdmin, companies: true, bricks: true, products: false },
+  }), [state.isAdmin, selectedOption]);
 
 
   // This function will request the data after selecting an option on any form
-  const onFinish = (type) => (values) => {
-    // Update formValues with the latest form input
-    setFormValues((prev) => ({ ...prev, [type]: values }));
-  
+  const onFinish = (type) => async (values) => {
+    // Update selected option with the latest form input
+    updateSelectedOption(type, values)
+
     // Set a trigger to fetch data
     updateFetchTriggers(type);
   };
@@ -317,14 +309,6 @@ export default function Vendas() {
   //       setProductsP(filters_product.products)
   //   }
   // }, [filters_product]);
-
-
-  // Set graph's content
-  // useEffect(()=> {
-  //   if (data_histogram){
-  //     setDataHistogram(data_histogram);
-  //   }
-  // },[data_histogram])
 
 
   return (
@@ -356,7 +340,7 @@ export default function Vendas() {
                     name="histogram"
                     onFinish={onFinish("histogram")}
                     layout="inline"
-                    initialValues={predefinedValues_histogram}
+                    initialValues={Object.keys(selectedOption.histogram).length !== 0 ? selectedOption.histogram : predefinedValues_histogram}
                     form={form_histogram}
                   >
                     <Form.Item className="large-select" name='Ano_H'>
@@ -394,7 +378,7 @@ export default function Vendas() {
                   name="table_product"
                   onFinish={onFinish("products")}
                   layout="inline"
-                  initialValues={predefinedValues_table_product}
+                  initialValues={Object.keys(selectedOption.products).length !== 0 ? selectedOption.products : predefinedValues_table_product}
                   form={form_table_product}
                 >
                   {state.isAdmin && 
@@ -469,7 +453,7 @@ export default function Vendas() {
                   name="table_brick"
                   onFinish={onFinish("totalProducts")}
                   layout="inline"
-                  initialValues={predefinedValues_table_total}
+                  initialValues={Object.keys(selectedOption.totalProducts).length !== 0 ? selectedOption.totalProducts : predefinedValues_table_total}
                   form={form_table_total}
                 >
                     <Form.Item className="large-select" name='Delegado_TP'>
@@ -533,7 +517,7 @@ export default function Vendas() {
                   name="table_total"
                   onFinish={onFinish("bricks")}
                   layout="inline"
-                  initialValues={predefinedValues_table_brick}
+                  initialValues={Object.keys(selectedOption.bricks).length !== 0 ? selectedOption.bricks : predefinedValues_table_brick}
                   form={form_table_brick}
                 >
                   {state.isAdmin && 
