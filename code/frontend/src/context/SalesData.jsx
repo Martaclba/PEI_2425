@@ -48,7 +48,6 @@ const useSalesDataStore = create((set) => ({
         bricks: [],
     },
     
-    // podem vir vazios, não preciso do isAdmin
     filters: {
         histogram: { years: years_default, delegates: delegates_default },
         products: { years: years_default, delegates: delegates_default, companies: companies_default, bricks: bricks_default, products: products_default },
@@ -57,12 +56,15 @@ const useSalesDataStore = create((set) => ({
     },
 
     updateFetchTriggers: (type) => {
-        set((state) => ({
-            triggers: {
-                ...state.triggers,
-                histogram: Date.now(),
-            },
-        }))
+        set((state) => {
+            const updatedTriggers = type
+                ? { ...state.triggers, [type]: !state.triggers[type], }                       // Single trigger update
+                : Object.fromEntries(
+                      Object.keys(state.triggers).map((key) => [key, !state.triggers[key],]) // Update all triggers
+                  );
+    
+            return { triggers: updatedTriggers };
+        });
     },
 
     updateFiltersData: (type, filters) =>
@@ -80,7 +82,29 @@ const useSalesDataStore = create((set) => ({
                 [type]: { ...state.data[type], ...data },
             },
         }))
-    }
+    },
+
+    reset: () => set({
+        triggers: {
+          histogram: false,
+          products: false, 
+          totalProducts: false,
+          bricks: false,
+        },
+        data: {
+          histogram: [],    
+          products: [],
+          totalProducts: [],
+          bricks: [],
+        },
+        filters: {
+          histogram: { years: years_default, delegates: delegates_default },
+          products: { years: years_default, delegates: delegates_default, companies: companies_default, bricks: bricks_default, products: products_default },
+          totalProducts: { delegates: delegates_default, companies: companies_default, bricks: bricks_default, products: products_default },
+          bricks: { years: years_default, delegates: delegates_default, companies: companies_default },
+        },
+        selectedOption: {}                   
+      }),
 }))
 
 export default useSalesDataStore

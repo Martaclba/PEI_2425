@@ -94,10 +94,10 @@ const Sidebar = () => {
                 <li className="profile">
                     <div className="profile-details">                        
                         <i className="bx bx-pie-chart-alt-2"><CgProfile /></i>
-                        <div className="name_job">
+                        {/* <div className="name_job">
                             <div className="name">Rui Correia</div>
                             <div className="job">Delegado</div>
-                        </div>
+                        </div> */}
                     </div>
                     <div className="logout" onClick={handleLogout} style={{ cursor: 'pointer' }}>
                         <i className="bx bx-log-out" id="log_out"><TbLogout2 /></i>

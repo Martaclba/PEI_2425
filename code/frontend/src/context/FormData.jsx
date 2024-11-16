@@ -17,7 +17,19 @@ const useFormDataStore = create((set) => ({
       instituitions: data[0].instituitions,
       specialties: data[0].specialties,
     });
-  } 
+  },
+
+  reset: () => {
+    set({
+      hasFetched: false,
+      districts: [],
+      regions: [],
+      towns: [],
+      instituitions: [],
+      specialties: [],
+    })
+  }
+
 }))
 
 export default useFormDataStore

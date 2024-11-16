@@ -257,8 +257,7 @@ export default function Vendas() {
     {
       key: '1',
       label:  
-        // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        <Upload {...UploadFileProps(location.pathname, )} maxCount={1}>
+        <Upload {...UploadFileProps(location.pathname, null)} maxCount={1}>
           <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
             Importar Ficheiro
           </Button>
@@ -297,8 +296,7 @@ export default function Vendas() {
     setFormValues((prev) => ({ ...prev, [type]: values }));
   
     // Set a trigger to fetch data
-    console.log("AAAAAAAAAAAAA", type)
-    updateFetchTriggers("histogram");
+    updateFetchTriggers(type);
   };
 
 
