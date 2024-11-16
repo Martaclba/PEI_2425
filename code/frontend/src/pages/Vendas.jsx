@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { IconContext } from "react-icons";
 import { HiOutlineUpload } from "react-icons/hi";
 import { IoAddCircleOutline } from "react-icons/io5";
-import { Dropdown, Space, Upload, Button, Table, ConfigProvider, Select, Form } from 'antd';
+import { Dropdown, Space, Upload, Button, Table, ConfigProvider, Select, Form, Empty } from 'antd';
 import { useLocation } from "react-router-dom"
 import { Column } from '@ant-design/plots';
 
@@ -44,6 +44,12 @@ const predefinedValues_table_brick = {
 
 
 const DemoColumn = ({ dataHistogram }) => {
+  if (!dataHistogram || dataHistogram.length === 0) {
+    return (
+      <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+    );
+  }
+
   const config = {
     data: dataHistogram,
     xField: 'type',
@@ -283,7 +289,7 @@ export default function Vendas() {
 
 
   // This function will request the data after selecting an option on any form
-  const onFinish = (type) => async (values) => {
+  const onFinish = (type) => (values) => {
     // Update selected option with the latest form input
     updateSelectedOption(type, values)
 
@@ -331,41 +337,43 @@ export default function Vendas() {
         
         <div style={{padding: '1rem'}}>
           <div className='dashboard-card'>
-            <div id='data-import'>
+            {/* <div id='data-import'> */}
               <p className="table-title">Histórico De Vendas</p>
 
               {state.isAdmin && 
-                <div style={{display:'flex', gap:'1rem', marginBottom: '1rem'}}>
+                <div style={{ marginBottom: '1rem' }}>
                   <Form
                     name="histogram"
                     onFinish={onFinish("histogram")}
-                    layout="inline"
+                    layout="vertical"
                     initialValues={Object.keys(selectedOption.histogram).length !== 0 ? selectedOption.histogram : predefinedValues_histogram}
                     form={form_histogram}
                   >
-                    <Form.Item className="large-select" name='Ano_H'>
-                      <Select 
-                        placeholder="Ano"                        
-                        options={filters.histogram.years}
-                        onChange={() => form_histogram.submit()}
-                        showSearch
-                        filterOption={(input, option) => 
-                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                    </Form.Item>
+                    <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: '40%' }}>
+                      <Form.Item className="large-select" label='Ano' name='Ano_H'>
+                        <Select 
+                          placeholder="Ano"                        
+                          options={filters.histogram.years}
+                          onChange={() => form_histogram.submit()}
+                          showSearch
+                          filterOption={(input, option) => 
+                              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                      </Form.Item>
 
-                    <Form.Item className="large-select" name='Delegado_H'>
-                      <Select                         
-                        placeholder="Delegado"
-                        options={filters.histogram.delegates}
-                        onChange={() => form_histogram.submit()} 
-                        showSearch
-                        filterOption={(input, option) => 
-                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                    </Form.Item>
+                      <Form.Item className="large-select" label='Delegado' name='Delegado_H'>
+                        <Select                         
+                          placeholder="Delegado"
+                          options={filters.histogram.delegates}
+                          onChange={() => form_histogram.submit()} 
+                          showSearch
+                          filterOption={(input, option) => 
+                              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                      </Form.Item>
+                    </div>
                   </Form>
                 </div>
               }
-            </div>
+            {/* </div> */}
             <DemoColumn dataHistogram={data.histogram} />
           </div>
 
@@ -373,67 +381,69 @@ export default function Vendas() {
             <div className='dashboard-card'>
               <p className="table-title">Consulta por Produto</p>
 
-              <div style={{display:'flex', gap:'1rem', marginBottom: '1rem'}}>
+              <div style={{ marginBottom: '1rem' }}>
                 <Form
                   name="table_product"
                   onFinish={onFinish("products")}
-                  layout="inline"
+                  layout="vertical"
                   initialValues={Object.keys(selectedOption.products).length !== 0 ? selectedOption.products : predefinedValues_table_product}
                   form={form_table_product}
                 >
-                  {state.isAdmin && 
-                    <Form.Item className="large-select" name='Ano_P'>
-                      <Select                       
-                        placeholder="Ano"
-                        options={filters.products.years} 
+                  <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                    {state.isAdmin && 
+                      <Form.Item className="large-select" label='Ano' name='Ano_P'>
+                        <Select                       
+                          placeholder="Ano"
+                          options={filters.products.years} 
+                          onChange={() => form_table_product.submit()}
+                          showSearch
+                          filterOption={(input, option) => 
+                              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                      </Form.Item>
+                    }
+
+                    {state.isAdmin && 
+                      <Form.Item className="large-select" label='Delegado' name='Delegado_P'>
+                        <Select                       
+                          placeholder="Delegado"
+                          options={filters.products.delegates} 
+                          onChange={() => form_table_product.submit()}
+                          showSearch
+                          filterOption={(input, option) => 
+                              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                      </Form.Item>
+                    }
+                    
+                    <Form.Item className="large-select" label='Empresa' name='Empresa_P'>
+                      <Select                     
+                        placeholder="Empresa"
+                        options={filters.products.companies} 
                         onChange={() => form_table_product.submit()}
                         showSearch
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
-                  }
 
-                  {state.isAdmin && 
-                    <Form.Item className="large-select" name='Delegado_P'>
-                      <Select                       
-                        placeholder="Delegado"
-                        options={filters.products.delegates} 
+                    <Form.Item className="large-select" label='Brick' name='Brick_P'>
+                      <Select                     
+                        placeholder="Brick"
+                        options={filters.products.bricks} 
                         onChange={() => form_table_product.submit()}
                         showSearch
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
-                  }
-                  
-                  <Form.Item className="large-select" name='Empresa_P'>
-                    <Select                     
-                      placeholder="Empresa"
-                      options={filters.products.companies} 
-                      onChange={() => form_table_product.submit()}
-                      showSearch
-                      filterOption={(input, option) => 
-                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                  </Form.Item>
 
-                  <Form.Item className="large-select" name='Brick_P'>
-                    <Select                     
-                      placeholder="Brick"
-                      options={filters.products.bricks} 
-                      onChange={() => form_table_product.submit()}
-                      showSearch
-                      filterOption={(input, option) => 
-                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                  </Form.Item>
-
-                  <Form.Item className="large-select" name='Product_P'>
-                    <Select                     
-                      placeholder="Product"
-                      options={filters.products.products} 
-                      onChange={() => form_table_product.submit()}
-                      showSearch
-                      filterOption={(input, option) => 
-                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                  </Form.Item>
+                    <Form.Item className="large-select" label='Produto' name='Product_P'>
+                      <Select                     
+                        placeholder="Product"
+                        options={filters.products.products} 
+                        onChange={() => form_table_product.submit()}
+                        showSearch
+                        filterOption={(input, option) => 
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                    </Form.Item>
+                  </div>
                 </Form>
               </div>
 
@@ -448,15 +458,17 @@ export default function Vendas() {
 
             {state.isAdmin && <div className='dashboard-card'>
               <p className="table-title">Consulta Total por Produto</p>
-              <div style={{display:'flex', gap:'1rem', marginBottom:'1rem'}}>
+              
+              <div style={{ marginBottom:'1rem' }}>
                 <Form
                   name="table_brick"
                   onFinish={onFinish("totalProducts")}
-                  layout="inline"
+                  layout="vertical"
                   initialValues={Object.keys(selectedOption.totalProducts).length !== 0 ? selectedOption.totalProducts : predefinedValues_table_total}
                   form={form_table_total}
                 >
-                    <Form.Item className="large-select" name='Delegado_TP'>
+                  <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem',  width: '80%' }}>
+                    <Form.Item className="large-select" label='Delegado' name='Delegado_TP'>
                       <Select                       
                         placeholder="Delegado"
                         options={filters.totalProducts.delegates}
@@ -466,9 +478,7 @@ export default function Vendas() {
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
                   
-
-                  
-                    <Form.Item className="large-select" name='Empresa_TP'> 
+                    <Form.Item className="large-select" label='Empresa' name='Empresa_TP'> 
                       <Select                       
                         placeholder="Empresa"
                         options={filters.totalProducts.companies} 
@@ -476,28 +486,28 @@ export default function Vendas() {
                         showSearch
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                    </Form.Item>                
+
+                    <Form.Item className="large-select" label='Brick' name='Brick_TP'> 
+                      <Select                     
+                        placeholder="Brick"
+                        options={filters.totalProducts.bricks} 
+                        onChange={() => form_table_total.submit()}
+                        showSearch
+                        filterOption={(input, option) => 
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
-                  
 
-                  <Form.Item className="large-select" name='Brick_TP'> 
-                    <Select                     
-                      placeholder="Brick"
-                      options={filters.totalProducts.bricks} 
-                      onChange={() => form_table_total.submit()}
-                      showSearch
-                      filterOption={(input, option) => 
-                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                  </Form.Item>
-
-                  <Form.Item className="large-select" name='Product_TP'> 
-                    <Select                     
-                      placeholder="Product"
-                      options={filters.totalProducts.products} 
-                      onChange={() => form_table_total.submit()}
-                      showSearch
-                      filterOption={(input, option) => 
-                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                  </Form.Item>
+                    <Form.Item className="large-select" label='Produto' name='Product_TP'> 
+                      <Select                     
+                        placeholder="Product"
+                        options={filters.totalProducts.products} 
+                        onChange={() => form_table_total.submit()}
+                        showSearch
+                        filterOption={(input, option) => 
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                    </Form.Item>
+                  </div>
                 </Form>
               </div>
 
@@ -512,47 +522,50 @@ export default function Vendas() {
 
             <div className='dashboard-card'>
               <p className="table-title">Consulta por Brick</p>
-              <div style={{display:'flex', gap:'1rem', marginBottom:'1rem'}}>
+
+              <div style={{ marginBottom:'1rem' }}>
                 <Form
                   name="table_total"
                   onFinish={onFinish("bricks")}
-                  layout="inline"
+                  layout="vertical"
                   initialValues={Object.keys(selectedOption.bricks).length !== 0 ? selectedOption.bricks : predefinedValues_table_brick}
                   form={form_table_brick}
                 >
-                  {state.isAdmin && 
-                    <Form.Item className="large-select" name='Ano_B'>
-                      <Select                       
-                        placeholder="Ano"
-                        options={filters.bricks.years}
+                  <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: '60%' }}>
+                    {state.isAdmin && 
+                      <Form.Item className="large-select" label='Ano' name='Ano_B'>
+                        <Select                       
+                          placeholder="Ano"
+                          options={filters.bricks.years}
+                          onChange={() => form_table_brick.submit()}
+                          showSearch
+                          filterOption={(input, option) => 
+                              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                      </Form.Item>
+                    }
+
+                    {state.isAdmin &&
+                      <Form.Item className="large-select" label='Delegado' name='Delegado_B'> 
+                        <Select                       
+                          placeholder="Delegado"
+                          options={filters.bricks.delegates} 
+                          onChange={() => form_table_brick.submit()}
+                          showSearch
+                          filterOption={(input, option) => 
+                              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                      </Form.Item>
+                    }
+
+                    <Form.Item className="large-select" label='Empresa' name='Empresa_B'> 
+                      <Select                     
+                        placeholder="Empresa"
+                        options={filters.bricks.companies} 
                         onChange={() => form_table_brick.submit()}
                         showSearch
                         filterOption={(input, option) => 
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
-                  }
-
-                  {state.isAdmin &&
-                    <Form.Item className="large-select" name='Delegado_B'> 
-                      <Select                       
-                        placeholder="Delegado"
-                        options={filters.bricks.delegates} 
-                        onChange={() => form_table_brick.submit()}
-                        showSearch
-                        filterOption={(input, option) => 
-                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                    </Form.Item>
-                  }
-
-                  <Form.Item className="large-select" name='Empresa_B'> 
-                    <Select                     
-                      placeholder="Empresa"
-                      options={filters.bricks.companies} 
-                      onChange={() => form_table_brick.submit()}
-                      showSearch
-                      filterOption={(input, option) => 
-                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                  </Form.Item>
+                  </div>
                 </Form>
               </div>
 
@@ -563,9 +576,7 @@ export default function Vendas() {
                 pagination={{ pageSize: 7, showSizeChanger: false }}
                 showSorterTooltip={false}                             
               />
-            </div>
-
-            
+            </div>            
           </ConfigProvider>
         </div>
       </div>

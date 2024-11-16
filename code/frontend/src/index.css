@@ -286,7 +286,12 @@ form[action$="destroy"] button {
 }
 
 .large-select {
-  width: 150px;
+  width: 50%;
+  flex: 1
+}
+
+.costum-form .ant-form-item {
+  margin-bottom: 0;
 }
 
 /* Custom Ant Design components */

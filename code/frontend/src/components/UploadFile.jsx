@@ -4,13 +4,14 @@ import useSalesDataStore from '../context/SalesData';
 // Upload a Excel file
 const UploadFileProps = (path, setFetchTrigger) => ({    
     listType: 'picture',
+    showUploadList: false, 
 
     // Only accepts Excel files
     accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 
-    // Set the backend URL
+    // Post to the backend URL
     action: process.env.REACT_APP_API_PATH  + path,
-
+    
     // Handling the change event to monitor upload progress and success/failure
     // States: 'done', 'error', 'uploading' and 'removed'
     onChange: (info) => {
@@ -31,14 +32,6 @@ const UploadFileProps = (path, setFetchTrigger) => ({
         } else if (status === 'error') {
             message.error("Oops! Ocorreu algum erro durante o upload...");
             console.log(`"${info.file.name}" upload failed.`);
-                        // Check if setFetchTrigger is a single trigger or an object trigger
-                        if (setFetchTrigger) {
-                            setFetchTrigger(Date.now());
-                        } else if (setFetchTrigger === null) {
-                            // Update all triggers in the Zustand store
-                            const { updateFetchTriggers } = useSalesDataStore.getState();
-                            updateFetchTriggers();
-                        }
         }else if (status === 'removed') {
             message.info("Ficheiro removido");
             console.log(`"${info.file.name}" file was removed.`);
