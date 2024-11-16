@@ -15,33 +15,6 @@ import { getColumnsProdutoTotal } from '../components/utils';
 import useSalesDataStore from '../context/SalesData';
 
 
-const predefinedValues_histogram = {
-  Ano_H: new Date().getFullYear(),
-  Delegado_H: 'Todos',
-};
-
-const predefinedValues_table_product = {
-  Ano_P: new Date().getFullYear(),
-  Delegado_P: 'Todos',
-  Empresa_P: 'Todos',
-  Brick_P: 'Todos',
-  Product_P: 'Todos'
-};
-
-const predefinedValues_table_total = {
-  Delegado_TP: 'Todos',
-  Empresa_TP: 'Todos',
-  Brick_TP: 'Todos',
-  Product_TP: 'Todos'
-};
-
-const predefinedValues_table_brick = {
-  Ano_B: new Date().getFullYear(),
-  Delegado_B: 'Todos',
-  Empresa_B: 'Todos',
-};
-
-
 
 const DemoColumn = ({ dataHistogram }) => {
   if (!dataHistogram || dataHistogram.length === 0) {
@@ -159,7 +132,6 @@ const columns_produto = [
     sorter: (a, b) => a.dezembro - b.dezembro
   },
 ];
-
 
 const columns_produto_total = getColumnsProdutoTotal()
 
@@ -281,11 +253,11 @@ export default function Vendas() {
   
   // Memoized filter configurations for each fetch
   const options = useMemo(() => ({
-    histogram: { option_selected: selectedOption.histogram, type: 'histogram', delegates: state.isAdmin, years: state.isAdmin, companies: false, bricks: false, products: false },
-    products: { option_selected: selectedOption.products, type: 'products', delegates: state.isAdmin, years: state.isAdmin, companies: true, bricks: true, products: true },
-    totalProducts: { option_selected: selectedOption.totalProducts, type: 'totalProducts', delegates: state.isAdmin, years: false, companies: state.isAdmin, bricks: state.isAdmin, products: state.isAdmin },
-    bricks: { option_selected: selectedOption.bricks, type: 'bricks', delegates: state.isAdmin, years: state.isAdmin, companies: true, bricks: true, products: false },
-  }), [state.isAdmin, selectedOption]);
+    histogram: { option_selected: selectedOption.histogram, type: 'histogram' },
+    products: { option_selected: selectedOption.products, type: 'products' },
+    totalProducts: { option_selected: selectedOption.totalProducts, type: 'totalProducts' },
+    bricks: { option_selected: selectedOption.bricks, type: 'bricks' },
+  }), [selectedOption]);
 
 
   // This function will request the data after selecting an option on any form
@@ -346,7 +318,7 @@ export default function Vendas() {
                     name="histogram"
                     onFinish={onFinish("histogram")}
                     layout="vertical"
-                    initialValues={Object.keys(selectedOption.histogram).length !== 0 ? selectedOption.histogram : predefinedValues_histogram}
+                    initialValues={selectedOption.histogram}
                     form={form_histogram}
                   >
                     <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: '40%' }}>
@@ -386,7 +358,7 @@ export default function Vendas() {
                   name="table_product"
                   onFinish={onFinish("products")}
                   layout="vertical"
-                  initialValues={Object.keys(selectedOption.products).length !== 0 ? selectedOption.products : predefinedValues_table_product}
+                  initialValues={selectedOption.products}
                   form={form_table_product}
                 >
                   <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
@@ -464,7 +436,7 @@ export default function Vendas() {
                   name="table_brick"
                   onFinish={onFinish("totalProducts")}
                   layout="vertical"
-                  initialValues={Object.keys(selectedOption.totalProducts).length !== 0 ? selectedOption.totalProducts : predefinedValues_table_total}
+                  initialValues={selectedOption.totalProducts}
                   form={form_table_total}
                 >
                   <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem',  width: '80%' }}>
@@ -528,7 +500,7 @@ export default function Vendas() {
                   name="table_total"
                   onFinish={onFinish("bricks")}
                   layout="vertical"
-                  initialValues={Object.keys(selectedOption.bricks).length !== 0 ? selectedOption.bricks : predefinedValues_table_brick}
+                  initialValues={selectedOption.bricks}
                   form={form_table_brick}
                 >
                   <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: '60%' }}>
@@ -560,6 +532,16 @@ export default function Vendas() {
                       <Select                     
                         placeholder="Empresa"
                         options={filters.bricks.companies} 
+                        onChange={() => form_table_brick.submit()}
+                        showSearch
+                        filterOption={(input, option) => 
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                    </Form.Item>
+
+                    <Form.Item className="large-select" label='Brick' name='Brick_B'> 
+                      <Select                     
+                        placeholder="Brick"
+                        options={filters.bricks.brick} 
                         onChange={() => form_table_brick.submit()}
                         showSearch
                         filterOption={(input, option) => 

@@ -2,37 +2,66 @@ import { create } from 'zustand'
 
 // TODO: REMOVER ESTES DEFAULTSSSSSSSSSSSSSSSSSSSSSSSS
 const years_default = [
-    { label: '2018', value: '2018' },
-    { label: '2019', value: '2019' },
-    { label: '2020', value: '2020' },
+    { label: '2018', value: 2018 },
+    { label: '2019', value: 2019 },
+    { label: '2020', value: 2020 },
 ];
 
 const delegates_default = [
-    { label: "Rui Correia", value: "Rui Correia" },
-    { label: "André Barros", value: "André Barros" },
-    { label: "Matilde Santos", value: "Matilde Santos" }
+    { label: 'Todos', value: 'Todos'},
+    { label: "Rui Correia", value: 0 },
+    { label: "André Barros", value: 1 },
+    { label: "Matilde Santos", value: 2 }
 ]
 
-const companies_default = [
-    { label: 'MyPharme', value: 'MyPharma' },
-    { label: 'Pharma1000', value: 'Pharma1000' },
-    { label: 'Empresa 3', value: 'Empresa 3'}
+const companies_default = [    
+    { label: 'MyPharma', value: 0 },
+    { label: 'Pharma1000', value: 1 },
+    { label: 'Empresa 3', value: 2 }
 ] 
 
 const bricks_default = [
-    { label: "brick 0", value: "brick 0"},
-    { label: "brick 1", value: "brick 1"},
-    { label: "brick 2", value: "brick 2"}
+    { label: 'Todos', value: 'Todos'},
+    { label: "brick 0", value: 0 },
+    { label: "brick 1", value: 1 },
+    { label: "brick 2", value: 2 }
 ]
 
 const products_default = [
-    { label: "product 0", value: "product 0" },
-    { label: "product 1", value: "product 1" },
-    { label: "product 2", value: "product 2" }
+    { label: 'Todos', value: 'Todos'},
+    { label: "product 0", value: 0 },
+    { label: "product 1", value: 1 },
+    { label: "product 2", value: 2 }
 ]
 
+const predefinedValues_histogram = {
+    Ano_H: new Date().getFullYear(),
+    Delegado_H: 'Todos',
+  };
+  
+  const predefinedValues_table_product = {
+    Ano_P: new Date().getFullYear(),
+    Delegado_P: 'Todos',
+    Empresa_P: 'MyPharma',
+    Brick_P: 'Todos',
+    Product_P: 'Todos'
+  };
+  
+  const predefinedValues_table_total = {
+    Delegado_TP: 'Todos',
+    Empresa_TP: 'MyPharma',
+    Brick_TP: 'Todos',
+    Product_TP: 'Todos'
+  };
+  
+  const predefinedValues_table_brick = {
+    Ano_B: new Date().getFullYear(),
+    Delegado_B: 'Todos',
+    Empresa_B: 'MyPharma',
+    Brick_B: 'Todos'
+  };
 
-
+  
 const useSalesDataStore = create((set) => ({
     triggers: {
         histogram: false,
@@ -57,10 +86,10 @@ const useSalesDataStore = create((set) => ({
 
     // Store filters form's values to be able to pass them to the fetch hook
     selectedOption: {
-        histogram: {},
-        products: {},
-        totalProducts: {},
-        bricks: {}
+        histogram: predefinedValues_histogram,
+        products: predefinedValues_table_product,
+        totalProducts: predefinedValues_table_total,
+        bricks: predefinedValues_table_brick
     },
 
     updateFetchTriggers: (type) => {
@@ -121,10 +150,10 @@ const useSalesDataStore = create((set) => ({
           bricks: { years: years_default, delegates: delegates_default, companies: companies_default },
         },
         selectedOption: {
-            histogram: {},
-            products: {},
-            totalProducts: {},
-            bricks: {}
+            histogram: predefinedValues_histogram,
+            products: predefinedValues_table_product,
+            totalProducts: predefinedValues_table_total,
+            bricks: predefinedValues_table_brick
         }                   
       }),
 }))
