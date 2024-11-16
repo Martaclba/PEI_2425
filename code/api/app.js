@@ -2,31 +2,8 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
-const { Pool } = require('pg')
-
-// DB_USER = "mypharma"
-// DB_PASSWORD = "mypharma"
-// DB_HOST = "localhost"
-// DB_PORT = 5432
-// DB_NAME = "mypharma"
- 
-// const db = new Pool({
-//   user: DB_USER,
-//   password: DB_PASSWORD,
-//   host: DB_HOST,
-//   port: DB_PORT,
-//   database: DB_NAME,
-// })
-// db.connect((err) => {
-//   if (err) {
-//     console.error('PostgreSQL connection error...', err.stack);
-//   } else {
-//     console.log('Conexão ao PostgreSQL realizada com sucesso');
-//   }
-// });
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 
 var app = express();
 
