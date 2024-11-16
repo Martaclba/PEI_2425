@@ -91,6 +91,13 @@ with psycopg2.connect(conn_string) as conn:
                         hmr_zone = cur.fetchone()
                     hmr_zone_id = hmr_zone[0]
 
+                    # Insert into `Sale` and fetch sale_id
+                    cur.execute("""
+                        INSERT INTO sale (registry_date, fk_brick) 
+                        VALUES (%s, %s) RETURNING id_sale  -- Adjusted to match the correct column name
+                    """, (row['Date'], row['Brick']))
+                    sale_id = cur.fetchone()[0]  # Get the generated sale_id
+
                     # Prepare row for batch insertion into `Sale`
                     data_batch.append((
                         row['Brick'],
@@ -98,19 +105,20 @@ with psycopg2.connect(conn_string) as conn:
                         row['Date'],
                         row['Value']
                     ))
-                    sale_id = None  # Replace with logic to obtain `sale_id` if needed
 
-                    # Check and insert into `sale_product`
-                    cur.execute("SELECT * FROM sale_product WHERE fk_id_sale = %s AND fk_cnp = %s AND product_amount = %s", (sale_id, product_id, row[8]))
+                    # Insert or retrieve from `sale_product`
+                    product_amount = row.iloc[8]  # Access the 9th column (index 8) using `.iloc[]`
+                    cur.execute("SELECT * FROM sale_product WHERE fk_id_sale = %s AND fk_cnp = %s AND product_amount = %s", 
+                                (sale_id, product_id, product_amount))
                     sale_product = cur.fetchone()
                     if sale_product is None:
                         cur.execute("""
                             INSERT INTO sale_product (fk_id_sale, fk_cnp, product_amount)
                             VALUES (%s, %s, %s) RETURNING (fk_id_sale, fk_cnp);
-                            """, (sale_id, product_id, row[8]))
-                    sale_product = cur.fetchone()
+                        """, (sale_id, product_id, product_amount))
+                        sale_product = cur.fetchone()
 
-                # Insert data in batches
+                # Insert data in batches into `Sale`
                 insert_query = """
                 INSERT INTO sale (registry_date, fk_brick) VALUES (%s, %s)
                 """
