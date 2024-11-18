@@ -17,6 +17,147 @@ db.connect((err) => {
   }
 });
 
+
+// ESTA É A BASE DAS QUERIES ---- deste estilo
+module.exports.getSaleHistogram = async (idDelegate, year) => {
+  try {
+    const query = "SELECT delegate_name, SUM(jan) AS jan,"
+    query += " SUM(fev) AS fev, SUM(mar) AS mar, SUM(abr) AS abr, SUM(mai) AS mai,"
+    query += " SUM(jun) AS jun, SUM(jul) AS jul, SUM(ago) AS ago, SUM(set) AS set,"
+    query += " SUM(out) AS out, SUM(nov) AS nov, SUM (dez) AS dez"     
+    query += " FROM general_table"
+    query += " WHERE delegate_name = $1"
+    query += " AND year = $2"
+    query += " AND company_name = MyPharma"
+    query += " GROUP BY delegate_name, company_name, year"
+    const results = await db.query(query, [ídDelegate,year]);
+    
+    return results.rows;
+  } catch (err) {
+    throw err;
+  }
+};
+
+module.exports.getSaleTotalProducts = async (idDelegate, idCompany, idBrick, idProduct) => {
+  try {
+    idDelegate = Number.isInteger(idDelegate) ? idDelegate : null;
+    idCompany = Number.isInteger(idCompany) ? idCompany : null;
+    idBrick = Number.isInteger(idBrick) ? idBrick : null;
+    idProduct = Number.isInteger(idProduct) ? idProduct : null;
+    const results = await db.query('DO NOTHING', [idDelegate, idCompany, idBrick, idProduct]); // TODO
+    return results.rows;
+  } catch (err) {
+    throw err;
+  }
+};
+
+module.exports.getSaleProducts = async (idDelegate, year, idCompany, idBrick, idProduct) => {
+  try {
+    idDelegate = Number.isInteger(idDelegate) ? idDelegate : null;
+    year = Number.isInteger(year) ? year : null;
+    idCompany = Number.isInteger(idCompany) ? idCompany : null;
+    idBrick = Number.isInteger(idBrick) ? idBrick : null;
+    idProduct = Number.isInteger(idProduct) ? idProduct : null;
+    const results = await db.query('DO NOTHING', [idDelegate, year, idCompany, idBrick, idProduct]); // TODO
+    return results.rows;
+  } catch (err) {
+    throw err;
+  }
+};
+
+module.exports.getSaleBricks = async (idDelegate, year, idCompany, idBrick) => {
+  try {
+    idDelegate = Number.isInteger(idDelegate) ? idDelegate : null;
+    year = Number.isInteger(year) ? year : null;
+    idCompany = Number.isInteger(idCompany) ? idCompany : null;
+    idBrick = Number.isInteger(idBrick) ? idBrick : null;
+    const results = await db.query('DO NOTHING', [idDelegate, year, idCompany, idBrick]); // TODO
+    return results.rows;
+  } catch (err) {
+    throw err;
+  }
+};
+
+module.exports.getDelegates = async (year, idCompany, idBrick, idProduct) => {
+  try {
+    year = Number.isInteger(year) ? year : null;
+    idCompany = Number.isInteger(idCompany) ? idCompany : null;
+    idBrick = Number.isInteger(idBrick) ? idBrick : null;
+    idProduct = Number.isInteger(idProduct) ? idProduct : null;
+    const results = await db.query('SELECT DISTINCT delegate_id, delegate_name FROM general_table WHERE (year = $1 OR $1 IS NULL) AND (company_id = $2 OR $2 IS NULL) AND (brick_id = $3 OR $3 IS NULL) AND (product_id = $4 OR $4 IS NULL);', [year, idCompany, idBrick, idProduct]);
+    return results.rows;
+  } catch (err) {
+    throw err;
+  }
+};
+
+module.exports.getYears = async (idDelegate,idCompany,idBrick,idProduct) => {
+  try {
+    idDelegate = Number.isInteger(idDelegate) ? idDelegate : null;
+    idCompany = Number.isInteger(idCompany) ? idCompany : null;
+    idBrick = Number.isInteger(idBrick) ? idBrick : null;
+    idProduct = Number.isInteger(idProduct) ? idProduct : null;
+    const results = await db.query('SELECT DISTINCT year FROM general_table WHERE (delegate_id = $1 OR $1 IS NULL) AND (company_id = $2 OR $2 IS NULL) AND (brick = $3 OR $3 IS NULL) AND (product_id = $4 OR $4 IS NULL);', [idDelegate, idCompany, idBrick, idProduct]);
+    return results.rows;
+  } catch (err) {
+    throw err;
+  }
+};
+
+module.exports.getCompanies = async (idDelegate, year, idBrick, idProduct) => {
+  try {
+    idDelegate = Number.isInteger(idDelegate) ? idDelegate : null;
+    year = Number.isInteger(year) ? year : null;
+    idBrick = Number.isInteger(idBrick) ? idBrick : null;
+    idProduct = Number.isInteger(idProduct) ? idProduct : null;
+    const results = await db.query('SELECT DISTINCT company_id,company_name FROM general_table WHERE (delegate_id = $1 OR $1 IS NULL) AND (year = $2 OR $2 IS NULL) AND (brick = $3 OR $3 IS NULL) AND (product_id = $4 OR $4 IS NULL);', [idDelegate, year, idBrick, idProduct]);
+    return results.rows;
+  } catch (err) {
+    throw err;
+  }
+};
+
+module.exports.getBricks = async (idDelegate,year,idCompany,idProduct) => {
+  try {
+    idDelegate = Number.isInteger(idDelegate) ? idDelegate : null;
+    year = Number.isInteger(year) ? year : null;
+    idCompany = Number.isInteger(idCompany) ? idCompany : null;
+    idProduct = Number.isInteger(idProduct) ? idProduct : null;
+    const results = await db.query('SELECT DISTINCT brick FROM general_table WHERE (delegate_id = $1 OR $1 IS NULL) AND (year = $2 OR $2 IS NULL) AND (company_id = $3 OR $3 IS NULL) AND (product_id = $4 OR $4 IS NULL);', [idDelegate, year, idCompany, idProduct]);
+    return results.rows;
+  } catch (err) {
+    throw err;
+  }
+};
+
+module.exports.getProducts = async (idDelegate,year,idCompany,idBrick) => {
+  try {
+    idDelegate = Number.isInteger(idDelegate) ? idDelegate : null;
+    year = Number.isInteger(year) ? year : null;
+    idCompany = Number.isInteger(idCompany) ? idCompany : null;
+    idBrick = Number.isInteger(idBrick) ? idBrick : null;
+    const results = await db.query('SELECT DISTINCT product_id, product_name FROM general_table WHERE (delegate_id = $1 OR $1 IS NULL) AND (year = $2 OR $2 IS NULL) AND (company_id = $3 OR $3 IS NULL) AND (brick = $4 OR $4 IS NULL);', [idDelegate, year, idCompany, idBrick]);
+    return results.rows;
+  } catch (err) {
+    throw err;
+  }
+};
+
+
+// QUERY TEST
+// IGNORE
+module.exports.getTowns = async () => {
+  try {
+    const results = await db.query('SELECT * FROM town ORDER BY id_town ASC');
+    return results.rows;
+  } catch (err) {
+    throw err;
+  }
+};
+
+
+// ! - DEPRECATED BELOW
+
 // TODO
 // tratar de rollbacks quando uma query falha após outra
 // adicionar parametros
@@ -41,17 +182,6 @@ module.exports.createSale= (res, req) => {
       res.status(501).json({error: err, msg: "Could not add new Sale"});
     }
     res.status(201).json({msg: "Sale successfully added with ID: ${results.insertId}"})
-  })
-}
-
-// Obtain list of delegates 
-// TODO  - NOT TESTED 
-module.exports.getDelegates = (res, req) => {
-  db.query('SELECT * FROM delegate ORDER BY name ASC', (err,results) => {
-    if (err) {
-      res.status(502).json({error: err, msg: "Could not obtain list of Delegates"});
-    }
-    res.status(200).json(results.rows)
   })
 }
 
@@ -124,13 +254,5 @@ module.exports.createVisit = (res, req) => {
 }
 
 
-// QUERY TEST
-// IGNORE
-module.exports.getTowns = (res, req) => {
-  db.query('SELECT * FROM town ORDER BY id_town ASC', (err,results) => {
-    if (err) {
-      res.status(500).json({error: err, msg: "ARDEU AMIGO"});
-    }
-    res.status(200).json(results.rows)
-  })
-}
+
+
