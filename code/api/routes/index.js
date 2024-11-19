@@ -44,8 +44,8 @@ router.post('/', async function(req, res, next) {
   
   try {
     if (options.type === 'histogram') {
-      const idDelegate = options.option_selected.Delegado_H                    // default: Todos
-      const year = options.option_selected.Ano_H                              // default: 2024
+      const idDelegate = options.option_selected.Delegate_H                    // default: Todos
+      const year = options.option_selected.Year_H                              // default: 2024
 
       // data.histogram = await Queries.getSaleHistogram(idDelegate, year)   
       // filters.histogram.delegates = await Queries.getDelegates(year, null, null, null)
@@ -53,9 +53,9 @@ router.post('/', async function(req, res, next) {
       console.log("HHHH ", idDelegate, year)
     } 
     else if (options.type === 'bricks') {
-      const idDelegate = options.option_selected.Delegado_B
-      const year = options.option_selected.Ano_B
-      const idCompany = options.option_selected.Empresa_B                        // default: Todos
+      const idDelegate = options.option_selected.Delegate_B
+      const year = options.option_selected.Year_B
+      const idCompany = options.option_selected.Company_B                        // default: Todos
       const idBrick = options.option_selected.Brick_B                           // default: Todos
 
       console.log("BBBB ", idDelegate, year, idCompany, idBrick)
@@ -67,9 +67,9 @@ router.post('/', async function(req, res, next) {
       // filters.bricks.bricks = await Queries.getBricks(idDelegate,year,idCompany, null)
     
     } else if (options.type === 'products') {
-      const idDelegate = options.option_selected.Delegado_P
-      const year = options.option_selected.Ano_P
-      const idCompany = options.option_selected.Empresa_P                        // default: Todos
+      const idDelegate = options.option_selected.Delegate_P
+      const year = options.option_selected.Year_P
+      const idCompany = options.option_selected.Company_P                        // default: Todos
       const idBrick = options.option_selected.Brick_P                           // default: Todos
       const idProduct = options.option_selected.Product_P
 
@@ -82,8 +82,8 @@ router.post('/', async function(req, res, next) {
       // filters.products.products = await Queries.getProducts(idDelegate,year,idCompany,idBrick)
 
     } else if (options.type === 'totalProducts') {
-      const idDelegate = options.option_selected.Delegado_TP
-      const idCompany = options.option_selected.Empresa_TP                        // default: Todos
+      const idDelegate = options.option_selected.Delegate_TP
+      const idCompany = options.option_selected.Company_TP                        // default: Todos
       const idBrick = options.option_selected.Brick_TP                            // default: Todos
       const idProduct = options.option_selected.Product_TP
 
@@ -154,7 +154,7 @@ router.get('/:id', function(req, res, next) {
 /*    POST sales   */
 // Route responsible for sending the hmr file to the database
 // TODO
-// router.post('/', function(req, res, next) { Queries.createDelegate(res, req) });
+router.post('/import', function(req, res, next) { Queries.createDelegate(res, req) });
 
 
 

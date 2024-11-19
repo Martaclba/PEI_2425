@@ -322,7 +322,7 @@ export default function Vendas() {
                     form={form_histogram}
                   >
                     <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: '40%' }}>
-                      <Form.Item className="large-select" label='Ano' name='Ano_H'>
+                      <Form.Item className="large-select" label='Ano' name='Year_H'>
                         <Select 
                           placeholder="Ano"                        
                           options={filters.histogram.years}
@@ -332,7 +332,7 @@ export default function Vendas() {
                               (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                       </Form.Item>
 
-                      <Form.Item className="large-select" label='Delegado' name='Delegado_H'>
+                      <Form.Item className="large-select" label='Delegado' name='Delegate_H'>
                         <Select                         
                           placeholder="Delegado"
                           options={filters.histogram.delegates}
@@ -363,7 +363,7 @@ export default function Vendas() {
                 >
                   <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: state.isAdmin ? '100%' : '60%' }}>
                     {state.isAdmin && 
-                      <Form.Item className="large-select" label='Ano' name='Ano_P'>
+                      <Form.Item className="large-select" label='Ano' name='Year_P'>
                         <Select                       
                           placeholder="Ano"
                           options={filters.products.years} 
@@ -375,7 +375,7 @@ export default function Vendas() {
                     }
 
                     {state.isAdmin && 
-                      <Form.Item className="large-select" label='Delegado' name='Delegado_P'>
+                      <Form.Item className="large-select" label='Delegado' name='Delegate_P'>
                         <Select                       
                           placeholder="Delegado"
                           options={filters.products.delegates} 
@@ -386,7 +386,7 @@ export default function Vendas() {
                       </Form.Item>
                     }
                     
-                    <Form.Item className="large-select" label='Empresa' name='Empresa_P'>
+                    <Form.Item className="large-select" label='Empresa' name='Company_P'>
                       <Select                     
                         placeholder="Empresa"
                         options={filters.products.companies} 
@@ -440,7 +440,7 @@ export default function Vendas() {
                   form={form_table_total}
                 >
                   <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem',  width: '80%' }}>
-                    <Form.Item className="large-select" label='Delegado' name='Delegado_TP'>
+                    <Form.Item className="large-select" label='Delegado' name='Delegate_TP'>
                       <Select                       
                         placeholder="Delegado"
                         options={filters.totalProducts.delegates}
@@ -450,7 +450,7 @@ export default function Vendas() {
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
                     </Form.Item>
                   
-                    <Form.Item className="large-select" label='Empresa' name='Empresa_TP'> 
+                    <Form.Item className="large-select" label='Empresa' name='Company_TP'> 
                       <Select                       
                         placeholder="Empresa"
                         options={filters.totalProducts.companies} 
@@ -505,7 +505,7 @@ export default function Vendas() {
                 >
                   <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: state.isAdmin ? '60%' : '40%' }}>
                     {state.isAdmin && 
-                      <Form.Item className="large-select" label='Ano' name='Ano_B'>
+                      <Form.Item className="large-select" label='Ano' name='Year_B'>
                         <Select                       
                           placeholder="Ano"
                           options={filters.bricks.years}
@@ -517,7 +517,7 @@ export default function Vendas() {
                     }
 
                     {state.isAdmin &&
-                      <Form.Item className="large-select" label='Delegado' name='Delegado_B'> 
+                      <Form.Item className="large-select" label='Delegado' name='Delegate_B'> 
                         <Select                       
                           placeholder="Delegado"
                           options={filters.bricks.delegates} 
@@ -528,7 +528,7 @@ export default function Vendas() {
                       </Form.Item>
                     }
 
-                    <Form.Item className="large-select" label='Empresa' name='Empresa_B'> 
+                    <Form.Item className="large-select" label='Empresa' name='Company_B'> 
                       <Select                     
                         placeholder="Empresa"
                         options={filters.bricks.companies} 
