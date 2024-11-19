@@ -13,6 +13,14 @@ var Queries = require('./queries')
 //   products: (true/false)                                             -> irrelevante
 // }
 
+router.get('/towns', async function (req, res, next) {
+  try {
+    const towns = await Queries.getDelegates(null); // Wait for the function to resolve
+    res.status(200).json(towns); // Respond with the data
+  } catch (err) {
+    res.status(521).json({ error: err, msg: "ARDEU AMIGO" }); // Handle the error
+  }
+});
 
 /*    GET sales    */ 
 // Route responsible for retrieving the dashboard's data for each kind of user.
@@ -20,7 +28,7 @@ var Queries = require('./queries')
   // the total of sales for each delegate and year as well as the total of sales for every delegate; 
   // the total of sales by product for each delegate,  year (divided in months) and company as well as the tota of sales for every delegate
   // the total of sales by brick for each delegate and year (divided in months) as well as the tota of sales for every delegate
-router.get('/', function(req, res, next) { 
+router.get('/', async function(req, res, next) { 
   const data = {
     histogram: [],
     products: [],
@@ -37,55 +45,59 @@ router.get('/', function(req, res, next) {
 
   const { options } = req.query
 
-  if (options.type === 'histogram') {
-    const idDelegate = options.option_selected.delegate                   // default: Todos
-    const year = options.option_selected.year                             // default: 2024
+  try {
+    if (options.type === 'histogram') {
+      const idDelegate = options.option_selected.delegate                   // default: Todos
+      const year = options.option_selected.year                              // default: 2024
 
-    data.histogram = Queries.getSaleHistogram(idDelegate, year)   
-    filters.histogram.delegates = Queries.getDelegates(year)
-    filters.histogram.years = Queries.getYears(idDelegate)
+      data.histogram = await Queries.getSaleHistogram(idDelegate, year)   
+      filters.histogram.delegates = await Queries.getDelegates(year, null, null, null)
+      filters.histogram.years = await Queries.getYears(idDelegate)
 
-  } else if (options.type === 'bricks') {
-    const idDelegate = options.option_selected.delegate
-    const year = options.option_selected.year
-    const idCompany = options.option_selected.company                        // default: Todos
-    const idBrick = options.option_selected.bricks                           // default: Todos
+    } else if (options.type === 'bricks') {
+      const idDelegate = options.option_selected.delegate
+      const year = options.option_selected.year
+      const idCompany = options.option_selected.company                        // default: Todos
+      const idBrick = options.option_selected.bricks                           // default: Todos
 
-    data.bricks = Queries.getSaleBricks(idDelegate, year, idCompany, idBrick)   
-    filters.bricks.delegates = Queries.getDelegates(year,idCompany,idBrick)
-    filters.bricks.years = Queries.getYears(idDelegate,idCompany,idBrick)
-    filters.bricks.companies = Queries.getCompanies(idDelegate,year,idBrick)
-    filters.bricks.bricks = Queries.getBricks(idDelegate,year,idCompany)
-  
-  } else if (options.type === 'products') {
-    const idDelegate = options.option_selected.delegate
-    const year = options.option_selected.year
-    const idCompany = options.option_selected.company                        // default: Todos
-    const idBrick = options.option_selected.bricks                           // default: Todos
-    const idProduct = options.option_selected.bricks
+      data.bricks = await Queries.getSaleBricks(idDelegate, year, idCompany, idBrick)   
+      filters.bricks.delegates = await Queries.getDelegates(year,idCompany,idBrick, null)
+      filters.bricks.years = await Queries.getYears(idDelegate,idCompany,idBrick, null)
+      filters.bricks.companies = await Queries.getCompanies(idDelegate,year,idBrick, null)
+      filters.bricks.bricks = await Queries.getBricks(idDelegate,year,idCompany, null)
+    
+    } else if (options.type === 'products') {
+      const idDelegate = options.option_selected.delegate
+      const year = options.option_selected.year
+      const idCompany = options.option_selected.company                        // default: Todos
+      const idBrick = options.option_selected.bricks                           // default: Todos
+      const idProduct = options.option_selected.bricks
 
-    data.products = Queries.getSaleProducts(idDelegate, year, idCompany, idBrick, idProduct)   
-    filters.products.delegates = Queries.getDelegates(year,idCompany,idBrick,idProduct)
-    filters.products.years = Queries.getYears(idDelegate,idCompany,idBrick,idProduct)
-    filters.products.companies = Queries.getCompanies(idDelegate,year,idBrick,idProduct)
-    filters.products.bricks = Queries.getBricks(idDelegate,year,idCompany,idProduct)
-    filters.products.products = Queries.getProducts(idDelegate,year,idCompany,idBrick)
+      data.products = await Queries.getSaleProducts(idDelegate, year, idCompany, idBrick, idProduct)   
+      filters.products.delegates = await Queries.getDelegates(year,idCompany,idBrick,idProduct)
+      filters.products.years = await Queries.getYears(idDelegate,idCompany,idBrick,idProduct)
+      filters.products.companies = await Queries.getCompanies(idDelegate,year,idBrick,idProduct)
+      filters.products.bricks = await Queries.getBricks(idDelegate,year,idCompany,idProduct)
+      filters.products.products = await Queries.getProducts(idDelegate,year,idCompany,idBrick)
 
-  } else if (options.type === 'totalProducts') {
-    const idDelegate = options.option_selected.delegate
-    const idCompany = options.option_selected.company                        // default: Todos
-    const idBrick = options.option_selected.bricks                           // default: Todos
-    const idProduct = options.option_selected.bricks
+    } else if (options.type === 'totalProducts') {
+      const idDelegate = options.option_selected.delegate
+      const idCompany = options.option_selected.company                        // default: Todos
+      const idBrick = options.option_selected.bricks                           // default: Todos
+      const idProduct = options.option_selected.bricks
 
-    data.totalProducts = Queries.getSaleTotalProducts(idDelegate, idCompany, idBrick, idProduct)   
-    filters.totalProducts.delegates = Queries.getDelegates(idCompany,idBrick,idProduct)
-    filters.totalProducts.companies = Queries.getCompanies(idDelegate,idBrick,idProduct)
-    filters.totalProducts.products = Queries.getProducts(idDelegate,idCompany,idBrick)
-  }
+      data.totalProducts = await Queries.getSaleTotalProducts(idDelegate, idCompany, idBrick, idProduct)   
+      filters.totalProducts.delegates = await Queries.getDelegates(null, idCompany,idBrick,idProduct)
+      filters.totalProducts.companies = await Queries.getCompanies(idDelegate, null, idBrick, idProduct)
+      filters.totalProducts.products = await Queries.getProducts(idDelegate, null,idCompany,idBrick)
+    }
 
-  // Queries.getSale(res, req) 
+    res.status(200).json({ data, filters });
+}
+catch (err) {
+  res.status(501).json({error: err, msg: "Error obtaining sales"});
+}
 
-  res.json({ data, filters });
 });
 
 
@@ -108,31 +120,33 @@ router.get('/:id', function(req, res, next) {
   const { options } = req.query
   const year = new Date().getFullYear()
 
-  if (options.type === 'histogram') {              
-    data.histogram = Queries.getSaleHistogram(idDelegate, year)
+  try {
+    if (options.type === 'histogram') {              
+      data.histogram = Queries.getSaleHistogram(idDelegate, year)
 
-  } else if (options.type === 'bricks') {
-    const idCompany = options.option_selected.company                        // default: Todos
-    const idBrick = options.option_selected.bricks                           // default: Todos
+    } else if (options.type === 'bricks') {
+      const idCompany = options.option_selected.company                        // default: Todos
+      const idBrick = options.option_selected.bricks                           // default: Todos
 
-    data.bricks = Queries.getSaleBricks(idDelegate, year, idCompany, idBrick) 
-    filters.bricks.companies = Queries.getCompanies(idDelegate, year, idBrick)
-    filters.bricks.bricks = Queries.getBricks(idDelegate, year, idCompany)  
+      data.bricks = Queries.getSaleBricks(idDelegate, year, idCompany, idBrick) 
+      filters.bricks.companies = Queries.getCompanies(idDelegate, year, idBrick, null)
+      filters.bricks.bricks = Queries.getBricks(idDelegate, year, idCompany, null)  
 
-  } else if (options.type === 'products') {
-    const idCompany = options.option_selected.company                        // default: Todos
-    const idBrick = options.option_selected.bricks                           // default: Todos
-    const idProduct = options.option_selected.bricks
+    } else if (options.type === 'products') {
+      const idCompany = options.option_selected.company                        // default: Todos
+      const idBrick = options.option_selected.bricks                           // default: Todos
+      const idProduct = options.option_selected.bricks
 
-    data.products = Queries.getSaleProducts(idDelegate, year, idCompany, idBrick, idProduct)  
-    filters.products.companies = Queries.getCompanies(idDelegate,year,idBrick,idProduct)
-    filters.products.bricks = Queries.getBricks(idDelegate,year,idCompany,idProduct)
-    filters.products.products = Queries.getProducts(idDelegate,year,idCompany,idBrick)
-  } 
-  
-  // Queries.getSale(res, req) 
-
-  res.json({ data, filters });
+      data.products = Queries.getSaleProducts(idDelegate, year, idCompany, idBrick, idProduct)  
+      filters.products.companies = Queries.getCompanies(idDelegate,year,idBrick,idProduct)
+      filters.products.bricks = Queries.getBricks(idDelegate,year,idCompany,idProduct)
+      filters.products.products = Queries.getProducts(idDelegate,year,idCompany,idBrick)
+    } 
+    res.status(200).json({ data, filters });
+  }
+  catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining sales"});
+  }
 });
 
 
@@ -179,10 +193,18 @@ router.post('/delegados/registar', function(req, res, next) { Queries.createDele
   // the regions
   // the towns
   // the products (?)
-  router.get('/forms', function(req, res, next) { Queries.getSale(res, req) });
+router.get('/forms', function(req, res, next) { Queries.getSale(res, req) });
 
 
 /* GET home page. */ // test queries
-//router.get('/towns', function(req, res, next) { Queries.getTowns(res, req) });
+router.get('/towns', async function (req, res, next) {
+  try {
+    const towns = await Queries.getTowns(); // Wait for the function to resolve
+    res.status(200).json(towns); // Respond with the data
+  } catch (err) {
+    res.status(521).json({ error: err, msg: "ARDEU AMIGO" }); // Handle the error
+  }
+});
+
 
 module.exports = router;

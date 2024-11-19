@@ -30,7 +30,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.status(404).json({erro: err, mensagem: "Pedido não suportado"})
+  res.status(404).json({error: err, msg: "Pedido não suportado"})
 });
 
 module.exports = app;
