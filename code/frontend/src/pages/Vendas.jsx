@@ -361,7 +361,7 @@ export default function Vendas() {
                   initialValues={selectedOption.products}
                   form={form_table_product}
                 >
-                  <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                  <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: state.isAdmin ? '100%' : '60%' }}>
                     {state.isAdmin && 
                       <Form.Item className="large-select" label='Ano' name='Ano_P'>
                         <Select                       
@@ -503,7 +503,7 @@ export default function Vendas() {
                   initialValues={selectedOption.bricks}
                   form={form_table_brick}
                 >
-                  <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: '60%' }}>
+                  <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: state.isAdmin ? '60%' : '40%' }}>
                     {state.isAdmin && 
                       <Form.Item className="large-select" label='Ano' name='Ano_B'>
                         <Select                       

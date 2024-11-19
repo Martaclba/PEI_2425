@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Select, Card, Button, Input, Row, Col, Tag, ConfigProvider, message, AutoComplete } from 'antd';
+import { Form, Select, Card, Button, Input, Row, Col, Tag, ConfigProvider, message, AutoComplete, Spin } from 'antd';
 import { useNavigate, useLocation } from "react-router-dom";
 import {useAuth} from '../context/Auth';
 
@@ -10,19 +10,24 @@ import useConfirmModal from '../components/confirmModal';
 import themeConfig from '../styles/themeConfigForm';
 import useFormDataStore from '../context/FormData';
 import { useFetchFormData } from '../components/useFetchFormData';
+import { useFetchUser } from '../components/useFetchUser';
+
 
 const states = [
     {
-        value: 'blue',
-        label: 'Indisponível',
+      key: 'blue',
+      value: 'blue',
+      label: 'Indisponível',
     },
     {
-        value: 'volcano',
-        label: 'Inativo',
+      key: 'volcano',
+      value: 'volcano',
+      label: 'Inativo',
     },
     {
-        value: 'green',
-        label: 'Ativo',
+      key: 'green',
+      value: 'green',
+      label: 'Ativo',
     },
 ];
 
@@ -36,6 +41,7 @@ const tagRender = (props) => {
 
     return (
       <Tag
+        key={value}
         color={value}
         onMouseDown={onPreventMouseDown}
         closable={closable}
@@ -51,6 +57,8 @@ const tagRender = (props) => {
 
 export default function EditarMedico() {
     const date = getFormattedDate();
+    const [form] = Form.useForm();
+
     const {state} = useAuth();
     const navigate = useNavigate();
     const location = useLocation()
@@ -62,29 +70,14 @@ export default function EditarMedico() {
     // update the store and set the form's selects
     useFetchFormData(!hasFetched)
 
-    const [fetchTrigger, setFetchTrigger] = useState(false)
+    // Fetch the user's info
+    const { data, loading } = useFetchUser(location.pathname, 'doctor')
 
+    
     // State to control edit mode
     const [isEditing, setIsEditing] = useState(false);
-    
-    // Predefined data for the form
-    const predefinedValues = {
-        Nome: 'John',
-        Instituicao: 'Inativo',
-        Especialidade: 'Ativo',
-        Distrito: 'Indisponivel',
-        Regiao: 'Inativo',
-        Freguesia: 'Inativo',
-        Rua: 'Rua bla bla bla',
-        Codigo_postal: '1234-567',
-        Edificio: '1º Esq',
-        Telefone: '123456789',
-        Email: 'example@hotmail.com',
-        Estado: [{label:'Ativo', value:'green'}],
-        Notas: 'Some default notes here...',
-    };
-
-    const [form] = Form.useForm();
+    const [fetchTrigger, setFetchTrigger] = useState(false)
+    const [isFormValid, setIsFormValid] = useState(false);
 
     // This is needed because of the use of ConfigProvider
     const { showConfirm, contextHolder } = useConfirmModal();
@@ -129,6 +122,25 @@ export default function EditarMedico() {
         form.submit(); 
     };
 
+    const handleEditClick = async () => {
+        setIsEditing(true);
+        try {
+          await form.validateFields(); 
+        } catch (errorInfo) {
+          
+        }
+    };
+
+    // Function to check form validity when editing
+    const checkFormValidity = () => {
+        const hasErrors = form.getFieldsError().some(({ errors }) => errors.length > 0);
+        setIsFormValid(!hasErrors);
+    };
+
+    if (loading) {
+        return <Spin fullscreen tip="Carregando dados..." />;
+    }
+
     return(
         <ConfigProvider theme={themeConfig}>
         {contextHolder}
@@ -143,7 +155,7 @@ export default function EditarMedico() {
                             <div className="edit-container">
                                 {isEditing ? (
                                 <>
-                                    <Button type="primary" onClick={handleSubmitIsEdit}>
+                                    <Button type="primary" onClick={handleSubmitIsEdit} disabled={!isFormValid}>
                                         Guardar
                                     </Button>
                                     <Button danger onClick={() => navigate("/medicos/", { state: { shouldFetchData: fetchTrigger } })}>
@@ -152,7 +164,7 @@ export default function EditarMedico() {
                                 </>
                                 ) : (
                                 <>
-                                    {state.isAdmin && <Button type="primary" onClick={() => setIsEditing(true)}>
+                                    {state.isAdmin && <Button type="primary" onClick={handleEditClick}>
                                         Editar
                                     </Button>}
                                     <Button danger onClick={() => navigate("/medicos/")}>
@@ -171,7 +183,8 @@ export default function EditarMedico() {
                         name="validate_other"
                         onFinish={onFinish}
                         layout='vertical'
-                        initialValues={predefinedValues}
+                        initialValues={data}
+                        onFieldsChange={checkFormValidity}
                     >
 
                         <Row gutter={16} style={{ display: 'flex' }}>
@@ -271,9 +284,6 @@ export default function EditarMedico() {
                                         label="Freguesia"
                                         name="Freguesia"
                                         hasFeedback
-                                        rules={[{
-                                            required: true,
-                                            message: 'Por favor insira uma freguesia'}]}
                                     >
                                         
                                         <AutoComplete
@@ -305,9 +315,10 @@ export default function EditarMedico() {
                                             <Form.Item
                                                 name="Codigo_postal"
                                                 hasFeedback
-                                                rules={[{
-                                                    required: true,
-                                                    message: 'Por favor insira um código postal'}]}
+                                                rules={[
+                                                    {required: true, message: 'Por favor insira um código postal'},
+                                                    {pattern: /^\d{4}-\d{3}$/, message: 'Por favor utilize o formato dddd-ddd'}
+                                                ]}
                                                 style={{ flex: 0.4 }}
                                             >
                                                 <Input maxLength={8} allowClear placeholder="Insira um código postal" disabled={!isEditing}/>
@@ -328,6 +339,9 @@ export default function EditarMedico() {
                                             <Form.Item
                                                 name="Telefone"
                                                 hasFeedback
+                                                rules={[{
+                                                    required: true,
+                                                    message: 'Por favor insira um telefone'}]}
                                                 style={{ flex: 0.4}}
                                             >
                                                 <Input allowClear placeholder="Insira um telefone" disabled={!isEditing}/>

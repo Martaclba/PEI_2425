@@ -181,9 +181,7 @@ export default function RegistarMedico() {
                                             label="Freguesia"
                                             name="Freguesia"
                                             hasFeedback
-                                            rules={[{
-                                                required: true,
-                                                message: 'Por favor insira uma freguesia'}]}>
+                                        >
 
                                             <AutoComplete
                                                 allowClear
@@ -213,9 +211,10 @@ export default function RegistarMedico() {
                                                 <Form.Item
                                                     name="Codigo_postal"
                                                     hasFeedback
-                                                    rules={[{
-                                                        required: true,
-                                                        message: 'Por favor insira um código postal'}]}
+                                                    rules={[
+                                                        {required: true, message: 'Por favor insira um código postal'},
+                                                        {pattern: /^\d{4}-\d{3}$/, message: 'Por favor utilize o formato dddd-ddd'}
+                                                    ]}
                                                     style={{ flex: 0.4 }}
                                                 >
                                                     <Input maxLength={8} allowClear placeholder="Insira um código postal" />
@@ -236,6 +235,9 @@ export default function RegistarMedico() {
                                                 <Form.Item
                                                     name="Telefone"
                                                     hasFeedback
+                                                    rules={[{
+                                                        required: true,
+                                                        message: 'Por favor insira um telefone'}]}
                                                     style={{ flex: 0.4}}
                                                 >
                                                     <Input allowClear placeholder="Insira um telefone" />

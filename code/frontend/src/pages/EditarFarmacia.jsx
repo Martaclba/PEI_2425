@@ -1,5 +1,5 @@
 import React, { useState, useEffect }  from 'react';
-import { Form, Select, Card, Button, Input, Tag, Row, Col, List, ConfigProvider, message, AutoComplete } from 'antd';
+import { Form, Select, Card, Button, Input, Tag, Row, Col, List, ConfigProvider, message, AutoComplete, Spin } from 'antd';
 import { useNavigate, useLocation } from "react-router-dom"
 
 import axios from 'axios'
@@ -11,19 +11,23 @@ import useConfirmModal from '../components/confirmModal';
 import themeConfig from '../styles/themeConfigForm';
 import useFormDataStore from '../context/FormData';
 import { useFetchFormData } from '../components/useFetchFormData';
+import { useFetchUser } from '../components/useFetchUser';
 
-const states= [
+const states = [
     {
-        value: 'blue',
-        label: 'Indisponível',
+      key: 'blue',
+      value: 'blue',
+      label: 'Indisponível',
     },
     {
-        value: 'volcano',
-        label: 'Inativo',
+      key: 'volcano',
+      value: 'volcano',
+      label: 'Inativo',
     },
     {
-        value: 'green',
-        label: 'Ativo',
+      key: 'green',
+      value: 'green',
+      label: 'Ativo',
     },
 ];
 
@@ -37,6 +41,7 @@ const tagRender = (props) => {
 
     return (
       <Tag
+        key={value}
         color={value}
         onMouseDown={onPreventMouseDown}
         closable={closable}
@@ -52,6 +57,8 @@ const tagRender = (props) => {
 
 export default function EditarFarmacia() {
     const date = getFormattedDate();
+    const [form] = Form.useForm();
+
     const {state} = useAuth();
     const navigate = useNavigate()
     const location = useLocation()
@@ -63,7 +70,13 @@ export default function EditarFarmacia() {
     // update the store and set the form's selects
     useFetchFormData(!hasFetched)
 
+    // Fetch the user's info
+    const { data, loading } = useFetchUser(location.pathname, 'doctor')
+
+    // State to control edit mode
+    const [isEditing, setIsEditing] = useState(false);
     const [fetchTrigger, setFetchTrigger] = useState(false)
+    const [isFormValid, setIsFormValid] = useState(false);
 
     // State for the product list
     const [produtos, setProdutos] = useState([{ key: '1', label: 'Produto 1' }]); 
@@ -72,28 +85,8 @@ export default function EditarFarmacia() {
     const deleteProduto = (key) => {
         setProdutos(produtos.filter(produto => produto.key !== key));
     };
-    
-    // State to control edit mode
-    const [isEditing, setIsEditing] = useState(false);
-
-    // Predefined data
-    const predefinedValues = {
-        Nome: 'Farmácia A',
-        Distrito: 'Braga',
-        Regiao: 'Braga',
-        Freguesia: 'Lousado',
-        Rua: 'Rua bla bla bla',
-        Codigo_postal: '1234-567',
-        Edificio: '1º Esq',
-        Telefone: '123456789',
-        Email: 'example@hotmail.com',
-        Estado: [{label:'Ativo', value:'green'}],
-        Notas: 'janknffnkn kajsndkjfn kjsndknfna kajndfnsn',
-        Produtos: [{ key: '1', label: 'Produto 1' }]
-    };
 
     // Update the "Produtos" form field whenever "produtos" state changes
-    const [form] = Form.useForm();
     useEffect(() => {
         form.setFieldsValue({ Produtos: produtos });
     }, [produtos, form]);
@@ -139,7 +132,26 @@ export default function EditarFarmacia() {
         setIsEditing(false);
         // Submit the form programmatically 
         form.submit(); 
-      };
+    };
+
+    const handleEditClick = async () => {
+        setIsEditing(true);
+        try {
+          await form.validateFields(); 
+        } catch (errorInfo) {
+          
+        }
+    };
+
+    // Function to check form validity when editing
+    const checkFormValidity = () => {
+        const hasErrors = form.getFieldsError().some(({ errors }) => errors.length > 0);
+        setIsFormValid(!hasErrors);
+    };
+
+    if (loading) {
+        return <Spin fullscreen tip="Carregando dados..." />;
+    }
 
     return(
         <ConfigProvider theme={themeConfig}>
@@ -155,7 +167,7 @@ export default function EditarFarmacia() {
                             <div className="edit-container">
                                 {isEditing ? (
                                 <>
-                                    <Button type="primary" onClick={handleSubmitIsEdit}>
+                                    <Button type="primary" onClick={handleSubmitIsEdit} disabled={!isFormValid}>
                                         Guardar
                                     </Button>
                                     <Button danger onClick={() => navigate("/farmacias/")}>
@@ -164,7 +176,7 @@ export default function EditarFarmacia() {
                                 </>
                                 ) : (
                                 <>
-                                {state.isAdmin && <Button type="primary" onClick={() => setIsEditing(true)}>
+                                {state.isAdmin && <Button type="primary" onClick={handleEditClick}>
                                     Editar
                                 </Button>}
                                 <Button danger onClick={() => navigate("/farmacias/", { state: { shouldFetchData: fetchTrigger } })}>
@@ -183,7 +195,8 @@ export default function EditarFarmacia() {
                             name="validate_other"
                             onFinish={onFinish}
                             layout='vertical'
-                            initialValues={predefinedValues}
+                            initialValues={data}
+                            onFieldsChange={checkFormValidity}
                         >
 
                             <Row gutter={16} style={{ display: 'flex' }}>
@@ -244,9 +257,6 @@ export default function EditarFarmacia() {
                                             label="Freguesia"
                                             name="Freguesia"
                                             hasFeedback
-                                            rules={[{
-                                                required: true,
-                                                message: 'Por favor insira uma freguesia',},]}
                                         >
 
                                             <AutoComplete
@@ -275,9 +285,10 @@ export default function EditarFarmacia() {
                                                 <Form.Item
                                                     name="Codigo_postal"
                                                     hasFeedback
-                                                    rules={[{
-                                                        required: true,
-                                                        message: 'Por favor insira um código postal'}]}
+                                                    rules={[
+                                                        {required: true, message: 'Por favor insira um código postal'},
+                                                        {pattern: /^\d{4}-\d{3}$/, message: 'Por favor utilize o formato dddd-ddd'}
+                                                    ]}
                                                     style={{ flex: 0.4 }}
                                                 >
                                                     <Input maxLength={8} allowClear placeholder="Insira um código postal" disabled={!isEditing}/>
@@ -298,6 +309,9 @@ export default function EditarFarmacia() {
                                                 <Form.Item
                                                     name="Telefone"
                                                     hasFeedback
+                                                    rules={[{
+                                                        required: true,
+                                                        message: 'Por favor insira um telefone'}]}
                                                     style={{ flex: 0.4}}
                                                 >
                                                     <Input allowClear placeholder="Insira um telefone" disabled={!isEditing}/>

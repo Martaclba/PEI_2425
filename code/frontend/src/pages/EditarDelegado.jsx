@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Select, Tag, Card, Button, Input, ConfigProvider, message, AutoComplete } from 'antd';
+import { Form, Select, Tag, Card, Button, Input, ConfigProvider, message, AutoComplete, Spin } from 'antd';
 import { useNavigate, useLocation } from "react-router-dom";
 
 import axios from 'axios'
@@ -9,19 +9,20 @@ import { getFormattedDate } from '../components/utils';
 import useConfirmModal from '../components/confirmModal';
 import useFormDataStore from '../context/FormData';
 import { useFetchFormData } from '../components/useFetchFormData';
+import { useFetchUser } from '../components/useFetchUser';
 
 const states = [
   {
-      value: 'blue',
-      label: 'Indisponível',
+    value: 'Indisponível',
+    label: 'Indisponível',
   },
   {
-      value: 'volcano',
-      label: 'Inativo',
+    value: 'Inativo',
+    label: 'Inativo',
   },
   {
-      value: 'green',
-      label: 'Ativo',
+    value: 'Ativo',
+    label: 'Ativo',
   },
 ];
 
@@ -33,9 +34,17 @@ const tagRender = (props) => {
     event.stopPropagation();
   };
 
+  // Set color based on the value
+  const colorMap = {
+    Ativo: 'green',     
+    Inativo: 'volcano',         
+    Indisponível: 'blue',       
+  };
+
   return (
     <Tag
-      color={value}
+      key={value}
+      color={colorMap[value] || 'blue'}
       onMouseDown={onPreventMouseDown}
       closable={closable}
       onClose={onClose}
@@ -62,21 +71,13 @@ export default function EditarDelegado() {
   // update the store and set the form's selects
   useFetchFormData(!hasFetched)
 
+  // Fetch the user's info
+  const { data, loading } = useFetchUser(location.pathname, 'delegate')
+
   // State to control edit mode
   const [isEditing, setIsEditing] = useState(false)
   const [fetchTrigger, setFetchTrigger] = useState(false)
-
-  // Predefined data
-  const predefinedValues = {
-    Nome: {
-      Primeiro: 'John',
-      Ultimo: 'Doe',
-    },
-    Distrito: '1',
-    Regiao: ['1', '2'],
-    Freguesia: ['3'],
-    Estado: [{label:'Ativo', value:'green'}],
-  };
+  const [isFormValid, setIsFormValid] = useState(false);
 
   // This is needed because of the use of ConfigProvider
   const { showConfirm, contextHolder } = useConfirmModal();
@@ -118,10 +119,30 @@ export default function EditarDelegado() {
   };
 
   const handleSubmitIsEdit = () => {
+    // Ensure the button is only enabled when valid
     setIsEditing(false); 
     // Submit the form programmatically (execute onFinish)
     form.submit(); 
   };
+
+  const handleEditClick = async () => {
+    setIsEditing(true);
+    try {
+      await form.validateFields(); 
+    } catch (errorInfo) {
+      
+    }
+};
+
+  // Function to check form validity when editing
+  const checkFormValidity = () => {
+    const hasErrors = form.getFieldsError().some(({ errors }) => errors.length > 0);
+    setIsFormValid(!hasErrors);
+  };
+
+  if (loading) {
+    return <Spin fullscreen tip="Carregando dados..." />;
+  }
 
   return (
     <ConfigProvider theme={themeConfig}>
@@ -138,7 +159,7 @@ export default function EditarDelegado() {
               <div className="edit-container">
                 {isEditing ? (
                   <>
-                    <Button type="primary" onClick={handleSubmitIsEdit}>
+                    <Button type="primary" onClick={handleSubmitIsEdit} disabled={!isFormValid}>
                       Guardar
                     </Button>
                     <Button danger onClick={() => navigate("/delegados/", { state: { shouldFetchData: fetchTrigger } })}>
@@ -147,7 +168,7 @@ export default function EditarDelegado() {
                   </>
                 ) : (
                   <>
-                  <Button type="primary" onClick={() => setIsEditing(true)}>
+                  <Button type="primary" onClick={handleEditClick}>
                     Editar
                   </Button>
                   <Button danger onClick={() => navigate("/delegados/")}>
@@ -166,14 +187,15 @@ export default function EditarDelegado() {
               name="validate_other"
               onFinish={onFinish}
               layout="vertical"
-              initialValues={predefinedValues}
+              initialValues={data}
               form={form}
+              onFieldsChange={checkFormValidity}
             >
 
               <Form.Item label="Nome" style={{ marginBottom: 0 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
                       <Form.Item
-                          name="Primeiro"
+                          name={['Nome', 'Primeiro']}
                           hasFeedback
                           rules={[{ required: true, message: "Insira o primeiro nome" }]}
                           style={{ flex: 1}}
@@ -182,7 +204,7 @@ export default function EditarDelegado() {
                       </Form.Item>
 
                       <Form.Item
-                          name="Ultimo"
+                          name={['Nome', 'Ultimo']}
                           hasFeedback
                           rules={[{ required: true, message: "Insira o último nome" }]}
                           style={{ flex: 1}}
@@ -253,18 +275,17 @@ export default function EditarDelegado() {
                     message: 'Por favor defina um estado'}]}>
 
                 <Select 
-                    allowClear
-                    mode='multiple'         
-                    maxCount={1}                                       
+                    mode='multiple'
+                    maxCount={1}
+                    allowClear                                    
                     tagRender={tagRender}
                     placeholder="Insira um estado"
                     options={states}
                     disabled={!isEditing}
-                    labelInValue
                     onChange={changeState}
                     filterOption={(input, option) => 
                         (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-            </Form.Item>
+                </Form.Item>
             </Form>
           </Card>
         </div>
