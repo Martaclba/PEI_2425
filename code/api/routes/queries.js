@@ -21,20 +21,21 @@ db.connect((err) => {
 // ESTA É A BASE DAS QUERIES ---- deste estilo
 module.exports.getSaleHistogram = async (idDelegate, year) => {
   try {
-    const query = "SELECT delegate_name, SUM(jan) AS jan,"
-    query += " SUM(fev) AS fev, SUM(mar) AS mar, SUM(abr) AS abr, SUM(mai) AS mai,"
-    query += " SUM(jun) AS jun, SUM(jul) AS jul, SUM(ago) AS ago, SUM(set) AS set,"
-    query += " SUM(out) AS out, SUM(nov) AS nov, SUM (dez) AS dez"     
-    query += " FROM general_table"
-    query += " WHERE delegate_name = $1"
-    query += " AND year = $2"
-    query += " AND company_name = MyPharma"
-    query += " GROUP BY delegate_name, company_name, year"
-    const results = await db.query(query, [ídDelegate,year]);
+    idDelegate = Number.isInteger(idDelegate) ? idDelegate : null;
+    year = Number.isInteger(year) ? year : 2024;
+    let query = `SELECT delegate_name, id_delegate,
+          SUM(jan) AS jan, SUM(feb) AS feb, SUM(mar) AS mar, 
+          SUM(apr) AS apr, SUM(may) AS may, SUM(jun) AS jun, 
+          SUM(jul) AS jul, SUM(aug) AS aug, SUM(sep) AS sep, 
+          SUM(oct) AS oct, SUM(nov) AS nov, SUM(dec) AS dec
+          FROM general_table
+          WHERE (id_delegate = $1 OR $1 IS NULL) AND (year = $2 OR $2 IS NULL) AND (company_name = 'Farma 1000' OR company_name IS NULL)
+          GROUP BY id_delegate, delegate_name, company_name, year;`
+    const results = await db.query(query, [idDelegate,year]);
     
     return results.rows;
   } catch (err) {
-    throw err;
+    return [{error:err, msg:'Error obtaining sales histogram'}]
   }
 };
 
@@ -44,19 +45,19 @@ module.exports.getSaleTotalProducts = async (idDelegate, idCompany, idBrick, idP
     idCompany = Number.isInteger(idCompany) ? idCompany : null;
     idBrick = Number.isInteger(idBrick) ? idBrick : null;
     idProduct = Number.isInteger(idProduct) ? idProduct : null;
-    const query = "SELECT product_name, SUM(2018) AS 2018,"
-    query += " SUM(2019) AS 2019, SUM(2020) AS 2020, SUM(2021) AS 2021, SUM(2022) AS 2022,"
-    query += " SUM(2023) AS 2023, SUM(2024) AS 2024"   
-    query += " FROM general_table_per_year"
-    query += " WHERE delegate_name = $1"
-    query += " AND company_name = $2"
-    query += " AND brick = $3"
-    query += " AND product_name = $4"
-    query += " GROUP BY delegate_name, company_name, brick, product_name"
+    let query = `SELECT product_cnp, product_name SUM(2018) AS 2018, 
+                SUM(2019) AS 2019, SUM(2020) AS 2020, SUM(2021) AS 2021, SUM(2022) AS 2022,
+                SUM(2023) AS 2023, SUM(2024) AS 2024
+                FROM general_table_per_year
+                WHERE (id_delegate = $1 OR $1 IS NULL)
+                AND (company_name = $2 OR $2 IS NULL)
+                AND (brick = $3 OR $3 IS NULL)
+                AND (product_cnp = $4 OR $4 IS NULL)
+                GROUP BY id_delegate, company_name, brick, product_name, product_cnp`
     const results = await db.query(query, [idDelegate, idCompany, idBrick, idProduct]);
     return results.rows;
   } catch (err) {
-    throw err;
+    return [{error:err, msg:'Error obtaining total yearly sales by product'}]
   }
 };
 
@@ -67,21 +68,21 @@ module.exports.getSaleProducts = async (idDelegate, year, idCompany, idBrick, id
     idCompany = Number.isInteger(idCompany) ? idCompany : null;
     idBrick = Number.isInteger(idBrick) ? idBrick : null;
     idProduct = Number.isInteger(idProduct) ? idProduct : null;
-    const query = "SELECT product_name, SUM(jan) AS jan,"
-    query += " SUM(fev) AS fev, SUM(mar) AS mar, SUM(abr) AS abr, SUM(mai) AS mai,"
-    query += " SUM(jun) AS jun, SUM(jul) AS jul, SUM(ago) AS ago, SUM(set) AS set,"
-    query += " SUM(out) AS out, SUM(nov) AS nov, SUM (dez) AS dez"   
-    query += " FROM general_table"
-    query += " WHERE delegate_name = $1"
-    query += " AND year = $2"
-    query += " AND company_name = $3"
-    query += " AND brick = $4"
-    query += " AND product_name = $5"
-    query += " GROUP BY delegate_name, year, company_name, brick, product_name"
+    let query = `SELECT product_cnp, product_name, SUM(jan) AS jan,
+            SUM(feb) AS feb, SUM(mar) AS mar, SUM(apr) AS apr, SUM(may) AS may,
+            SUM(jun) AS jun, SUM(jul) AS jul, SUM(aug) AS aug, SUM(sep) AS sep,
+            SUM(oct) AS oct, SUM(nov) AS nov, SUM (dec) AS dec
+            FROM general_table
+            WHERE (id_delegate = $1 OR $1 IS NULL)
+            AND (year = $2 OR $2 IS NULL)
+            AND (company_name = $3 OR $3 IS NULL)
+            AND (brick = $4 OR $4 IS NULL)
+            AND (product_cnp = $5 OR $5 IS NULL)
+            GROUP BY id_delegate, year, company_name, brick, product_cnp, product_name`
     const results = await db.query(query, [idDelegate, year, idCompany, idBrick, idProduct]);
     return results.rows;
   } catch (err) {
-    throw err;
+    return [{error:err, msg:'Error obtaining sales by products.'}]
   }
 };
 
@@ -91,20 +92,20 @@ module.exports.getSaleBricks = async (idDelegate, year, idCompany, idBrick) => {
     year = Number.isInteger(year) ? year : null;
     idCompany = Number.isInteger(idCompany) ? idCompany : null;
     idBrick = Number.isInteger(idBrick) ? idBrick : null;
-    const query = "SELECT brick, SUM(jan) AS jan,"
-    query += " SUM(fev) AS fev, SUM(mar) AS mar, SUM(abr) AS abr, SUM(mai) AS mai,"
+    let query = "SELECT brick, SUM(jan) AS jan,"
+    query += " SUM(feb) AS feb, SUM(may) AS may, SUM(abr) AS abr, SUM(mai) AS mai,"
     query += " SUM(jun) AS jun, SUM(jul) AS jul, SUM(ago) AS ago, SUM(set) AS set,"
     query += " SUM(out) AS out, SUM(nov) AS nov, SUM (dez) AS dez"   
     query += " FROM general_table"
-    query += " WHERE delegate_name = $1"
-    query += " AND year = $2"
-    query += " AND company_name = $3"
-    query += " AND brick = $4"
-    query += " GROUP BY delegate_name, year, company_name, brick"
-    const results = await db.query('DO NOTHING', [idDelegate, year, idCompany, idBrick]); // TODO
+    query += " WHERE (id_delegate = $1 OR $1 IS NULL)"
+    query += " AND (year = $2 OR $2 IS NULL)"
+    query += " AND (company_name = $3 OR $3 IS NULL)"
+    query += " AND (brick = $4 OR $4 IS NULL)"
+    query += " GROUP BY id_delegate, year, company_name, brick"
+    const results = await db.query(query, [idDelegate, year, idCompany, idBrick]);
     return results.rows;
   } catch (err) {
-    throw err;
+    return [{error:err, msg:'Error obtaining sales by bricks.'}]
   }
 };
 
@@ -114,10 +115,10 @@ module.exports.getDelegates = async (year, idCompany, idBrick, idProduct) => {
     idCompany = Number.isInteger(idCompany) ? idCompany : null;
     idBrick = Number.isInteger(idBrick) ? idBrick : null;
     idProduct = Number.isInteger(idProduct) ? idProduct : null;
-    const results = await db.query('SELECT DISTINCT delegate_id, delegate_name FROM general_table WHERE (year = $1 OR $1 IS NULL) AND (company_id = $2 OR $2 IS NULL) AND (brick_id = $3 OR $3 IS NULL) AND (product_id = $4 OR $4 IS NULL);', [year, idCompany, idBrick, idProduct]);
+    const results = await db.query('SELECT DISTINCT id_delegate, delegate_name FROM general_table WHERE (year = $1 OR $1 IS NULL) AND (company_id = $2 OR $2 IS NULL) AND (brick_id = $3 OR $3 IS NULL) AND (product_cnp = $4 OR $4 IS NULL);', [year, idCompany, idBrick, idProduct]);
     return results.rows;
   } catch (err) {
-    throw err;
+    return {error:err, msg:'Error obtaining delegates.'}
   }
 };
 
@@ -127,10 +128,10 @@ module.exports.getYears = async (idDelegate,idCompany,idBrick,idProduct) => {
     idCompany = Number.isInteger(idCompany) ? idCompany : null;
     idBrick = Number.isInteger(idBrick) ? idBrick : null;
     idProduct = Number.isInteger(idProduct) ? idProduct : null;
-    const results = await db.query('SELECT DISTINCT year FROM general_table WHERE (delegate_id = $1 OR $1 IS NULL) AND (company_id = $2 OR $2 IS NULL) AND (brick = $3 OR $3 IS NULL) AND (product_id = $4 OR $4 IS NULL);', [idDelegate, idCompany, idBrick, idProduct]);
+    const results = await db.query('SELECT DISTINCT year FROM general_table WHERE (id_delegate = $1 OR $1 IS NULL) AND (company_id = $2 OR $2 IS NULL) AND (brick = $3 OR $3 IS NULL) AND (product_cnp = $4 OR $4 IS NULL);', [idDelegate, idCompany, idBrick, idProduct]);
     return results.rows;
   } catch (err) {
-    throw err;
+    return {error:err, msg:'Error obtaining years.'}
   }
 };
 
@@ -140,10 +141,10 @@ module.exports.getCompanies = async (idDelegate, year, idBrick, idProduct) => {
     year = Number.isInteger(year) ? year : null;
     idBrick = Number.isInteger(idBrick) ? idBrick : null;
     idProduct = Number.isInteger(idProduct) ? idProduct : null;
-    const results = await db.query('SELECT DISTINCT company_id,company_name FROM general_table WHERE (delegate_id = $1 OR $1 IS NULL) AND (year = $2 OR $2 IS NULL) AND (brick = $3 OR $3 IS NULL) AND (product_id = $4 OR $4 IS NULL);', [idDelegate, year, idBrick, idProduct]);
+    const results = await db.query('SELECT DISTINCT company_name FROM general_table WHERE (id_delegate = $1 OR $1 IS NULL) AND (year = $2 OR $2 IS NULL) AND (brick = $3 OR $3 IS NULL) AND (product_cnp = $4 OR $4 IS NULL);', [idDelegate, year, idBrick, idProduct]);
     return results.rows;
   } catch (err) {
-    throw err;
+    return {error:err, msg:'Error obtaining companies.'}
   }
 };
 
@@ -153,10 +154,10 @@ module.exports.getBricks = async (idDelegate,year,idCompany,idProduct) => {
     year = Number.isInteger(year) ? year : null;
     idCompany = Number.isInteger(idCompany) ? idCompany : null;
     idProduct = Number.isInteger(idProduct) ? idProduct : null;
-    const results = await db.query('SELECT DISTINCT brick FROM general_table WHERE (delegate_id = $1 OR $1 IS NULL) AND (year = $2 OR $2 IS NULL) AND (company_id = $3 OR $3 IS NULL) AND (product_id = $4 OR $4 IS NULL);', [idDelegate, year, idCompany, idProduct]);
+    const results = await db.query('SELECT DISTINCT brick FROM general_table WHERE (id_delegate = $1 OR $1 IS NULL) AND (year = $2 OR $2 IS NULL) AND (company_name = $3 OR $3 IS NULL) AND (product_cnp = $4 OR $4 IS NULL);', [idDelegate, year, idCompany, idProduct]);
     return results.rows;
   } catch (err) {
-    throw err;
+    return {error:err, msg:'Error obtaining bricks.'}
   }
 };
 
@@ -166,10 +167,10 @@ module.exports.getProducts = async (idDelegate,year,idCompany,idBrick) => {
     year = Number.isInteger(year) ? year : null;
     idCompany = Number.isInteger(idCompany) ? idCompany : null;
     idBrick = Number.isInteger(idBrick) ? idBrick : null;
-    const results = await db.query('SELECT DISTINCT product_id, product_name FROM general_table WHERE (delegate_id = $1 OR $1 IS NULL) AND (year = $2 OR $2 IS NULL) AND (company_id = $3 OR $3 IS NULL) AND (brick = $4 OR $4 IS NULL);', [idDelegate, year, idCompany, idBrick]);
+    const results = await db.query('SELECT DISTINCT product_cnp, product_name FROM general_table WHERE (id_delegate = $1 OR $1 IS NULL) AND (year = $2 OR $2 IS NULL) AND (company_name = $3 OR $3 IS NULL) AND (brick = $4 OR $4 IS NULL);', [idDelegate, year, idCompany, idBrick]);
     return results.rows;
   } catch (err) {
-    throw err;
+    return {error:err, msg:'Error obtaining products.'}
   }
 };
 
