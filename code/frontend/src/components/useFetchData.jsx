@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/Auth';
+import useDelegatesDataStore from '../context/DelegadosData';
+import useMedicosDataStore from '../context/MedicosData';
+import useFarmaciasDataStore from '../context/FarmaciasData';
 
-export function useFetchData(path, fetchTrigger) {                                     
+export function useFetchData(path, fetchTrigger, selectedOption) {                                     
     const [data, setData] = useState([]);                                              
+    const [filters, setFilters] = useState({});                                              
+    const [loading, setLoading] = useState(true);
     const { state } = useAuth()
- 
+    //const updateFetchTrigger = useDelegatesDataStore((state) => state.updateFetchTrigger)
+    const { updateDelegatesFetchTrigger, updateDelegatesFiltersData, updateDelegatesData} = useDelegatesDataStore();
+    const { updateMedicosFetchTrigger, updateMedicosFiltersData, updateMedicosData} = useMedicosDataStore();
+    const { updateFarmaciasFetchTrigger, updateFarmaciasFiltersData, updateFarmaciasData} = useFarmaciasDataStore();
     // Send the user's id if the role is not admin
     const url = state.isAdmin ? process.env.REACT_APP_API_PATH + path : process.env.REACT_APP_API_PATH + path + `/${state.userID}`
 
@@ -23,14 +31,40 @@ export function useFetchData(path, fetchTrigger) {
 
                 if (response.status === 200){
                     console.log('Data loaded successfully:', response.data);
-                    setData(response.data)
-                    //setFilters(response.data.filters)
+                    //setData(response.data)
+                    if(path==='/delegados'){
+                        updateDelegatesFetchTrigger()
+                        // updateDelegatesFiltersData()
+                        // updateDelegatesData()
+                    } else if (path ==='/medicos'){
+                        updateMedicosFetchTrigger()
+                        //updateMedicosFiltersData()
+                        //updateMedicosData()
+                    } else if (path==='/farmacias'){
+                        updateFarmaciasFetchTrigger()
+                        // updateFarmaciasFiltersData()
+                        // updateFarmaciasData()
+                    }
                 } else {
                     console.error('Data loaded failed:', response.status);
                 }
             } catch (error) {
                 console.error('Error loading data :', error);
-            }
+                console.log("BBBBBBB",selectedOption)
+                if(path==='/delegados'){
+                    updateDelegatesFetchTrigger()
+                    //updateDelegatesData()
+                    //updateDelegatesFiltersData()
+                } else if (path ==='/medicos'){
+                    updateMedicosFetchTrigger()
+                    //updateMedicosFiltersData()
+                    //updateMedicosData()
+                } else if (path==='/farmacias'){
+                    updateFarmaciasFetchTrigger()
+                    // updateFarmaciasFiltersData()
+                    // updateFarmaciasData()
+                }
+            } finally {setLoading(false)}
         }
 
         console.log("Should Fetch Data: ", fetchTrigger)
@@ -44,5 +78,5 @@ export function useFetchData(path, fetchTrigger) {
         };
     }, [fetchTrigger, url]);
 
-    return data
+    return {loading}
 }

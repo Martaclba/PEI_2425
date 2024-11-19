@@ -3,7 +3,7 @@ import { IconContext } from "react-icons";
 import { HiOutlineUpload } from "react-icons/hi";
 import { LuStethoscope } from "react-icons/lu";
 import { IoAddCircleOutline } from "react-icons/io5";
-import { Dropdown, Space, Upload, Button, Table,Tag,  ConfigProvider} from 'antd';
+import { Dropdown, Space, Upload, Button, Table,Tag,  ConfigProvider, Form, Select} from 'antd';
 import { useNavigate, useLocation } from "react-router-dom"
 
 import {useAuth} from '../context/Auth';
@@ -11,6 +11,7 @@ import { getFormattedDate } from '../components/utils';
 import themeConfig from '../styles/themeConfigTable';
 import UploadFileProps from '../components/UploadFile';
 import { useFetchData } from '../components/useFetchData';
+import useMedicosDataStore from '../context/MedicosData';
 
 const columns = (navigate) => [
   {
@@ -20,24 +21,21 @@ const columns = (navigate) => [
     key: 'medico',
     fixed: 'left',
     className: 'fixed-column', 
-    filters: [
-      {
-        text: 'Médico 1',
-        value: 'Médico 1',
-      },
-      {
-        text: 'Médico 31',
-        value: 'Médico 31',
-      },
-      {
-        text: 'Médico 2',
-        value: 'Médico 2',
-      },
-    ],
-    filterMode: 'tree',
-    filterSearch: true,
-    onFilter: (value, record) => record.medico.startsWith(value),
     sorter: (a, b) => a.medico.localeCompare(b.medico)
+  },
+  {
+    key: 'brick',
+    title: 'Brick',
+    dataIndex: 'brick',
+    width: '15%',
+    sorter: (a, b) => a.brick.localeCompare(b.brick)
+  },
+  {
+    title: 'Distrito',
+    dataIndex: 'distrito',
+    key: 'distrito',
+    width: '16%',
+    sorter: (a, b) => a.distrito.localeCompare(b.distrito)
   },
   {
     title: 'Instituição',
@@ -58,28 +56,17 @@ const columns = (navigate) => [
     dataIndex: 'estado',
     key: 'estado',
     width: '16%',
-    render: (tags) => (
-      <>
-        {tags.map((tag) => {
-          let color = tag === 'Ativo' ? 'green' : 'geekblue';
-          if (tag === 'Inativo') {
-            color = 'volcano';
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
-  },
-  {
-    title: 'Distrito',
-    dataIndex: 'distrito',
-    key: 'distrito',
-    width: '16%',
-    sorter: (a, b) => a.distrito.localeCompare(b.distrito)
+    render: (tag) => {
+      let color = tag === 'Ativo' ? 'green' : 'blue';
+      if (tag === 'Inativo') {
+        color = 'volcano';
+      }
+      return (
+        <Tag color={color} key={tag}>
+          {tag.toUpperCase()}
+        </Tag>
+      );
+    },
   },
   {
     title: '',
@@ -101,9 +88,10 @@ const dataSource = Array.from({
 }).map((_, i) => ({
   key: i,
   medico: `Médico ${i}`,
+  brick: `Brick ${i}`,
   instituicao: `Hospital ${i}`,
   especialidade: `Especialidade ${i}`,
-  estado: ['Ativo','Inativo','Indisponível'],
+  estado: i % 2 === 0 ? 'Ativo' : 'Indisponivel',
   distrito: `Braga ${i}`
 }));
  
@@ -115,6 +103,9 @@ export default function Medicos() {
   const location = useLocation()
   
   const [fetchTrigger, setFetchTrigger] = useState(false)
+  const { trigger, data, filters, selectedOption } = useMedicosDataStore(state => state);
+  const { updateMedicosFetchTrigger, updateSelectedOption } = useMedicosDataStore();
+
 
   const items = [
     {
@@ -136,8 +127,24 @@ export default function Medicos() {
       </Upload>:<div></div>)
     },
   ];
+
+  const [form] = Form.useForm();
+
+  const onFinish = (values) => {
+    // Update selected option with the latest form input
+    updateSelectedOption(values)
+    // Set a trigger to fetch data
+    updateMedicosFetchTrigger();
+  };
+
+  const {loading} = useFetchData('/medicos', !trigger, selectedOption)
+    
+  //const {data} = useFetchData('/delegados', location.state?.shouldFetchData || fetchTrigger)
+  // if (loading) {
+  //   return <Spin fullscreen tip="Carregando dados..." />;
+  // }
   
-  const {data} = useFetchData('/medicos', location.state?.shouldFetchData || fetchTrigger)
+  //const {data} = useFetchData('/medicos', location.state?.shouldFetchData || fetchTrigger)
 
   return (
     <div id="contact">
@@ -159,6 +166,51 @@ export default function Medicos() {
 
       <div style={{padding: '1rem'}}>
         <ConfigProvider theme={themeConfig}>
+        <div className='dashboard-card'>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <Form
+                name="table_delegados"
+                onFinish={onFinish}
+                layout="vertical"
+                initialValues={selectedOption}
+                form={form}
+              >
+                <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+          
+                  <Form.Item className="large-select" label='Médico' name='medico'>
+                    <Select                       
+                      placeholder="Médico"
+                      options={filters.medicos} 
+                      onChange={() => form.submit()}
+                      showSearch
+                      filterOption={(input, option) => 
+                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                  </Form.Item>
+                
+                  
+                  <Form.Item className="large-select" label='Distrito' name='distrito'>
+                    <Select                     
+                      placeholder="Distrito"
+                      options={filters.distritos} 
+                      onChange={() => form.submit()}
+                      showSearch
+                      filterOption={(input, option) => 
+                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                  </Form.Item>
+
+                  <Form.Item className="large-select" label='Instituição' name='instituicao'>
+                    <Select                     
+                      placeholder="Instituição"
+                      options={filters.instituicoes} 
+                      onChange={() => form.submit()}
+                      showSearch
+                      filterOption={(input, option) => 
+                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                  </Form.Item>
+                </div>
+              </Form>
+            </div>
           <Table 
             columns={columns(navigate)}
             dataSource={dataSource}
@@ -166,6 +218,7 @@ export default function Medicos() {
             pagination={{ pageSize: 7, showSizeChanger: false }}
             showSorterTooltip={false}                             
           />
+          </div>
         </ConfigProvider>
       </div>
     </div>

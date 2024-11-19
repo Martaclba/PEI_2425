@@ -2,13 +2,14 @@ import React from 'react';
 import { IconContext } from "react-icons";
 import { LuCross } from "react-icons/lu";
 import { IoAddCircleOutline} from "react-icons/io5";
-import { Dropdown, Space, Button, Table, ConfigProvider } from 'antd';
+import { Dropdown, Space, Button, Table, ConfigProvider, Form, Select} from 'antd';
 import { useNavigate, useLocation } from "react-router-dom";
 
 import {useAuth} from '../context/Auth';
 import themeConfig from '../styles/themeConfigTable';
 import { getFormattedDate } from '../components/utils';
 import { useFetchData } from '../components/useFetchData';
+import useFarmaciasDataStore from '../context/FarmaciasData';
 
 const columns = (navigate) => [
   {
@@ -38,6 +39,13 @@ const columns = (navigate) => [
     sorter: (a, b) => a.farmacia.localeCompare(b.farmacia)          
   },
   {
+    key: 'brick',
+    title: 'Brick',
+    dataIndex: 'brick',
+    width: '15%',
+    sorter: (a, b) => a.brick.localeCompare(b.brick)
+  },
+  {
     key: 'distrito',
     title: 'Distrito',
     dataIndex: 'distrito',
@@ -62,14 +70,8 @@ const columns = (navigate) => [
     key: 'morada',
     title: 'Morada',
     dataIndex: 'morada',
-    width: '15%',
+    width: '30%',
     sorter: (a, b) => a.morada.localeCompare(b.morada) 
-  },
-  {
-    key: 'contacto',
-    title: 'Contacto',
-    dataIndex: 'contacto',
-    width: '15%',
   },
   {
     key: 'action',
@@ -90,6 +92,7 @@ const dataSource = Array.from({
 }).map((_, i) => ({
   key: i,
   farmacia: `Farmácia ${i}`,
+  brick:`Brick ${i}`,
   distrito: `Distrito ${i}`,
   regiao: `Região ${i}`,      
   freguesia: `Freguesia ${i}`,
@@ -104,6 +107,9 @@ export default function Farmacias() {
   const navigate = useNavigate()
   const location = useLocation();
 
+  const { trigger, data, filters, selectedOption } = useFarmaciasDataStore(state => state);
+  const { updateFarmaciasFetchTrigger, updateSelectedOption } = useFarmaciasDataStore();
+
   const items = [
     {
       key: '1',
@@ -115,7 +121,21 @@ export default function Farmacias() {
     },
   ];
 
-  const {data} = useFetchData('/farmacias', location.state?.shouldFetchData)
+  const [form] = Form.useForm();
+
+  const onFinish = (values) => {
+    // Update selected option with the latest form input
+    updateSelectedOption(values)
+    // Set a trigger to fetch data
+    updateFarmaciasFetchTrigger();
+  };
+
+  const {loading} = useFetchData('/farmacias', !trigger, selectedOption)
+
+   //const {data} = useFetchData('/delegados', location.state?.shouldFetchData || fetchTrigger)
+  // if (loading) {
+  //   return <Spin fullscreen tip="Carregando dados..." />;
+  // }
 
   return (
     <div id="contact">
@@ -137,13 +157,59 @@ export default function Farmacias() {
 
       <div style={{padding: '1rem'}}>
         <ConfigProvider theme={themeConfig}>
+          <div className='dashboard-card'>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <Form
+                name="table_delegados"
+                onFinish={onFinish}
+                layout="vertical"
+                initialValues={selectedOption}
+                form={form}
+              >
+                <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+          
+                  <Form.Item className="large-select" label='Farmácia' name='farmacia'>
+                    <Select                       
+                      placeholder="Farmácia"
+                      options={filters.farmacias} 
+                      onChange={() => form.submit()}
+                      showSearch
+                      filterOption={(input, option) => 
+                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                  </Form.Item>
+                
+                  
+                  <Form.Item className="large-select" label='Distrito' name='distrito'>
+                    <Select                     
+                      placeholder="Distrito"
+                      options={filters.distritos} 
+                      onChange={() => form.submit()}
+                      showSearch
+                      filterOption={(input, option) => 
+                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                  </Form.Item>
+
+                  <Form.Item className="large-select" label='Região' name='regiao'>
+                    <Select                     
+                      placeholder="Região"
+                      options={filters.regioes} 
+                      onChange={() => form.submit()}
+                      showSearch
+                      filterOption={(input, option) => 
+                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                  </Form.Item>
+                </div>
+              </Form>
+            </div>
           <Table 
             columns={columns(navigate)}
             dataSource={dataSource}
             scroll={{x: 'max-content'}}
             pagination={{ pageSize: 7, showSizeChanger: false }}
             showSorterTooltip={false}                            
-          />   
+          />
+          </div>   
         </ConfigProvider>
       </div>
     </div>
