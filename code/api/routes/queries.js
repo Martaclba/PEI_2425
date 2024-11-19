@@ -44,7 +44,16 @@ module.exports.getSaleTotalProducts = async (idDelegate, idCompany, idBrick, idP
     idCompany = Number.isInteger(idCompany) ? idCompany : null;
     idBrick = Number.isInteger(idBrick) ? idBrick : null;
     idProduct = Number.isInteger(idProduct) ? idProduct : null;
-    const results = await db.query('DO NOTHING', [idDelegate, idCompany, idBrick, idProduct]); // TODO
+    const query = "SELECT product_name, SUM(2018) AS 2018,"
+    query += " SUM(2019) AS 2019, SUM(2020) AS 2020, SUM(2021) AS 2021, SUM(2022) AS 2022,"
+    query += " SUM(2023) AS 2023, SUM(2024) AS 2024"   
+    query += " FROM general_table_per_year"
+    query += " WHERE delegate_name = $1"
+    query += " AND company_name = $2"
+    query += " AND brick = $3"
+    query += " AND product_name = $4"
+    query += " GROUP BY delegate_name, company_name, brick, product_name"
+    const results = await db.query(query, [idDelegate, idCompany, idBrick, idProduct]);
     return results.rows;
   } catch (err) {
     throw err;
@@ -58,7 +67,18 @@ module.exports.getSaleProducts = async (idDelegate, year, idCompany, idBrick, id
     idCompany = Number.isInteger(idCompany) ? idCompany : null;
     idBrick = Number.isInteger(idBrick) ? idBrick : null;
     idProduct = Number.isInteger(idProduct) ? idProduct : null;
-    const results = await db.query('DO NOTHING', [idDelegate, year, idCompany, idBrick, idProduct]); // TODO
+    const query = "SELECT product_name, SUM(jan) AS jan,"
+    query += " SUM(fev) AS fev, SUM(mar) AS mar, SUM(abr) AS abr, SUM(mai) AS mai,"
+    query += " SUM(jun) AS jun, SUM(jul) AS jul, SUM(ago) AS ago, SUM(set) AS set,"
+    query += " SUM(out) AS out, SUM(nov) AS nov, SUM (dez) AS dez"   
+    query += " FROM general_table"
+    query += " WHERE delegate_name = $1"
+    query += " AND year = $2"
+    query += " AND company_name = $3"
+    query += " AND brick = $4"
+    query += " AND product_name = $5"
+    query += " GROUP BY delegate_name, year, company_name, brick, product_name"
+    const results = await db.query(query, [idDelegate, year, idCompany, idBrick, idProduct]);
     return results.rows;
   } catch (err) {
     throw err;
@@ -71,6 +91,16 @@ module.exports.getSaleBricks = async (idDelegate, year, idCompany, idBrick) => {
     year = Number.isInteger(year) ? year : null;
     idCompany = Number.isInteger(idCompany) ? idCompany : null;
     idBrick = Number.isInteger(idBrick) ? idBrick : null;
+    const query = "SELECT brick, SUM(jan) AS jan,"
+    query += " SUM(fev) AS fev, SUM(mar) AS mar, SUM(abr) AS abr, SUM(mai) AS mai,"
+    query += " SUM(jun) AS jun, SUM(jul) AS jul, SUM(ago) AS ago, SUM(set) AS set,"
+    query += " SUM(out) AS out, SUM(nov) AS nov, SUM (dez) AS dez"   
+    query += " FROM general_table"
+    query += " WHERE delegate_name = $1"
+    query += " AND year = $2"
+    query += " AND company_name = $3"
+    query += " AND brick = $4"
+    query += " GROUP BY delegate_name, year, company_name, brick"
     const results = await db.query('DO NOTHING', [idDelegate, year, idCompany, idBrick]); // TODO
     return results.rows;
   } catch (err) {
