@@ -1,7 +1,9 @@
 CREATE MATERIALIZED VIEW general_table AS
 SELECT 
     product.name AS product_name,                      -- Product name
+    product.cnp AS product_cnp,
     delegate.name AS delegate_name,                   -- Delegate name
+    delegate.id_delegate AS id_delegate,
     company.name AS company_name,                     -- Company name
     hmr_zone.brick AS brick,                          -- Brick (HMR Zone)
     EXTRACT(YEAR FROM sale.registry_date) AS year,    -- Year of the sale
@@ -31,7 +33,9 @@ JOIN
     delegate ON hmr_zone.fk_id_Delegate = delegate.id_Delegate
 GROUP BY 
     product_name, 
-    delegate_name, 
+    product_cnp,
+    delegate_name,
+    id_delegate,
     company_name, 
     brick, 
     year;
@@ -39,7 +43,9 @@ GROUP BY
 CREATE MATERIALIZED VIEW general_table_per_years AS
 SELECT 
     product.name AS product_name,                     -- Product name
+    product.cnp AS product_cnp,
     delegate.name AS delegate_name,                  -- Delegate name
+    delegate.id_delegate AS id_delegate
     company.name AS company_name,                    -- Company name
     hmr_zone.brick AS brick,                         -- Brick (HMR Zone)
 	SUM(CASE WHEN EXTRACT(YEAR FROM sale.registry_date) = 2018 THEN sale_product.product_amount ELSE 0 END) AS "2018",  -- Year 2018
@@ -63,14 +69,18 @@ JOIN
     delegate ON hmr_zone.fk_id_Delegate = delegate.id_Delegate
 GROUP BY 
     product_name, 
+    product_cnp,
     delegate_name, 
+    id_delegate,
     company_name, 
     brick;
 
 -- This is to apply filters to general_table
 SELECT 
     product_name, 
-    delegate_name, 
+    product_cnp,
+    delegate_name,
+    id_delegate, 
     company_name, 
     brick, 
     year,
@@ -89,14 +99,16 @@ SELECT
 FROM 
     general_table
 WHERE 
-    (product_name = ANY(:product_names) OR :product_names IS NULL) AND
-    (delegate_name = ANY(:delegate_names) OR :delegate_names IS NULL) AND
+    (product_cnp = ANY(:product_cnps) OR :product_cnps IS NULL) AND
+    (id_delegate = ANY(:id_delegates) OR :id_delegates NULL) AND
     (company_name = ANY(:company_names) OR :company_names IS NULL) AND
     (brick = ANY(:bricks) OR :bricks IS NULL) AND
     (year = ANY(:years) OR :years IS NULL)
 GROUP BY 
-    product_name, 
-    delegate_name, 
+    product_name,
+    product_cnp, 
+    delegate_name,
+    id_delegate, 
     company_name, 
     brick, 
     year;
@@ -104,7 +116,9 @@ GROUP BY
 -- This is to apply filters to general_table_per_years
 SELECT 
     product_name, 
-    delegate_name, 
+    product_cnp,
+    delegate_name,
+    id_delegate, 
     company_name, 
     brick,
     SUM(CASE WHEN '2018' = ANY(:years) THEN "2018" ELSE 0 END) AS "2018",
@@ -117,12 +131,14 @@ SELECT
 FROM 
     general_table_per_years
 WHERE 
-    (product_name = ANY(:product_names) OR :product_names IS NULL) AND
-    (delegate_name = ANY(:delegate_names) OR :delegate_names IS NULL) AND
+    (product_cnp = ANY(:product_cnps) OR :product_cnps IS NULL) AND
+    (id_delegate = ANY(:id_delegates) OR :id_delegates IS NULL) AND
     (company_name = ANY(:company_names) OR :company_names IS NULL) AND
     (brick = ANY(:bricks) OR :bricks IS NULL)
 GROUP BY 
-    product_name, 
-    delegate_name, 
+    product_name,
+    product_cnp 
+    delegate_name,
+    id_delegate, 
     company_name, 
     brick;
