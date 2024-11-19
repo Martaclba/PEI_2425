@@ -39,27 +39,27 @@ const predefinedValues_histogram = {
     Delegate_H: 'Todos',
   };
   
-  const predefinedValues_table_product = {
+const predefinedValues_table_product = {
     Year_P: new Date().getFullYear(),
     Delegate_P: 'Todos',
     Company_P: 'MyPharma',
     Brick_P: 'Todos',
     Product_P: 'Todos'
-  };
+};
   
-  const predefinedValues_table_total = {
+const predefinedValues_table_total = {
     Delegate_TP: 'Todos',
     Company_TP: 'MyPharma',
     Brick_TP: 'Todos',
     Product_TP: 'Todos'
-  };
+};
   
-  const predefinedValues_table_brick = {
+const predefinedValues_table_brick = {
     Year_B: new Date().getFullYear(),
     Delegate_B: 'Todos',
     Company_B: 'MyPharma',
     Brick_B: 'Todos'
-  };
+};
 
   
 const useSalesDataStore = create((set) => ({
