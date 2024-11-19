@@ -120,7 +120,7 @@ export default function Delegados() {
     {
       key: '2',
       label: 
-      <Upload {...UploadFileProps(location.pathname, setFetchTrigger)} maxCount={1}>
+      <Upload {...UploadFileProps(location.pathname, updateDelegatesFetchTrigger)} maxCount={1}>
         <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
           Registo por Ficheiro
         </Button>
@@ -137,12 +137,17 @@ export default function Delegados() {
     updateDelegatesFetchTrigger();
   };
 
-  const {loading} = useFetchData('/delegados', !trigger, selectedOption)
+  // Set a trigger if:
+    // the user is returning from a sucefull registry page 
+    // if there's an import
+    // new filter select 
+    // first time reloading
+  const { loading } = useFetchData('/delegados', location.state?.shouldFetchData || !trigger, selectedOption)
     
   //const {data} = useFetchData('/delegados', location.state?.shouldFetchData || fetchTrigger)
-  // if (loading) {
-  //   return <Spin fullscreen tip="Carregando dados..." />;
-  // }
+  if (loading) {
+    return <Spin fullscreen tip="Carregando dados..." />;
+  }
 
   return (
       <div id="contact">

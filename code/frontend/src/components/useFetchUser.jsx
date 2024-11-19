@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-// Predefined data
 const delegate = {
     Nome: {
         Primeiro: 'John',
@@ -29,7 +28,6 @@ const doctor = {
     Notas: 'Some default notes here...',         // Not required
 };
 
- // Predefined data
  const pharmacy = {
     Nome: 'Farmácia A',
     Distrito: 'Braga',
