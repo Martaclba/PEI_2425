@@ -15,7 +15,6 @@ import { getColumnsProdutoTotal } from '../components/utils';
 import useSalesDataStore from '../context/SalesData';
 
 
-
 const DemoColumn = ({ dataHistogram }) => {
   if (!dataHistogram || dataHistogram.length === 0) {
     return (
@@ -23,32 +22,31 @@ const DemoColumn = ({ dataHistogram }) => {
     );
   }
 
-  const config = {
+  // Find the minimum and maximum values
+  const minValue = Math.min(...dataHistogram.map(item => item.value));
+  const maxValue = Math.max(...dataHistogram.map(item => item.value));
+  
+  const config = {  
     data: dataHistogram,
     xField: 'type',
     yField: 'value',
-    style: {
-      fill: ({ type }) => {
-        if (type === 'Jul' || type === 'Aug') {
-          return '#22CBCC';
+    style:{
+      fill: ({ value }) => {
+        if (value === minValue) {
+          return '#D94F4F'; 
         }
-        return '#2989FF';
-      },
-    },
-    label: {
-      text: (originData) => {
-        const val = parseFloat(originData.value);
-        if (val < 0.0) {
-          return (val * 100).toFixed(1) + '%';
+        if (value === maxValue) {
+          return '#4FD967'; 
         }
-        return '';
+        return '#4F8ED9'; 
       },
-      offset: 10,
     },
     legend: false,
   };
+
   return <Column {...config} />;
 };
+
 
 const columns_produto = [
   {

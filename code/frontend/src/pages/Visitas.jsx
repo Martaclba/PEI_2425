@@ -8,6 +8,7 @@ import axios from 'axios'
 import themeConfig from '../styles/themeConfigTable';
 import { getFormattedDate } from '../components/utils';
 import { useFetchData } from '../components/useFetchData';
+import useVisitasDataStore from '../context/VisitasData';
 
 // For the table
 const columns = [
@@ -148,13 +149,18 @@ export default function Visitas() {
 
     const [form] = Form.useForm();
 
-    const { data } = useFetchData('/visitas', fetchTrigger)
+    
+
+    const { trigger, data, filters, selectedOption } = useVisitasDataStore(state => state);
+    const { updateVisitasFetchTrigger, updateSelectedOption } = useVisitasDataStore();
+
     
     const openModal = () => {
         setModalState(true)
     }
 
     const handleModalConfirm = async (values) => {
+
         console.log('Received values of form: ', values)
         setModalState(false)
         setComprador(false)
@@ -197,6 +203,18 @@ export default function Visitas() {
     }
 
 
+    const [form_filtros] = Form.useForm();
+
+    const onFinish = (values) => {
+      // Update selected option with the latest form input
+      updateSelectedOption(values)
+      // Set a trigger to fetch data
+      updateVisitasFetchTrigger();
+    };
+  
+    const { loading } = useFetchData('/visitas', !trigger, selectedOption)
+
+
     return (
         <div id="contact">
             <div>
@@ -221,7 +239,7 @@ export default function Visitas() {
                                 rules={[{ required: true, message: 'Por favor selecione uma data' }]}
                             >
 
-                                <DatePicker placeholder='Insira uma data' style={{width: '100%'}} />
+                                <DatePicker placeholder='Insira uma data' style={{width: '100%'}}/>
                             </Form.Item>
 
                             <Form.Item
@@ -268,6 +286,63 @@ export default function Visitas() {
             
             <div style={{padding: '1rem'}}>
                 <ConfigProvider theme={themeConfig}>
+                <div className='dashboard-card'>
+            
+                    <div style={{ marginBottom: '1rem' }}>
+                    <Form
+                        name="table_delegados"
+                        onFinish={onFinish}
+                        layout="vertical"
+                        initialValues={selectedOption}
+                        form={form_filtros}
+                    >
+                        <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                        <Form.Item
+                            className='large-select'
+                            label="Data"
+                            name="date"
+                        >
+                            <DatePicker 
+                            placeholder='Insira uma data'
+                            style={{width: '100%'}}
+                            onChange={() => form_filtros.submit()}
+                            format="DD-MM-YYYY"
+                            />
+                        </Form.Item>
+                
+                        <Form.Item className="large-select" label='Comprador' name='comprador'>
+                            <Select                       
+                            placeholder="Comprador"
+                            options={filters.compradores} 
+                            onChange={() => form_filtros.submit()}
+                            showSearch
+                            filterOption={(input, option) => 
+                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                        </Form.Item>
+                        
+                        
+                        <Form.Item className="large-select" label='Distrito' name='distrito'>
+                            <Select                     
+                            placeholder="Distrito"
+                            options={filters.distritos} 
+                            onChange={() => form_filtros.submit()}
+                            showSearch
+                            filterOption={(input, option) => 
+                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                        </Form.Item>
+
+                        <Form.Item className="large-select" label='Região' name='regiao'>
+                            <Select                     
+                            placeholder="Região"
+                            options={filters.regioes} 
+                            onChange={() => form_filtros.submit()}
+                            showSearch
+                            filterOption={(input, option) => 
+                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                        </Form.Item>
+                        </div>
+                    </Form>
+                    </div>
                     <Table 
                         columns={columns}
                         dataSource={data}
@@ -275,6 +350,7 @@ export default function Visitas() {
                         pagination={{ pageSize: 7, showSizeChanger: false }}
                         showSorterTooltip={false}                             
                     />
+                    </div>
                 </ConfigProvider>        
             </div>
         </div>
