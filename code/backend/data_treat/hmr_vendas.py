@@ -1,51 +1,53 @@
 import pandas as pd
 
-# Ler o ficheiro Excel a partir da linha 11, ignorando o cabeçalho original
-df = pd.read_excel('Base_de_Dados_Vendas_hmR.xlsx', sheet_name='Base de Dados hmR', dtype=str)
+# Ler o ficheiro Excel
+df = pd.read_excel(
+    'backend/data_treat/Base_de_Dados_Vendas_hmR.xlsx',
+    sheet_name='Base de Dados hmR',
+    skiprows=10,  # Ignorar as primeiras 10 linhas
+    header=0,     # Usar a linha 11 como cabeçalho
+    dtype=str     # Garantir que todas as colunas sejam lidas como strings
+)
 
 
-# Definir as colunas de ID (as primeiras 7)
+# Definir as colunas de ID esperadas
 id_columns = ['Brick', 'DIM', 'District', 'Region HMR', 'Parish', 'Company', 'Product']
 
-# Definir o número de colunas de mês (restantes)
-month_columns = df.columns[len(id_columns):]  # O resto das colunas
+# Identificar automaticamente colunas de meses com base no formato
+month_columns = [col for col in df.columns if '/' in str(col)]
+
+# Renomear colunas corretamente se necessário
+if len(month_columns) == 0:
+    # Criar nomes padrão para os meses, assumindo que as colunas adicionais correspondem a períodos
+    new_month_columns = [
+        f"{month}/{year}" for year in range(2018, 2025) for month in ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']
+    ][: len(df.columns) - len(id_columns)]
+    df.columns = id_columns + new_month_columns
 
 
-# Agora, podemos atribuir corretamente os nomes das colunas
-df.columns = id_columns + month_columns.tolist()
-
-# Preencher para baixo os valores faltantes em todas as colunas
-df = df.ffill()
-
-
-# Remover linhas completamente vazias
-df.dropna(how='all', inplace=True)
-
-# Converter todas as colunas para string (se necessário)
-for coluna in df.columns:
-    df[coluna] = df[coluna].astype(str)
+# Tratar valores nulos ou inválidos em `id_columns`
+for coluna in id_columns:
+    df[coluna] = df[coluna].replace(['', '0', None], 'N/D')  # Substituir strings vazias, zeros ou None por 'N/D'
 
 def clean_entidade(entidade):
     if isinstance(entidade, str):
         ent = entidade.lstrip('+')
-        return ent.lstrip('-')
+        return ent.lstrip('-').strip()  # Remover espaços extras
     return entidade
 
+if 'Product' in df.columns:
+    df['Product'] = df['Product'].apply(clean_entidade)
+else:
+    print("A coluna 'Product' não foi encontrada.")
 
-df['Product'] = df['Product'].apply(clean_entidade)
+if 'Company' in df.columns:
+    df['Company'] = df['Company'].apply(clean_entidade)
+else:
+    print("A coluna 'Company' não foi encontrada.")
 
-# Ignorar as primeiras 10 linhas (já que você tem a linha de cabeçalho do Excel em outro lugar)
-df = df.iloc[10:]
+# Converter colunas de meses para numérico, preenchendo valores nulos com 0
+for coluna in new_month_columns:
+    df[coluna] = pd.to_numeric(df[coluna], errors='coerce').fillna(0)
 
-# *** Data Reshaping to Long Format ***
-# Realizando o "melt" para transformar de formato largo para longo
-df_long = df.melt(id_vars=id_columns, value_vars=month_columns, var_name='Date', value_name='Value')
-
-# *** Convertendo a coluna 'Date' para datetime ***
-# Aqui, assumimos que o formato da data está em 'Month Year' (ex. 'Jan 2024')
-df_long['Date'] = pd.to_datetime(df_long['Date'], format='%b %Y')
-
-# *** Salvar o arquivo processado ***
-# Gravar os dados em um arquivo CSV
-df_long.to_csv('vendas_long.csv', sep=';', encoding='utf-8', index=False)
-
+# Salvar o arquivo processado
+df.to_csv('backend/data_treat/vendas_wide.csv', sep=';', encoding='utf-8', index=False)
