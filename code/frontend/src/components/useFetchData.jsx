@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+
 import { useAuth } from '../context/Auth';
 import useDelegatesDataStore from '../context/DelegadosData';
 import useMedicosDataStore from '../context/MedicosData';
@@ -16,6 +17,7 @@ export function useFetchData(path, fetchTrigger, selectedOption) {
     const { updateMedicosFetchTrigger, updateMedicosFiltersData, updateMedicosData} = useMedicosDataStore();
     const { updateFarmaciasFetchTrigger, updateFarmaciasFiltersData, updateFarmaciasData} = useFarmaciasDataStore();
     const { updateVisitasFetchTrigger, updateVisitasFiltersData, updateVisitasData} = useVisitasDataStore();
+    
     // Send the user's id if the role is not admin
     const url = state.isAdmin ? process.env.REACT_APP_API_PATH + path : process.env.REACT_APP_API_PATH + path + `/${state.userID}`
 
@@ -29,7 +31,7 @@ export function useFetchData(path, fetchTrigger, selectedOption) {
         // Fetch data from the backend
         const fetchData = async () => {
             try {
-                const response = await axios.get(url);
+                const response = await axios.post(url, { selectedOption });
 
                 if (response.status === 200){
                     console.log('Data loaded successfully:', response.data);

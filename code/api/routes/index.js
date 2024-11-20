@@ -259,10 +259,12 @@ router.get('/farmacias/:id', function(req, res, next) { Queries.getPharmacies(pa
   // the districts
   // the regions
   // the towns
-  // the products (?)
+  // the products
+  // doctors
+  // pharmacies
 router.get('/forms', function(req, res, next) { Queries.getSale(res, req) });
 
-
+router.get('/forms/:id', function(req, res, next) { Queries.getSale(res, req) });
 
 
 

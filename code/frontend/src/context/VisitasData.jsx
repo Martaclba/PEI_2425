@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import dayjs from 'dayjs';
 
 // TODO: REMOVER ESTES DEFAULTSSSSSSSSSSSSSSSSSSSSSSSS
 
@@ -33,9 +34,8 @@ const useVisitasDataStore = create((set) => ({
         regioes: regioes_default
     },
 
-    // Store filters form's values to be able to pass them to the fetch hook
     selectedOption: {
-        date: '',
+        date: dayjs().format('DD-MM-YYYY'),
         comprador : 'Todos',
         distrito: 'Todos',
         regiao: 'Todos'
@@ -43,7 +43,7 @@ const useVisitasDataStore = create((set) => ({
 
     updateVisitasFetchTrigger: () => {
         set((state) => ({
-                trigger: !state.trigger                     // Single trigger update     
+                trigger: !state.trigger                      
         }));
     },
 
@@ -73,7 +73,7 @@ const useVisitasDataStore = create((set) => ({
             regioes: regioes_default
         },
         selectedOption: {
-            date:'',
+            date: dayjs().format('DD-MM-YYYY'),
             comprador: 'Todos',
             distrito: 'Todos',
             regiao: 'Todos'

@@ -7,6 +7,9 @@ const useFormDataStore = create((set) => ({
   towns: [],
   instituitions: [],
   specialties: [],
+  products: [],
+  doctors: [],
+  pharmacies: [],
 
   updateFormDataStore: (data) => {
     set({
@@ -16,6 +19,9 @@ const useFormDataStore = create((set) => ({
       towns: data[0].towns,
       instituitions: data[0].instituitions,
       specialties: data[0].specialties,
+      products: data[0].products,
+      doctors: data[0].doctors,
+      pharmacies: data[0].pharmacies,
     });
   },
 
@@ -27,6 +33,9 @@ const useFormDataStore = create((set) => ({
       towns: [],
       instituitions: [],
       specialties: [],
+      products: [],
+      doctors: [],
+      pharmacies: [],
     })
   }
 
