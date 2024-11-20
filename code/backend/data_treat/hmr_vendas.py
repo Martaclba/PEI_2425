@@ -47,7 +47,8 @@ else:
 
 # Converter colunas de meses para numérico, preenchendo valores nulos com 0
 for coluna in new_month_columns:
-    df[coluna] = pd.to_numeric(df[coluna], errors='coerce').fillna(0)
+    df[coluna] = pd.to_numeric(df[coluna], errors='coerce').fillna(0).astype(int)
+
 
 # Salvar o arquivo processado
 df.to_csv('backend/data_treat/vendas_wide.csv', sep=';', encoding='utf-8', index=False)
