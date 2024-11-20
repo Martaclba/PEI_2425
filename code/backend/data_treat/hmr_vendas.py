@@ -4,30 +4,25 @@ import pandas as pd
 df = pd.read_excel(
     'backend/data_treat/Base_de_Dados_Vendas_hmR.xlsx',
     sheet_name='Base de Dados hmR',
-    skiprows=10,  # Ignorar as primeiras 10 linhas
-    header=0,     # Usar a linha 11 como cabeçalho
+    skiprows=0,  # Ignorar as primeiras 10 linhas
+    header=None,     # Usar a linha 11 como cabeçalho
     dtype=str     # Garantir que todas as colunas sejam lidas como strings
 )
 
-
+df = df[1:]
 # Definir as colunas de ID esperadas
-id_columns = ['Brick', 'DIM', 'District', 'Region HMR', 'Parish', 'Company', 'Product']
+colunas = ['Brick', 'DIM', 'District', 'Region HMR', 'Parish', 'Company', 'Product']
+y = ['2018','2019','2020','2021','2022','2023']
+m = ['01', '02','03','04','05','06','07','08','09','10','11','12']
+for y_ in y:
+    for m_ in m:
+        colunas.append(f'{y_}-{m_}-01')
 
-# Identificar automaticamente colunas de meses com base no formato
-month_columns = [col for col in df.columns if '/' in str(col)]
+for m_ in ['01', '02','03','04','05','06','07','08','09']:
+    colunas.append(f'{2024}-{m_}-01')
 
-# Renomear colunas corretamente se necessário
-if len(month_columns) == 0:
-    # Criar nomes padrão para os meses, assumindo que as colunas adicionais correspondem a períodos
-    new_month_columns = [
-        f"{month}/{year}" for year in range(2018, 2025) for month in ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']
-    ][: len(df.columns) - len(id_columns)]
-    df.columns = id_columns + new_month_columns
+df.columns = colunas
 
-
-# Tratar valores nulos ou inválidos em `id_columns`
-for coluna in id_columns:
-    df[coluna] = df[coluna].replace(['', '0', None], 'N/D')  # Substituir strings vazias, zeros ou None por 'N/D'
 
 def clean_entidade(entidade):
     if isinstance(entidade, str):
@@ -35,20 +30,18 @@ def clean_entidade(entidade):
         return ent.lstrip('-').strip()  # Remover espaços extras
     return entidade
 
-if 'Product' in df.columns:
-    df['Product'] = df['Product'].apply(clean_entidade)
-else:
-    print("A coluna 'Product' não foi encontrada.")
 
-if 'Company' in df.columns:
-    df['Company'] = df['Company'].apply(clean_entidade)
-else:
-    print("A coluna 'Company' não foi encontrada.")
+for col in df.columns[:8]:
+    df[col] = df[col].apply(clean_entidade)
 
-# Converter colunas de meses para numérico, preenchendo valores nulos com 0
-for coluna in new_month_columns:
-    df[coluna] = pd.to_numeric(df[coluna], errors='coerce').fillna(0).astype(int)
 
+# Tratar valores nulos ou inválidos em `id_columns`
+df['Parish'] = df['Parish'].fillna(value="N/D") # Substituir strings vazias, zeros ou None por 'N/D'
+
+for coluna in df[7:]:
+    df[coluna] = df[coluna].fillna(0) # Substituir strings vazias, zeros ou None por '0'
+
+print(df.head(20))
 
 # Salvar o arquivo processado
 df.to_csv('backend/data_treat/vendas_wide.csv', sep=';', encoding='utf-8', index=False)
