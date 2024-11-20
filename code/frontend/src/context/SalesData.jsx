@@ -35,31 +35,31 @@ const products_default = [
 ]
 
 const predefinedValues_histogram = {
-    Ano_H: new Date().getFullYear(),
-    Delegado_H: 'Todos',
+    Year_H: new Date().getFullYear(),
+    Delegate_H: 'Todos',
   };
   
-  const predefinedValues_table_product = {
-    Ano_P: new Date().getFullYear(),
-    Delegado_P: 'Todos',
-    Empresa_P: 'MyPharma',
+const predefinedValues_table_product = {
+    Year_P: new Date().getFullYear(),
+    Delegate_P: 'Todos',
+    Company_P: 'MyPharma',
     Brick_P: 'Todos',
     Product_P: 'Todos'
-  };
+};
   
-  const predefinedValues_table_total = {
-    Delegado_TP: 'Todos',
-    Empresa_TP: 'MyPharma',
+const predefinedValues_table_total = {
+    Delegate_TP: 'Todos',
+    Company_TP: 'MyPharma',
     Brick_TP: 'Todos',
     Product_TP: 'Todos'
-  };
+};
   
-  const predefinedValues_table_brick = {
-    Ano_B: new Date().getFullYear(),
-    Delegado_B: 'Todos',
-    Empresa_B: 'MyPharma',
+const predefinedValues_table_brick = {
+    Year_B: new Date().getFullYear(),
+    Delegate_B: 'Todos',
+    Company_B: 'MyPharma',
     Brick_B: 'Todos'
-  };
+};
 
   
 const useSalesDataStore = create((set) => ({
@@ -95,7 +95,7 @@ const useSalesDataStore = create((set) => ({
     updateFetchTriggers: (type) => {
         set((state) => {
             const updatedTriggers = type
-                ? { ...state.triggers, [type]: !state.triggers[type], }                       // Single trigger update
+                ? { ...state.triggers, [type]: !state.triggers[type], }                      // Single trigger update
                 : Object.fromEntries(
                       Object.keys(state.triggers).map((key) => [key, !state.triggers[key],]) // Update all triggers
                   );

@@ -82,7 +82,7 @@ export default function EditarDelegado() {
   // This is needed because of the use of ConfigProvider
   const { showConfirm, contextHolder } = useConfirmModal();
   const changeState = async (value) => {    
-    if (value.length !== 0 && value[0].label === 'Inativo'){
+    if (value.length !== 0 && value[0] === 'Inativo'){
         try{
             // Wait for the user’s response
             const confirmed = await showConfirm();
@@ -275,9 +275,9 @@ export default function EditarDelegado() {
                     message: 'Por favor defina um estado'}]}>
 
                 <Select 
+                    allowClear                                    
                     mode='multiple'
                     maxCount={1}
-                    allowClear                                    
                     tagRender={tagRender}
                     placeholder="Insira um estado"
                     options={states}

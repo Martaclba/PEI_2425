@@ -42,14 +42,13 @@ export function useFetchSales(path, fetchTrigger, options) {
         // Fetch data from the backend
         const fetchData = async () => {
             try {
-                const response = await axios.get(url, { params: options });
+                const response = await axios.post(url, { options });
 
                 if (response.status === 200){
                     console.log('Data loaded successfully:', response.data);
-                    
-                    updateFetchTriggers(options.type)
                     // updateSalesData(options.type, response.data[0])
                     // updateFiltersData(options.type, response.data[1])
+                    updateFetchTriggers(options.type)
 
                 } else {
                     console.error('Data loaded failed:', response.status);
@@ -59,7 +58,7 @@ export function useFetchSales(path, fetchTrigger, options) {
             }
         }
 
-        console.log("Should Fetch SALES: ", fetchTrigger)
+        // console.log("Should Fetch SALES: ", fetchTrigger)
         
         // Fetch data if there's no data or if there's a trigger (update, for example)
         // if (isMounted && (!data.lenght || fetchTrigger)) fetchData();

@@ -15,34 +15,38 @@ import { useFetchUser } from '../components/useFetchUser';
 
 const states = [
     {
-      key: 'blue',
-      value: 'blue',
+      value: 'Indisponível',
       label: 'Indisponível',
     },
     {
-      key: 'volcano',
-      value: 'volcano',
+      value: 'Inativo',
       label: 'Inativo',
     },
     {
-      key: 'green',
-      value: 'green',
+      value: 'Ativo',
       label: 'Ativo',
     },
-];
+  ];
 
-const tagRender = (props) => {
+  const tagRender = (props) => {
     const { label, value, closable, onClose } = props;
     
     const onPreventMouseDown = (event) => {
       event.preventDefault();
       event.stopPropagation();
     };
-
+  
+    // Set color based on the value
+    const colorMap = {
+      Ativo: 'green',     
+      Inativo: 'volcano',         
+      Indisponível: 'blue',       
+    };
+  
     return (
       <Tag
         key={value}
-        color={value}
+        color={colorMap[value] || 'blue'}
         onMouseDown={onPreventMouseDown}
         closable={closable}
         onClose={onClose}
@@ -53,7 +57,7 @@ const tagRender = (props) => {
         {label}
       </Tag>
     );
-};
+  };
 
 export default function EditarMedico() {
     const date = getFormattedDate();
@@ -82,7 +86,7 @@ export default function EditarMedico() {
     // This is needed because of the use of ConfigProvider
     const { showConfirm, contextHolder } = useConfirmModal();
     const changeState = async (value) => {    
-        if (value.length !== 0 && value[0].label === 'Inativo'){
+        if (value.length !== 0 && value[0] === 'Inativo'){
             try{
                 // Wait for the user’s response
                 const confirmed = await showConfirm();
@@ -374,7 +378,6 @@ export default function EditarMedico() {
                                             placeholder="Insira um estado"
                                             options={states}
                                             disabled={!isEditing}
-                                            labelInValue
                                             onChange={changeState}
                                             filterOption={(input, option) => 
                                                 (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
