@@ -84,13 +84,6 @@ const Sidebar = () => {
                     </Link>
                     <span className="tooltip">Farmácias</span>
                 </li>
-                {!state.isAdmin && <li>
-                    <Link to={`/chatbot/`}>
-                        <i className="bx bx-pie-chart-alt-2"><RiRobot2Line /></i>
-                        <span className="links_name">Chatbot</span>
-                    </Link>
-                    <span className="tooltip">Farmácias</span>
-                </li>}
                 <li className="profile">
                     <div className="profile-details">                        
                         <i className="bx bx-pie-chart-alt-2"><CgProfile /></i>

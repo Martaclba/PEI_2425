@@ -4,6 +4,7 @@ import { useAuth } from '../context/Auth';
 import useDelegatesDataStore from '../context/DelegadosData';
 import useMedicosDataStore from '../context/MedicosData';
 import useFarmaciasDataStore from '../context/FarmaciasData';
+import useVisitasDataStore from '../context/VisitasData';
 
 export function useFetchData(path, fetchTrigger, selectedOption) {                                     
     const [data, setData] = useState([]);                                              
@@ -14,6 +15,7 @@ export function useFetchData(path, fetchTrigger, selectedOption) {
     const { updateDelegatesFetchTrigger, updateDelegatesFiltersData, updateDelegatesData} = useDelegatesDataStore();
     const { updateMedicosFetchTrigger, updateMedicosFiltersData, updateMedicosData} = useMedicosDataStore();
     const { updateFarmaciasFetchTrigger, updateFarmaciasFiltersData, updateFarmaciasData} = useFarmaciasDataStore();
+    const { updateVisitasFetchTrigger, updateVisitasFiltersData, updateVisitasData} = useVisitasDataStore();
     // Send the user's id if the role is not admin
     const url = state.isAdmin ? process.env.REACT_APP_API_PATH + path : process.env.REACT_APP_API_PATH + path + `/${state.userID}`
 
@@ -44,6 +46,10 @@ export function useFetchData(path, fetchTrigger, selectedOption) {
                         updateFarmaciasFetchTrigger()
                         // updateFarmaciasFiltersData()
                         // updateFarmaciasData()
+                    } else if (path==='/visitas'){
+                        updateVisitasFetchTrigger()
+                        // updateVisitasFiltersData()
+                        // updateVisitasData()
                     }
                 } else {
                     console.error('Data loaded failed:', response.status);
@@ -63,6 +69,10 @@ export function useFetchData(path, fetchTrigger, selectedOption) {
                     updateFarmaciasFetchTrigger()
                     // updateFarmaciasFiltersData()
                     // updateFarmaciasData()
+                } else if (path==='/visitas'){
+                    updateVisitasFetchTrigger()
+                    // updateVisitasFiltersData()
+                    // updateVisitasData()
                 }
             } finally {setLoading(false)}
         }

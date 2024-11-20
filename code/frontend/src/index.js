@@ -80,7 +80,7 @@ const router = createBrowserRouter([
 
       {
         path: "chatbot/",
-        element: <ProtectedRoute isAdmin={false}><Chatbot /></ProtectedRoute>
+        element: <ProtectedRoute><Chatbot /></ProtectedRoute>
       },
     ],
   },
