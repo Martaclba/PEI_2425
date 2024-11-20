@@ -148,7 +148,7 @@ export default function Visitas() {
 
     const [form] = Form.useForm();
 
-    const {data} = useFetchData('/visitas', fetchTrigger)
+    const { data } = useFetchData('/visitas', fetchTrigger)
     
     const openModal = () => {
         setModalState(true)

@@ -1,9 +1,9 @@
-import React, {useState} from 'react';
+import React from 'react';
 import { IconContext } from "react-icons";
 import { HiOutlineUpload } from "react-icons/hi";
 import { LuStethoscope } from "react-icons/lu";
 import { IoAddCircleOutline } from "react-icons/io5";
-import { Dropdown, Space, Upload, Button, Table,Tag,  ConfigProvider, Form, Select} from 'antd';
+import { Dropdown, Space, Upload, Button, Table,Tag,  ConfigProvider, Form, Select, Spin} from 'antd';
 import { useNavigate, useLocation } from "react-router-dom"
 
 import {useAuth} from '../context/Auth';
@@ -102,7 +102,6 @@ export default function Medicos() {
   const navigate = useNavigate()
   const location = useLocation()
   
-  const [fetchTrigger, setFetchTrigger] = useState(false)
   const { trigger, data, filters, selectedOption } = useMedicosDataStore(state => state);
   const { updateMedicosFetchTrigger, updateSelectedOption } = useMedicosDataStore();
 
@@ -120,7 +119,7 @@ export default function Medicos() {
     {
       key: '2',
       label: 
-      (state.isAdmin ? <Upload {...UploadFileProps(location.pathname, setFetchTrigger)} maxCount={1}>
+      (state.isAdmin ? <Upload {...UploadFileProps(location.pathname, updateMedicosFetchTrigger)} maxCount={1}>
         <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
           Registo por Ficheiro
         </Button>
@@ -137,15 +136,17 @@ export default function Medicos() {
     updateMedicosFetchTrigger();
   };
 
-  const {loading} = useFetchData('/medicos', !trigger, selectedOption)
+  // Set a trigger if:
+    // the user is returning from a sucefull registry page 
+    // if there's an import
+    // new filter select 
+    // first time reloading
+  const { loading } = useFetchData('/medicos', location.state?.shouldFetchData || !trigger, selectedOption)
     
-  //const {data} = useFetchData('/delegados', location.state?.shouldFetchData || fetchTrigger)
-  // if (loading) {
-  //   return <Spin fullscreen tip="Carregando dados..." />;
-  // }
+  if (loading) {
+    return <Spin fullscreen tip="Carregando dados..." />;
+  }
   
-  //const {data} = useFetchData('/medicos', location.state?.shouldFetchData || fetchTrigger)
-
   return (
     <div id="contact">
       <div>

@@ -2,7 +2,7 @@ import React from 'react';
 import { IconContext } from "react-icons";
 import { LuCross } from "react-icons/lu";
 import { IoAddCircleOutline} from "react-icons/io5";
-import { Dropdown, Space, Button, Table, ConfigProvider, Form, Select} from 'antd';
+import { Dropdown, Space, Button, Table, ConfigProvider, Form, Select, Spin} from 'antd';
 import { useNavigate, useLocation } from "react-router-dom";
 
 import {useAuth} from '../context/Auth';
@@ -130,12 +130,11 @@ export default function Farmacias() {
     updateFarmaciasFetchTrigger();
   };
 
-  const {loading} = useFetchData('/farmacias', !trigger, selectedOption)
+  const { loading } = useFetchData('/farmacias', location.state?.shouldFetchData || !trigger, selectedOption)
 
-   //const {data} = useFetchData('/delegados', location.state?.shouldFetchData || fetchTrigger)
-  // if (loading) {
-  //   return <Spin fullscreen tip="Carregando dados..." />;
-  // }
+  if (loading) {
+    return <Spin fullscreen tip="Carregando dados..." />;
+  }
 
   return (
     <div id="contact">

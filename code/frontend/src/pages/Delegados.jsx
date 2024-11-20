@@ -1,4 +1,4 @@
-import React, {useState,useMemo,useEffect} from 'react';
+import React from 'react';
 import { IconContext } from "react-icons";
 import { HiOutlineUpload } from "react-icons/hi";
 import { IoAddCircleOutline, IoPersonOutline } from "react-icons/io5";
@@ -102,7 +102,6 @@ export default function Delegados() {
 
   const navigate = useNavigate()
   const location = useLocation();
-  const [fetchTrigger, setFetchTrigger] = useState(false)
   
   const { trigger, data, filters, selectedOption } = useDelegatesDataStore(state => state);
   const { updateDelegatesFetchTrigger, updateSelectedOption } = useDelegatesDataStore();
@@ -144,7 +143,6 @@ export default function Delegados() {
     // first time reloading
   const { loading } = useFetchData('/delegados', location.state?.shouldFetchData || !trigger, selectedOption)
     
-  //const {data} = useFetchData('/delegados', location.state?.shouldFetchData || fetchTrigger)
   if (loading) {
     return <Spin fullscreen tip="Carregando dados..." />;
   }
