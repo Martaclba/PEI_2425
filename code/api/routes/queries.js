@@ -80,6 +80,8 @@ module.exports.getSaleProducts = async (idDelegate, year, idCompany, idBrick, id
             AND (product_cnp = $5 OR $5 IS NULL)
             GROUP BY id_delegate, year, company_name, brick, product_cnp, product_name`
     const results = await db.query(query, [idDelegate, year, idCompany, idBrick, idProduct]);
+    
+
     return results.rows;
   } catch (err) {
     return [{error:err, msg:'Error obtaining sales by products.'}]
@@ -92,16 +94,16 @@ module.exports.getSaleBricks = async (idDelegate, year, idCompany, idBrick) => {
     year = Number.isInteger(year) ? year : null;
     idCompany = Number.isInteger(idCompany) ? idCompany : null;
     idBrick = Number.isInteger(idBrick) ? idBrick : null;
-    let query = "SELECT brick, SUM(jan) AS jan,"
-    query += " SUM(feb) AS feb, SUM(may) AS may, SUM(abr) AS abr, SUM(mai) AS mai,"
-    query += " SUM(jun) AS jun, SUM(jul) AS jul, SUM(ago) AS ago, SUM(set) AS set,"
-    query += " SUM(out) AS out, SUM(nov) AS nov, SUM (dez) AS dez"   
-    query += " FROM general_table"
-    query += " WHERE (id_delegate = $1 OR $1 IS NULL)"
-    query += " AND (year = $2 OR $2 IS NULL)"
-    query += " AND (company_name = $3 OR $3 IS NULL)"
-    query += " AND (brick = $4 OR $4 IS NULL)"
-    query += " GROUP BY id_delegate, year, company_name, brick"
+    let query = `SELECT brick, SUM(jan) AS jan,
+                  SUM(feb) AS feb, SUM(may) AS may, SUM(abr) AS abr, SUM(mai) AS mai,
+                  SUM(jun) AS jun, SUM(jul) AS jul, SUM(ago) AS ago, SUM(set) AS set,
+                  SUM(out) AS out, SUM(nov) AS nov, SUM (dez) AS dez
+                  FROM general_table
+                  WHERE (id_delegate = $1 OR $1 IS NULL)
+                  AND (year = $2 OR $2 IS NULL)
+                  AND (company_name = $3 OR $3 IS NULL)
+                  AND (brick = $4 OR $4 IS NULL)
+                  GROUP BY id_delegate, year, company_name, brick`
     const results = await db.query(query, [idDelegate, year, idCompany, idBrick]);
     return results.rows;
   } catch (err) {
@@ -111,11 +113,12 @@ module.exports.getSaleBricks = async (idDelegate, year, idCompany, idBrick) => {
 
 module.exports.getDelegates = async (year, idCompany, idBrick, idProduct) => {
   try {
+    
     year = Number.isInteger(year) ? year : null;
     idCompany = Number.isInteger(idCompany) ? idCompany : null;
     idBrick = Number.isInteger(idBrick) ? idBrick : null;
-    idProduct = Number.isInteger(idProduct) ? idProduct : null;
-    const results = await db.query('SELECT DISTINCT id_delegate, delegate_name FROM general_table WHERE (year = $1 OR $1 IS NULL) AND (company_id = $2 OR $2 IS NULL) AND (brick_id = $3 OR $3 IS NULL) AND (product_cnp = $4 OR $4 IS NULL);', [year, idCompany, idBrick, idProduct]);
+    idProduct = Number.isInteger(idProduct) ? idProduct : null;                                                                       // Eu ainda nao tenho nas vistas company com id por isso para ja fica apenas o nome
+    const results = await db.query('SELECT DISTINCT id_delegate, delegate_name FROM general_table WHERE (year = $1 OR $1 IS NULL) AND (company_name = $2 OR $2 IS NULL) AND (brick = $3 OR $3 IS NULL) AND (product_cnp = $4 OR $4 IS NULL);', [year, idCompany, idBrick, idProduct]);
     return results.rows;
   } catch (err) {
     return {error:err, msg:'Error obtaining delegates.'}
@@ -127,8 +130,8 @@ module.exports.getYears = async (idDelegate,idCompany,idBrick,idProduct) => {
     idDelegate = Number.isInteger(idDelegate) ? idDelegate : null;
     idCompany = Number.isInteger(idCompany) ? idCompany : null;
     idBrick = Number.isInteger(idBrick) ? idBrick : null;
-    idProduct = Number.isInteger(idProduct) ? idProduct : null;
-    const results = await db.query('SELECT DISTINCT year FROM general_table WHERE (id_delegate = $1 OR $1 IS NULL) AND (company_id = $2 OR $2 IS NULL) AND (brick = $3 OR $3 IS NULL) AND (product_cnp = $4 OR $4 IS NULL);', [idDelegate, idCompany, idBrick, idProduct]);
+    idProduct = Number.isInteger(idProduct) ? idProduct : null;                                                            // Eu ainda nao tenho nas vistas company com id por isso para ja fica apenas o nome
+    const results = await db.query('SELECT DISTINCT year FROM general_table WHERE (id_delegate = $1 OR $1 IS NULL) AND (company_name = $2 OR $2 IS NULL) AND (brick = $3 OR $3 IS NULL) AND (product_cnp = $4 OR $4 IS NULL);', [idDelegate, idCompany, idBrick, idProduct]);
     return results.rows;
   } catch (err) {
     return {error:err, msg:'Error obtaining years.'}
