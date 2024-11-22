@@ -143,76 +143,76 @@ const columns_brick = [
     sorter: (a, b) => a.brick.localeCompare(b.brick)          
   },
   {
-    key: 'janeiro',
+    key: 'jan',
     title: 'Jan',
-    dataIndex: 'janeiro',
-    sorter: (a, b) => a.janeiro - b.janeiro          
+    dataIndex: 'jan',
+    sorter: (a, b) => a.jan - b.jan          
   },
   {
-    key: 'fevereiro',
+    key: 'feb',
     title: 'Fev',
-    dataIndex: 'fevereiro',
-    sorter: (a, b) => a.fevereiro - b.fevereiro
+    dataIndex: 'feb',
+    sorter: (a, b) => a.feb - b.feb
   },
   {
-    key: 'marco',
+    key: 'mar',
     title: 'Mar',
-    dataIndex: 'marco',
-    sorter: (a, b) => a.marco - b.marco
+    dataIndex: 'mar',
+    sorter: (a, b) => a.mar - b.mar
   },
   {
-    key: 'abril',
+    key: 'apr',
     title: 'Abr',
-    dataIndex: 'abril',
-    sorter: (a, b) => a.abril - b.abril
+    dataIndex: 'apr',
+    sorter: (a, b) => a.apr - b.apr
   },
   {
-    key: 'maio',
+    key: 'may',
     title: 'Mai',
-    dataIndex: 'maio',
-    sorter: (a, b) => a.maio - b.maio
+    dataIndex: 'may',
+    sorter: (a, b) => a.may - b.may
   },
   {
-    key: 'junho',
+    key: 'jun',
     title: 'Jun',
-    dataIndex: 'junho',
-    sorter: (a, b) => a.junho - b.junho
+    dataIndex: 'jun',
+    sorter: (a, b) => a.jun - b.jun
   },
   {
-    key: 'julho',
+    key: 'jul',
     title: 'Jul',
-    dataIndex: 'junho',
-    sorter: (a, b) => a.junho - b.junho
+    dataIndex: 'jul',
+    sorter: (a, b) => a.jul - b.jul
   },
   {
-    key: 'agosto',
+    key: 'aug',
     title: 'Ago',
-    dataIndex: 'agosto',
-    sorter: (a, b) => a.agosto - b.agosto
+    dataIndex: 'aug',
+    sorter: (a, b) => a.aug - b.aug
   },
   {
-    key: 'setembro',
+    key: 'sep',
     title: 'Set',
-    dataIndex: 'setembro',
-    sorter: (a, b) => a.setembro - b.setembro
+    dataIndex: 'sep',
+    sorter: (a, b) => a.sep - b.sep
   },
   {
-    key: 'outubro',
+    key: 'oct',
     title: 'Out',
-    dataIndex: 'outubro',
-    sorter: (a, b) => a.outubro - b.outubro
+    dataIndex: 'oct',
+    sorter: (a, b) => a.oct - b.oct
   },
   {
-    key: 'novembro',
+    key: 'nov',
     title: 'Nov',
-    dataIndex: 'novembro',
-    sorter: (a, b) => a.novembro - b.novembro
+    dataIndex: 'nov',
+    sorter: (a, b) => a.nov - b.nov
   },
   {
-    key: 'dezembro',
+    key: 'dec',
     title: 'Dez',
-    dataIndex: 'dezembro',
-    sorter: (a, b) => a.dezembro - b.dezembro
+    dataIndex: 'dec',
+    sorter: (a, b) => a.dec - b.dec
   },
 ];
 
@@ -275,19 +275,6 @@ export default function Vendas() {
   //useFetchSales('/', !triggers.totalProducts, options.totalProducts)
   //useFetchSales('/', !triggers.bricks, options.bricks)
 
-
-  // VER DEPOIS SE NÃO DÁ ERRO PORQUE SE NÃO FOR ADMIN ISTO VEM VAZIO
-  // useEffect(() => {
-  //   if (filters_product) {
-  //       setYearsP(filters_product.years);                                    
-  //       setDelegatesP(filters_product.delegates);
-  //       setCompaniesP(filters_product.companies);
-  //       setBricksP(filters_product.bricks);
-  //       setProductsP(filters_product.products)
-  //   }
-  // }, [filters_product]);
-
-
   return (
       <div id="contact">
         <div>
@@ -308,7 +295,6 @@ export default function Vendas() {
         
         <div style={{padding: '1rem'}}>
           <div className='dashboard-card'>
-            {/* <div id='data-import'> */}
               <p className="table-title">Histórico De Vendas</p>
 
               {state.isAdmin && 
@@ -344,7 +330,6 @@ export default function Vendas() {
                   </Form>
                 </div>
               }
-            {/* </div> */}
             <DemoColumn dataHistogram={data.histogram} />
           </div>
 

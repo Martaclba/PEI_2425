@@ -31,7 +31,7 @@ export function useFetchData(path, fetchTrigger, selectedOption) {
         // Fetch data from the backend
         const fetchData = async () => {
             try {
-                const response = await axios.post(url, { selectedOption });
+                const response = await axios.post(url, selectedOption, { headers: { 'Content-Type': 'application/json' } });
 
                 if (response.status === 200){
                     console.log('Data loaded successfully:', response.data);

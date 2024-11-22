@@ -104,7 +104,7 @@ export default function EditarMedico() {
         console.log('Received values of form: ', values);
   
         try {
-          const response = await axios.put(process.env.REACT_APP_API_PATH + location.pathname, values)
+          const response = await axios.put(process.env.REACT_APP_API_PATH + location.pathname, values, { headers: { 'Content-Type': 'application/json' } })
         
           if(response.status === 200){
             message.success("Editado com sucesso")

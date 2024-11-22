@@ -3,82 +3,6 @@ const router = express.Router();
 
 var Queries = require('./queries')
 
-// options = {
-//   option_selected: { year: '2024', delegate: 'Todos' }              (example)
-//   type: (histogram/products/totalProducts/bricks)                   (to know what to put on "data")
-// }
-
-
-// router.get('/towns', async function (req, res, next) {
-//   try {
-//     const towns = await Queries.getDelegates(null); // Wait for the function to resolve
-//     res.status(200).json(towns); // Respond with the data
-//   } catch (err) {
-//     res.status(521).json({ error: err, msg: "ARDEU AMIGO" }); // Handle the error
-//   }
-// });
-
-
-
-// Function to set the data
-const setData = (dataArray, key, value) => {
-  return dataArray.map((entry, index) => ({
-    key: index,
-    [key]: entry[value],
-    janeiro: entry.jan,
-    fevereiro: entry.feb,
-    marco: entry.mar,
-    abril: entry.apr,
-    maio: entry.may,
-    junho: entry.jun,
-    julho: entry.jul,
-    agosto: entry.aug,
-    setembro: entry.sep,
-    outubro: entry.oct,
-    novembro: entry.nov,
-    dezembro: entry.dec,
-  }));
-}
-
-
-// Functions to set the filters
-async function getAndMapFilterData(queryFunction, mapFunction) {
-  const data = await queryFunction();
-  return Array.isArray(data) && data.length > 0
-    ? data.map(mapFunction)
-    : [];
-}
-
-const mapHistogram = (item) => ({
-  month: item.month,
-  value: item.value,
-});
-
-const mapDelegate = (delegate) => ({
-  label: delegate.delegate_name,
-  value: delegate.id_delegate,
-});
-
-const mapYear = (year) => ({
-  label: year,
-  value: year,
-});
-
-const mapCompany = (company, index) => ({
-  label: company.company_name,
-  value: index,               // mudar depois para o id do que for na label
-});
-
-const mapBrick = (brick) => ({
-  label: brick.brick_name,
-  value: index,               // mudar depois para o id do que for na label
-});
-
-const mapProduct = (product) => ({
-  label: product.product_name,
-  value: index,               // mudar depois para o id do que for na label
-});
-
 
 /*    GET sales    */ 
 // Route responsible for retrieving the dashboard's data for each kind of user.
@@ -86,199 +10,103 @@ const mapProduct = (product) => ({
   // the total of sales for each delegate and year as well as the total of sales for every delegate; 
   // the total of sales by product for each delegate,  year (divided in months) and company as well as the tota of sales for every delegate
   // the total of sales by brick for each delegate and year (divided in months) as well as the tota of sales for every delegate
-  router.post('/', async function(req, res, next) { 
-    const data = {
-      histogram: [],
-      products: [],
-      totalProducts: [],
-      bricks: []
-    }
+router.post('/', async function(req, res, next) { 
+  const data = {
+    histogram: [],
+    products: [],
+    totalProducts: [],
+    bricks: []
+  }
+
+  const filters = {
+    histogram: {},
+    products: {},
+    totalProducts: {},
+    bricks: {}
+  }
+
+  const { type, option_selected } = req.body
+  // console.log('Type:', type, "Option Select: ", option_selected);
   
-  
-    const filters = {
-      histogram: {},
-      products: {},
-      totalProducts: {},
-      bricks: {}
-    }
-  
-    const { options } = req.body
-    // console.log('Type:', type, "Option Select: ", option_selected);
+  try {
+    if (type === 'histogram') {
+      const idDelegate = option_selected.Delegate_H                    // default: Todos
+      const year = option_selected.Year_H                              // default: 2024
+      console.log("HHHH ", idDelegate, year)
+
+      data.histogram = await Queries.getSaleHistogram(idDelegate, year)
+      filters.histogram.delegates = await Queries.getDelegates(year, null, null, null),
+      filters.histogram.years = await Queries.getYears(idDelegate)
     
-    //Test if there is Null values
-    function isValid(value) { return value !== null; } // value ! undefined ????
-    try {
-      if (options.type === 'histogram') {
-        console.log(options.type)
-        const idDelegate = options.option_selected.Delegate_H                    // default: Todos
-        const year = options.option_selected.Year_H                              // default: 2024
-        console.log("HHHH ", idDelegate, year)
+    } 
+    else if (type === 'bricks') {
+      const idDelegate = option_selected.Delegate_B
+      const year = option_selected.Year_B
+      const idCompany = option_selected.Company_B                       // default: Todos
+      const idBrick = option_selected.Brick_B                           // default: Todos
+      console.log("BBBB ", idDelegate, year, idCompany, idBrick)
 
-        data.histogram = await getAndMapFilterData(
-          () => Queries.getSaleHistogram(idDelegate, year),
-          mapHistogram
-        );
-
-        filters.histogram.delegates = await getAndMapFilterData(
-          () => Queries.getDelegates(year, null, null, null),
-          mapDelegate
-        );
-
-        filters.histogram.years = await getAndMapFilterData(
-          () => Queries.getYears(idDelegate),
-          mapYear
-        );
-
-      } 
-      else if (options.type === 'bricks') {
-        const idDelegate = options.option_selected.Delegate_B
-        const year = options.option_selected.Year_B
-        const idCompany = options.option_selected.Company_B                        // default: Todos
-        const idBrick = options.option_selected.Brick_B                           // default: Todos
-        console.log("BBBB ", idDelegate, year, idCompany, idBrick)
-  
-        const data_bricks = await Queries.getSaleBricks(idDelegate, year, idCompany, idBrick)   
-        data.bricks = setData(data_bricks, 'brick', 'brick_name')
-
-        filters.bricks.delegates = await Queries.getDelegates(year,idCompany,idBrick, null)
-        filters.bricks.years = await Queries.getYears(idDelegate,idCompany,idBrick, null)
-        filters.bricks.companies = await Queries.getCompanies(idDelegate,year,idBrick, null)
-        filters.bricks.bricks = await Queries.getBricks(idDelegate,year,idCompany, null)
-  
-        /*
-        filters.bricks.delegates = filters.bricks.delegates.
-          map((delegate, index) => ({
-            label: delegate.name,
-            value: index,
-        }));
-  
-        filters.bricks.years = filters.bricks.years.
-          map((year) => ({
-            label: String(year),
-            value: year,
-        }));
-  
-        filters.bricks.companies = filters.bricks.companies.
-          map((company, index) => ({
-            label: company.company_name,
-            value: index,
-        }));
-  
-        filters.bricks.bricks = filters.bricks.bricks.
-          map((brick, index) => ({
-            label: brick.brick_name,
-            value: index,
-        }));
-        */
+      data.bricks= await Queries.getSaleBricks(idDelegate, year, idCompany, idBrick)   
+      filters.bricks.delegates = await Queries.getDelegates(year,idCompany,idBrick, null)
+      filters.bricks.years = await Queries.getYears(idDelegate,idCompany,idBrick, null)
+      filters.bricks.companies = await Queries.getCompanies(idDelegate,year,idBrick, null)
+      filters.bricks.bricks = await Queries.getBricks(idDelegate,year,idCompany, null)
+    
+    } else if (type === 'products') {
+      const idDelegate = option_selected.Delegate_P
+      const year = option_selected.Year_P
+      const idCompany = option_selected.Company_P                        // default: Todos
+      const idBrick = option_selected.Brick_P                            // default: Todos
+      const idProduct = option_selected.Product_P
+      console.log("PPPP ", idDelegate, year, idCompany, idBrick, idProduct)
       
-      } else if (options.type === 'products') {
-        const idDelegate = options.option_selected.Delegate_P
-        const year = options.option_selected.Year_P
-        const idCompany = options.option_selected.Company_P                        // default: Todos
-        const idBrick = options.option_selected.Brick_P                            // default: Todos
-        const idProduct = options.option_selected.Product_P
-        console.log("PPPP ", idDelegate, year, idCompany, idBrick, idProduct)
-        
-
-        data.products = await Queries.getSaleProducts(idDelegate, 2018, 'Todos', idBrick, idProduct)   
-        filters.products.delegates = await Queries.getDelegates(year,idCompany,idBrick,idProduct)
-        filters.products.years = await Queries.getYears(idDelegate,idCompany,idBrick,idProduct)
-        filters.products.companies = await Queries.getCompanies(idDelegate,year,idBrick,idProduct)
-        filters.products.bricks = await Queries.getBricks(idDelegate,year,idCompany,idProduct)
-        filters.products.products = await Queries.getProducts(idDelegate,year,idCompany,idBrick)
-
-
-        //const data_products = await Queries.getSaleProducts(idDelegate, year, idCompany, idBrick, idProduct)   
-        // data.products = setData(data_products, 'produto', 'product_name')
-
-        // filters.products.delegates = await getAndMapFilterData(
-        //   () => Queries.getDelegates(year, idCompany, idBrick, idProduct),
-        //   mapDelegate
-        // );
-
-        // filters.products.years = await getAndMapFilterData(
-        //   () => Queries.getYears(idDelegate, idCompany, idBrick, idProduct),
-        //   mapYear
-        // );
-        
-        // filters.products.companies = await getAndMapFilterData(
-        //   () => Queries.getCompanies(idDelegate, year, idBrick, idProduct),
-        //   mapCompany
-        // );
-
-        // filters.products.bricks = await getAndMapFilterData(
-        //   () => Queries.getBricks(idDelegate,year,idCompany,idProduct),
-        //   mapBrick
-        // );
-        
-        // filters.products.companies = await getAndMapFilterData(
-        //   () => Queries.getProducts(idDelegate,year,idCompany,idBrick),
-        //   mapProduct
-        // );
-    
-        
-        console.log("Estrutura completa - products:", JSON.stringify(data.products, null, 2));
-        //console.log("Estrutura completa - filters.products.delegates:", JSON.stringify(filters.products.delegates, null, 2));
-        //console.log("Estrutura completa - filters.products.years:", JSON.stringify(filters.products.years, null, 2));
-        //console.log("Estrutura completa - filters.products.companies:", JSON.stringify(filters.products.companies, null, 2));
-        //console.log("Estrutura completa - filters.products.bricks:", JSON.stringify(filters.products.bricks, null, 2));
-        console.log("Estrutura completa - filters.products.products:", JSON.stringify(filters.products.products, null, 2));
-        
-        
-      } else if (options.type === 'totalProducts') {
-        const idDelegate = options.option_selected.Delegate_TP
-        const idCompany = options.option_selected.Company_TP                        // default: Todos
-        const idBrick = options.option_selected.Brick_TP                            // default: Todos
-        const idProduct = options.option_selected.Product_TP
+      data.products = await Queries.getSaleProducts(idDelegate, 2018, 'Todos', idBrick, idProduct)   
+      filters.products.delegates = await Queries.getDelegates(year,idCompany,idBrick,idProduct)
+      filters.products.years = await Queries.getYears(idDelegate,idCompany,idBrick,idProduct)
+      filters.products.companies = await Queries.getCompanies(idDelegate,year,idBrick,idProduct)
+      filters.products.bricks = await Queries.getBricks(idDelegate,year,idCompany,idProduct)
+      filters.products.products = await Queries.getProducts(idDelegate,year,idCompany,idBrick)
   
-        console.log("TPTP ", idDelegate, idCompany, idBrick, idProduct)
-        data.totalProducts = await Queries.getSaleTotalProducts(idDelegate, idCompany, idBrick, idProduct)   
-        filters.totalProducts.delegates = await Queries.getDelegates(null, idCompany,idBrick,idProduct)
-        filters.totalProducts.companies = await Queries.getCompanies(idDelegate, null, idBrick, idProduct)
-        filters.totalProducts.products = await Queries.getProducts(idDelegate, null,idCompany,idBrick)
-        
-        data.totalProducts = data.totalProducts.filter(product => 
-          Object.keys(product).every(key => isValid(product[key])))
-          .map((product, index) => ({
-            key: index,
-            2018: product['2018'],
-            2019: product['2019'],
-            2020: product['2020'],
-            2021: product['2021'],
-            2022: product['2022'],
-            2023: product['2023'],
-            2024: product['2024'],
-        }));
-  
-        // filters.totalProducts.delegates = filters.totalProducts.delegates
-        //   .filter(delegate => isValid(delegate.name))
-        //   .map((delegate, index) => ({
-        //     label: delegate.name,
-        //     value: index,
-        //   }));
-  
-        // filters.totalProducts.companies = filters.totalProducts.companies
-        //   .filter(company => isValid(company.company_name))
-        //   .map((company, index) => ({
-        //     label: company.company_name,
-        //     value: index,
-        // }));
-  
-        // filters.totalProducts.bricks = filters.totalProducts.bricks
-        //   .filter(brick => isValid(brick.brick_name))
-        //   .map((brick, index) => ({
-        //     label: brick.brick_name,
-        //     value: index,
-        // }));
-        
-      }
-        
-      res.status(200).json({ data, filters });
+      
+      console.log("Estrutura completa - products:", JSON.stringify(data.products, null, 2));
+      //console.log("Estrutura completa - filters.products.delegates:", JSON.stringify(filters.products.delegates, null, 2));
+      //console.log("Estrutura completa - filters.products.years:", JSON.stringify(filters.products.years, null, 2));
+      //console.log("Estrutura completa - filters.products.companies:", JSON.stringify(filters.products.companies, null, 2));
+      //console.log("Estrutura completa - filters.products.bricks:", JSON.stringify(filters.products.bricks, null, 2));
+      console.log("Estrutura completa - filters.products.products:", JSON.stringify(filters.products.products, null, 2));
+      
+    } else if (type === 'totalProducts') {
+      const idDelegate = option_selected.Delegate_TP
+      const idCompany = option_selected.Company_TP                        // default: Todos
+      const idBrick = option_selected.Brick_TP                            // default: Todos
+      const idProduct = option_selected.Product_TP
+      console.log("TPTP ", idDelegate, idCompany, idBrick, idProduct)
+      
+      data.totalProducts = await Queries.getSaleTotalProducts(idDelegate, idCompany, idBrick, idProduct)   
+      filters.totalProducts.delegates = await Queries.getDelegates(null, idCompany,idBrick,idProduct)
+      filters.totalProducts.companies = await Queries.getCompanies(idDelegate, null, idBrick, idProduct)
+      filters.totalProducts.products = await Queries.getProducts(idDelegate, null,idCompany,idBrick)
+      
+      data.totalProducts = data.totalProducts.filter(product => 
+        Object.keys(product).every(key => isValid(product[key])))
+        .map((product, index) => ({
+          key: index,
+          2018: product['2018'],
+          2019: product['2019'],
+          2020: product['2020'],
+          2021: product['2021'],
+          2022: product['2022'],
+          2023: product['2023'],
+          2024: product['2024'],
+      })); 
     }
-    catch (err) {
-      res.status(501).json({error: err, msg: "Error obtaining sales"});
-    }
-  });
+      
+    res.status(200).json({ data, filters });
+  }
+  catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining sales"});
+  }
+});
   
   
 
@@ -628,18 +456,5 @@ router.get('/farmacias/:id', function(req, res, next) { Queries.getPharmacies(pa
 router.get('/forms', function(req, res, next) { Queries.getSale(res, req) });
 
 router.get('/forms/:id', function(req, res, next) { Queries.getSale(res, req) });
-
-
-
-/* GET home page. */ // test queries
-router.get('/towns', async function (req, res, next) {
-  try {
-    const towns = await Queries.getTowns(); // Wait for the function to resolve
-    res.status(200).json(towns); // Respond with the data
-  } catch (err) {
-    res.status(521).json({ error: err, msg: "ARDEU AMIGO" }); // Handle the error
-  }
-});
-
 
 module.exports = router;

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
+import { useAuth } from '../context/Auth';
+
 const delegate = {
     Nome: {
         Primeiro: 'John',
@@ -43,9 +45,14 @@ const doctor = {
     Produtos: [{ key: '1', label: 'Produto 1' }]  // Not required 
 };
 
-export function useFetchUser(path, type) {                                     
+export function useFetchUser(path, type) {    
+    const { state } = useAuth()
+    
     const [data, setData] = useState([]);   
     const [loading, setLoading] = useState(true);                                           
+
+    // Send the user's id if the role is not admin
+    const url = state.isAdmin ? process.env.REACT_APP_API_PATH + path : process.env.REACT_APP_API_PATH + path + `${state.userID}`
 
     // Load the table's content and update it when necessary
     useEffect (() => {
@@ -54,7 +61,7 @@ export function useFetchUser(path, type) {
         // Fetch data from the backend
         const fetchData = async () => {
             try {
-                const response = await axios.get(process.env.REACT_APP_API_PATH + path);
+                const response = await axios.get(url, { headers: { 'Content-Type': 'application/json' } });
 
                 if (response.status === 200){
                     console.log('Data loaded successfully:', response.data);

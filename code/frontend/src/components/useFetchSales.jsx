@@ -42,7 +42,7 @@ export function useFetchSales(path, fetchTrigger, options) {
         // Fetch data from the backend
         const fetchData = async () => {
             try {
-                const response = await axios.post(url, { options }, { headers: { 'Content-Type': 'application/json' } });
+                const response = await axios.post(url, options, { headers: { 'Content-Type': 'application/json' } });
 
                 if (response.status === 200){
                     console.log('Data loaded successfully:', response.data);
