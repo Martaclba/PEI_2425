@@ -9,14 +9,76 @@ var Queries = require('./queries')
 // }
 
 
-router.get('/towns', async function (req, res, next) {
-  try {
-    const towns = await Queries.getDelegates(null); // Wait for the function to resolve
-    res.status(200).json(towns); // Respond with the data
-  } catch (err) {
-    res.status(521).json({ error: err, msg: "ARDEU AMIGO" }); // Handle the error
-  }
+// router.get('/towns', async function (req, res, next) {
+//   try {
+//     const towns = await Queries.getDelegates(null); // Wait for the function to resolve
+//     res.status(200).json(towns); // Respond with the data
+//   } catch (err) {
+//     res.status(521).json({ error: err, msg: "ARDEU AMIGO" }); // Handle the error
+//   }
+// });
+
+
+
+// Function to set the data
+const setData = (dataArray, key, value) => {
+  return dataArray.map((entry, index) => ({
+    key: index,
+    [key]: entry[value],
+    janeiro: entry.jan,
+    fevereiro: entry.feb,
+    marco: entry.mar,
+    abril: entry.apr,
+    maio: entry.may,
+    junho: entry.jun,
+    julho: entry.jul,
+    agosto: entry.aug,
+    setembro: entry.sep,
+    outubro: entry.oct,
+    novembro: entry.nov,
+    dezembro: entry.dec,
+  }));
+}
+
+
+// Functions to set the filters
+async function getAndMapFilterData(queryFunction, mapFunction) {
+  const data = await queryFunction();
+  return Array.isArray(data) && data.length > 0
+    ? data.map(mapFunction)
+    : [];
+}
+
+const mapHistogram = (item) => ({
+  month: item.month,
+  value: item.value,
 });
+
+const mapDelegate = (delegate) => ({
+  label: delegate.delegate_name,
+  value: delegate.id_delegate,
+});
+
+const mapYear = (year) => ({
+  label: year,
+  value: year,
+});
+
+const mapCompany = (company, index) => ({
+  label: company.company_name,
+  value: index,               // mudar depois para o id do que for na label
+});
+
+const mapBrick = (brick) => ({
+  label: brick.brick_name,
+  value: index,               // mudar depois para o id do que for na label
+});
+
+const mapProduct = (product) => ({
+  label: product.product_name,
+  value: index,               // mudar depois para o id do que for na label
+});
+
 
 /*    GET sales    */ 
 // Route responsible for retrieving the dashboard's data for each kind of user.
@@ -40,81 +102,51 @@ router.get('/towns', async function (req, res, next) {
       bricks: {}
     }
   
-    const  options  = req.body
-    //console.log('Options received:', options);
+    const  options = req.body
+    // console.log('Type:', type, "Option Select: ", option_selected);
     
     //Test if there is Null values
-    function isValid(value) {
-      return value !== null;
-      // value ! undefined ????
-     }
+    function isValid(value) { return value !== null; } // value ! undefined ????
   
     try {
       
       if (options.type === 'histogram') {
         const idDelegate = options.option_selected.Delegate_H                    // default: Todos
         const year = options.option_selected.Year_H                              // default: 2024
-        data.histogram = await Queries.getSaleHistogram(idDelegate, year) 
-        //console.log(data)
-        filters.histogram.delegates = await Queries.getDelegates(year, null, null, null)
-        filters.histogram.years = await Queries.getYears(idDelegate)
         console.log("HHHH ", idDelegate, year)
-        /*
-        data.histogram = data.histogram
-          .filter(item => isValid(item.month) && isValid(item.value)) // Filtra valores inválidos
-          .map((item) => ({
-          month: item.month,
-          value: item.value,
-        }));
-  
-        filters.histogram.delegates = filters.histogram.delegates
-          .filter(delegate => isValid(delegate.name))
-          .map((delegate, index) => ({
-          label: delegate.name,
-          value: index,
-        }));
-  
-        filters.histogram.years = filters.histogram.years
-          .filter(year => isValid(year))
-          .map((year) => ({
-            label: String(year),
-            value: year,
-        }));
-        */
+
+        data.histogram = await getAndMapFilterData(
+          () => Queries.getSaleHistogram(idDelegate, year),
+          mapHistogram
+        );
+
+        filters.histogram.delegates = await getAndMapFilterData(
+          () => Queries.getDelegates(year, null, null, null),
+          mapDelegate
+        );
+
+        filters.histogram.years = await getAndMapFilterData(
+          () => Queries.getYears(idDelegate),
+          mapYear
+        );
+
       } 
       else if (options.type === 'bricks') {
         const idDelegate = options.option_selected.Delegate_B
         const year = options.option_selected.Year_B
         const idCompany = options.option_selected.Company_B                        // default: Todos
         const idBrick = options.option_selected.Brick_B                           // default: Todos
-  
         console.log("BBBB ", idDelegate, year, idCompany, idBrick)
   
-        data.bricks = await Queries.getSaleBricks(idDelegate, year, idCompany, idBrick)   
+        const data_bricks = await Queries.getSaleBricks(idDelegate, year, idCompany, idBrick)   
+        data.bricks = setData(data_bricks, 'brick', 'brick_name')
+
         filters.bricks.delegates = await Queries.getDelegates(year,idCompany,idBrick, null)
         filters.bricks.years = await Queries.getYears(idDelegate,idCompany,idBrick, null)
         filters.bricks.companies = await Queries.getCompanies(idDelegate,year,idBrick, null)
         filters.bricks.bricks = await Queries.getBricks(idDelegate,year,idCompany, null)
   
         /*
-        data.bricks = data.bricks.
-          map((brick, index) => ({
-            key: index,
-            Brick: brick.brick_name,
-            janeiro: brick.jan,
-            fevereiro: brick.feb,
-            marco: brick.mar,
-            abril: brick.apr,
-            maio: brick.may,
-            junho: brick.jun,
-            julho: brick.jul,
-            agosto: brick.aug,
-            setembro: brick.sep,
-            outubro: brick.oct,
-            novembro: brick.nov,
-            dezembro: brick.dec,
-          }));
-  
         filters.bricks.delegates = filters.bricks.delegates.
           map((delegate, index) => ({
             label: delegate.name,
@@ -144,90 +176,53 @@ router.get('/towns', async function (req, res, next) {
         const idDelegate = options.option_selected.Delegate_P
         const year = options.option_selected.Year_P
         const idCompany = options.option_selected.Company_P                        // default: Todos
-        const idBrick = options.option_selected.Brick_P                           // default: Todos
+        const idBrick = options.option_selected.Brick_P                            // default: Todos
         const idProduct = options.option_selected.Product_P
-  
         console.log("PPPP ", idDelegate, year, idCompany, idBrick, idProduct)
+        
         data.products = await Queries.getSaleProducts(idDelegate, year, idCompany, idBrick, idProduct)   
         filters.products.delegates = await Queries.getDelegates(year,idCompany,idBrick,idProduct)
         filters.products.years = await Queries.getYears(idDelegate,idCompany,idBrick,idProduct)
         filters.products.companies = await Queries.getCompanies(idDelegate,year,idBrick,idProduct)
         filters.products.bricks = await Queries.getBricks(idDelegate,year,idCompany,idProduct)
         filters.products.products = await Queries.getProducts(idDelegate,year,idCompany,idBrick)
-        //console.log("Estrutura completa - products:", JSON.stringify(data.products, null, 2));
+
+        //const data_products = await Queries.getSaleProducts(idDelegate, year, idCompany, idBrick, idProduct)   
+        // data.products = setData(data_products, 'produto', 'product_name')
+
+        // filters.products.delegates = await getAndMapFilterData(
+        //   () => Queries.getDelegates(year, idCompany, idBrick, idProduct),
+        //   mapDelegate
+        // );
+
+        // filters.products.years = await getAndMapFilterData(
+        //   () => Queries.getYears(idDelegate, idCompany, idBrick, idProduct),
+        //   mapYear
+        // );
+        
+        // filters.products.companies = await getAndMapFilterData(
+        //   () => Queries.getCompanies(idDelegate, year, idBrick, idProduct),
+        //   mapCompany
+        // );
+
+        // filters.products.bricks = await getAndMapFilterData(
+        //   () => Queries.getBricks(idDelegate,year,idCompany,idProduct),
+        //   mapBrick
+        // );
+        
+        // filters.products.companies = await getAndMapFilterData(
+        //   () => Queries.getProducts(idDelegate,year,idCompany,idBrick),
+        //   mapProduct
+        // );
+    
+        
+        console.log("Estrutura completa - products:", JSON.stringify(data.products, null, 2));
         //console.log("Estrutura completa - filters.products.delegates:", JSON.stringify(filters.products.delegates, null, 2));
         //console.log("Estrutura completa - filters.products.years:", JSON.stringify(filters.products.years, null, 2));
         //console.log("Estrutura completa - filters.products.companies:", JSON.stringify(filters.products.companies, null, 2));
-        console.log("Estrutura completa - filters.products.bricks:", JSON.stringify(filters.products.bricks, null, 2));
-  
-        if (Array.isArray(data.products) && data.products.length > 0) {
-          data.products = data.products.map((product, index) => ({
-              key: index + 1,
-              produto: product.product_name,
-              janeiro: product.jan,
-              fevereiro: product.feb,
-              marco: product.mar,
-              abril: product.apr,
-              maio: product.may,
-              junho: product.jun,
-              julho: product.jul,
-              agosto: product.aug,
-              setembro: product.sep,
-              outubro: product.oct,
-              novembro: product.nov,
-              dezembro: product.dec,
-          }));
-        }
-  
-        if (Array.isArray(filters.products.delegates) && filters.products.delegates.length > 0) {
-          filters.products.delegates = filters.products.delegates
-            .map((delegate, index) => ({
-              label: delegate.delegate_name,
-              value: delegate.id_delegate,
-          }));
-        } 
-  
-        if (Array.isArray(filters.products.years) && filters.products.years.length > 0) {
-          filters.products.years = filters.products.years
-            .map((year) => ({
-              label: year,
-              value: year,
-          }));
-        }
-  
-        if (Array.isArray(filters.products.companies) && filters.products.companies.length > 0) {
-          filters.products.companies = filters.products.companies
-            .map((company, index) => ({
-              label: company.company_name,
-              // para ja vai ficar o index mas depois temos que alterar para meter o id da empresa
-              value: index,
-          }));
-        }
-        /*if (Array.isArray(data.products) && data.products.length > 0) {
-          data.products.forEach((product, index) => {
-            console.log(`Produto ${index + 1}:`, Object.keys(product));
-          });
-        } else {
-            console.log('Nenhum produto encontrado.');
-        }*/
-  
-        if (Array.isArray(filters.products.bricks) && filters.products.brick.length > 0) {
-          filters.products.bricks = filters.products.bricks
-            .map((brick, index) => ({
-              label: brick.brick_name,
-              value: index,
-          }));
-        }
-  
-        if (Array.isArray(filters.products.products) && filters.products.products.length > 0) {
-          filters.products.products = filters.products.products
-            .map((product, index) => ({
-              label: product.product_name,
-              value: index,
-          }));
-        }
-      
-  
+        //console.log("Estrutura completa - filters.products.bricks:", JSON.stringify(filters.products.bricks, null, 2));
+        console.log("Estrutura completa - filters.products.products:", JSON.stringify(filters.products.products, null, 2));
+        
         
       } else if (options.type === 'totalProducts') {
         const idDelegate = options.option_selected.Delegate_TP
@@ -244,36 +239,36 @@ router.get('/towns', async function (req, res, next) {
         data.totalProducts = data.totalProducts.filter(product => 
           Object.keys(product).every(key => isValid(product[key])))
           .map((product, index) => ({
-          key: index,
-          2018: product['2018'],
-          2019: product['2019'],
-          2020: product['2020'],
-          2021: product['2021'],
-          2022: product['2022'],
-          2023: product['2023'],
-          2024: product['2024'],
+            key: index,
+            2018: product['2018'],
+            2019: product['2019'],
+            2020: product['2020'],
+            2021: product['2021'],
+            2022: product['2022'],
+            2023: product['2023'],
+            2024: product['2024'],
         }));
   
-        filters.totalProducts.delegates = filters.totalProducts.delegates
-          .filter(delegate => isValid(delegate.name))
-          .map((delegate, index) => ({
-            label: delegate.name,
-            value: index,
-          }));
+        // filters.totalProducts.delegates = filters.totalProducts.delegates
+        //   .filter(delegate => isValid(delegate.name))
+        //   .map((delegate, index) => ({
+        //     label: delegate.name,
+        //     value: index,
+        //   }));
   
-        filters.totalProducts.companies = filters.totalProducts.companies
-          .filter(company => isValid(company.company_name))
-          .map((company, index) => ({
-            label: company.company_name,
-            value: index,
-        }));
+        // filters.totalProducts.companies = filters.totalProducts.companies
+        //   .filter(company => isValid(company.company_name))
+        //   .map((company, index) => ({
+        //     label: company.company_name,
+        //     value: index,
+        // }));
   
-        filters.totalProducts.bricks = filters.totalProducts.bricks
-          .filter(brick => isValid(brick.brick_name))
-          .map((brick, index) => ({
-            label: brick.brick_name,
-            value: index,
-        }));
+        // filters.totalProducts.bricks = filters.totalProducts.bricks
+        //   .filter(brick => isValid(brick.brick_name))
+        //   .map((brick, index) => ({
+        //     label: brick.brick_name,
+        //     value: index,
+        // }));
         
       }
         
