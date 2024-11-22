@@ -50,84 +50,84 @@ const DemoColumn = ({ dataHistogram }) => {
 
 const columns_produto = [
   {
-    key: 'produto',
+    key: 'product_name',
     title: 'Produto',
-    dataIndex: 'produto',
+    dataIndex: 'product_name',
     fixed: 'left',
     className: 'fixed-column',
-    sorter: (a, b) => a.produto.localeCompare(b.produto)          
+    sorter: (a, b) => a.product_name.localeCompare(b.product_name)          
   },
   {
-    key: 'janeiro',
+    key: 'jan',
     title: 'Jan',
-    dataIndex: 'janeiro',
-    sorter: (a, b) => a.janeiro - b.janeiro          
+    dataIndex: 'jan',
+    sorter: (a, b) => a.jan - b.jan          
   },
   {
-    key: 'fevereiro',
+    key: 'feb',
     title: 'Fev',
-    dataIndex: 'fevereiro',
-    sorter: (a, b) => a.fevereiro - b.fevereiro
+    dataIndex: 'feb',
+    sorter: (a, b) => a.feb - b.feb
   },
   {
-    key: 'marco',
+    key: 'mar',
     title: 'Mar',
-    dataIndex: 'marco',
-    sorter: (a, b) => a.marco - b.marco
+    dataIndex: 'mar',
+    sorter: (a, b) => a.mar - b.mar
   },
   {
-    key: 'abril',
+    key: 'apr',
     title: 'Abr',
-    dataIndex: 'abril',
-    sorter: (a, b) => a.abril - b.abril
+    dataIndex: 'apr',
+    sorter: (a, b) => a.apr - b.apr
   },
   {
-    key: 'maio',
+    key: 'may',
     title: 'Mai',
-    dataIndex: 'maio',
-    sorter: (a, b) => a.maio - b.maio
+    dataIndex: 'may',
+    sorter: (a, b) => a.may - b.may
   },
   {
-    key: 'junho',
+    key: 'jun',
     title: 'Jun',
-    dataIndex: 'junho',
-    sorter: (a, b) => a.junho - b.junho
+    dataIndex: 'jun',
+    sorter: (a, b) => a.jun - b.jun
   },
   {
-    key: 'julho',
+    key: 'jul',
     title: 'Jul',
-    dataIndex: 'junho',
-    sorter: (a, b) => a.junho - b.junho
+    dataIndex: 'jul',
+    sorter: (a, b) => a.jul - b.jul
   },
   {
-    key: 'agosto',
+    key: 'aug',
     title: 'Ago',
-    dataIndex: 'agosto',
-    sorter: (a, b) => a.agosto - b.agosto
+    dataIndex: 'aug',
+    sorter: (a, b) => a.aug - b.aug
   },
   {
-    key: 'setembro',
+    key: 'sep',
     title: 'Set',
-    dataIndex: 'setembro',
-    sorter: (a, b) => a.setembro - b.setembro
+    dataIndex: 'sep',
+    sorter: (a, b) => a.sep - b.sep
   },
   {
-    key: 'outubro',
+    key: 'oct',
     title: 'Out',
-    dataIndex: 'outubro',
-    sorter: (a, b) => a.outubro - b.outubro
+    dataIndex: 'oct',
+    sorter: (a, b) => a.oct - b.oct
   },
   {
-    key: 'novembro',
+    key: 'nov',
     title: 'Nov',
-    dataIndex: 'novembro',
-    sorter: (a, b) => a.novembro - b.novembro
+    dataIndex: 'nov',
+    sorter: (a, b) => a.nov - b.nov
   },
   {
-    key: 'dezembro',
+    key: 'dec',
     title: 'Dez',
-    dataIndex: 'dezembro',
-    sorter: (a, b) => a.dezembro - b.dezembro
+    dataIndex: 'dec',
+    sorter: (a, b) => a.dec - b.dec
   },
 ];
 
@@ -248,7 +248,7 @@ export default function Vendas() {
   const [form_table_total] = Form.useForm();
   const [form_table_brick] = Form.useForm();
 
-  
+
   // Memoized filter configurations for each fetch
   const options = useMemo(() => ({
     histogram: { option_selected: selectedOption.histogram, type: 'histogram' },
@@ -257,6 +257,7 @@ export default function Vendas() {
     bricks: { option_selected: selectedOption.bricks, type: 'bricks' },
   }), [selectedOption]);
 
+  console.log("WORKIN HERE 22222", data.products)
 
   // This function will request the data after selecting an option on any form
   const onFinish = (type) => (values) => {
@@ -269,10 +270,10 @@ export default function Vendas() {
 
 
   // Fetch data for each graph on loading the page. Should also return the filter's options 
-  useFetchSales('/', !triggers.histogram, options.histogram)
+  //useFetchSales('/', !triggers.histogram, options.histogram)
   useFetchSales('/', !triggers.products, options.products)
-  useFetchSales('/', !triggers.totalProducts, options.totalProducts)
-  useFetchSales('/', !triggers.bricks, options.bricks)
+  //useFetchSales('/', !triggers.totalProducts, options.totalProducts)
+  //useFetchSales('/', !triggers.bricks, options.bricks)
 
 
   // VER DEPOIS SE NÃO DÁ ERRO PORQUE SE NÃO FOR ADMIN ISTO VEM VAZIO

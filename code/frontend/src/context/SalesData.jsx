@@ -116,7 +116,7 @@ const useSalesDataStore = create((set) => ({
         set((state) => ({
             data: {
                 ...state.data,
-                [type]: { ...state.data[type], ...data },
+                [type]: { ...state.data[type], ...data[type] },
             },
         }))
     },
