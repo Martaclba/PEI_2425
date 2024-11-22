@@ -13,9 +13,6 @@ conn_string =f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME
 
 df = pd.read_csv('backend/data_treat/vendas_wide.csv', delimiter=';')
 
-['Brick', 'DIM', 'District', 'Region HMR', 'Parish', 'Company', 'Product', 'Date', 'Value']
-#print(df.values[0])
-
 with psycopg.connect(conn_string) as conn:
     with conn.cursor() as cur:
         cur.execute('BEGIN')
@@ -111,9 +108,8 @@ with psycopg.connect(conn_string) as conn:
                         cur.execute(f"INSERT INTO sale_product (fk_id_sale, fk_cnp, product_amount) VALUES ({sale_id}, {product_id}, {value_column}) RETURNING (fk_id_sale,fk_cnp);")
                         sale_product = cur.fetchone()
                     #sale_product_id = sale_product[0]
-                    #print(sale_product)     
+                    #print(sale_product)
+            conn.execute('COMMIT')     
         except Exception as e:
             print("Error: ", e)
             cur.execute('ROLLBACK')
-        
-        conn.execute('COMMIT')
