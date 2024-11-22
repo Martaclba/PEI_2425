@@ -186,3 +186,15 @@ CREATE TABLE Sale_Product (
 	CONSTRAINT fk_id_Sale FOREIGN KEY (fk_id_Sale) REFERENCES Sale(id_Sale) ON DELETE NO ACTION,
 	CONSTRAINT fk_CNP FOREIGN KEY (fk_CNP) REFERENCES Product(CNP) ON DELETE NO ACTION
 );
+
+ALTER TABLE delegate ADD CONSTRAINT unique_delegate_name UNIQUE (name);
+
+ALTER TABLE region ADD CONSTRAINT unique_region_name UNIQUE (name);
+
+ALTER TABLE district ADD CONSTRAINT unique_district_name UNIQUE (name);
+
+ALTER TABLE town ADD CONSTRAINT unique_town_name UNIQUE (name);
+
+ALTER TABLE company ADD CONSTRAINT unique_company_name UNIQUE (name);
+
+ALTER TABLE product ADD CONSTRAINT unique_product_company UNIQUE (name, fk_id_company);

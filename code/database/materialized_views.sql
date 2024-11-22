@@ -40,12 +40,13 @@ GROUP BY
     brick, 
     year;
 
+
 CREATE MATERIALIZED VIEW general_table_per_years AS
 SELECT 
     product.name AS product_name,                     -- Product name
     product.cnp AS product_cnp,
     delegate.name AS delegate_name,                  -- Delegate name
-    delegate.id_delegate AS id_delegate
+    delegate.id_delegate AS id_delegate,
     company.name AS company_name,                    -- Company name
     hmr_zone.brick AS brick,                         -- Brick (HMR Zone)
 	SUM(CASE WHEN EXTRACT(YEAR FROM sale.registry_date) = 2018 THEN sale_product.product_amount ELSE 0 END) AS "2018",  -- Year 2018
