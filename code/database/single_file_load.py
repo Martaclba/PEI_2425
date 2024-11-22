@@ -11,7 +11,7 @@ DB_NAME = "mypharma"
 
 conn_string =f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-df = pd.read_csv('backend/data_treat/vendas_wide.csv', delimiter=';')
+df = pd.read_csv('../backend/data_treat/vendas_wide.csv', delimiter=';')
 
 with psycopg.connect(conn_string) as conn:
     with conn.cursor() as cur:
