@@ -44,7 +44,7 @@ module.exports.getSaleTotalProducts = async (idDelegate, idCompany, idBrick, idP
     idCompany = Number.isInteger(idCompany) ? parseInt(idCompany) : null;
     idBrick = Number.isInteger(idBrick) ? parseInt(idBrick) : null;
     idProduct = Number.isInteger(idProduct) ? parseInt(idProduct) : null;
-    let query = `SELECT product_cnp, product_name, SUM(2018) AS 2018, 
+    let query = `SELECT ROW_NUMBER() OVER () -1 as key, product_cnp, product_name, SUM(2018) AS 2018, 
                 SUM(2019) AS 2019, SUM(2020) AS 2020, SUM(2021) AS 2021, SUM(2022) AS 2022,
                 SUM(2023) AS 2023, SUM(2024) AS 2024
                 FROM general_table_per_year
@@ -64,11 +64,11 @@ module.exports.getSaleProducts = async (idDelegate, year, idCompany, idBrick, id
   try {
     console.log(`\n [][][][][] [Inicial] [][][][][] \n idDelegate: ${idDelegate}\n year: ${year}\n idCompany: ${idCompany}\n idBrick: ${idBrick}\n idProduct: ${idProduct}\nn`)
     idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
-    year = Number.isInteger(year) ? Number(year) : null;
+    year = Number.isInteger(year) ? Number(year) : 2024;
     idCompany = Number.isInteger(idCompany) ? parseInt(idCompany) : null;
     idBrick = Number.isInteger(idBrick) ? parseInt(idBrick) : null;
     idProduct = Number.isInteger(idProduct) ? parseInt(idProduct) : null;
-    let query = `SELECT product_cnp, product_name, SUM(jan) AS jan,
+    let query = `SELECT ROW_NUMBER() OVER () -1 as key,  product_name, SUM(jan) AS jan,
             SUM(feb) AS feb, SUM(mar) AS mar, SUM(apr) AS apr, SUM(may) AS may,
             SUM(jun) AS jun, SUM(jul) AS jul, SUM(aug) AS aug, SUM(sep) AS sep,
             SUM(oct) AS oct, SUM(nov) AS nov, SUM (dec) AS dec
@@ -95,7 +95,7 @@ module.exports.getSaleBricks = async (idDelegate, year, idCompany, idBrick) => {
     year = Number.isInteger(year) ? Number(year) : null;
     idCompany = Number.isInteger(idCompany) ? parseInt(idCompany) : null;
     idBrick = Number.isInteger(idBrick) ? parseInt(idBrick) : null;
-    let query = `SELECT brick, SUM(jan) AS jan,
+    let query = `SELECT ROW_NUMBER() OVER () -1 as key, brick, SUM(jan) AS jan,
                   SUM(feb) AS feb, SUM(may) AS may, SUM(apr) AS abr, SUM(may) AS mai,
                   SUM(jun) AS jun, SUM(jul) AS jul, SUM(aug) AS ago, SUM(sep) AS set,
                   SUM(oct) AS out, SUM(nov) AS nov, SUM (dec) AS dez

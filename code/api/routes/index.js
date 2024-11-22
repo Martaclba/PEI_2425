@@ -102,15 +102,14 @@ const mapProduct = (product) => ({
       bricks: {}
     }
   
-    const  options = req.body
+    const { options } = req.body
     // console.log('Type:', type, "Option Select: ", option_selected);
     
     //Test if there is Null values
     function isValid(value) { return value !== null; } // value ! undefined ????
-  
     try {
-      
       if (options.type === 'histogram') {
+        console.log(options.type)
         const idDelegate = options.option_selected.Delegate_H                    // default: Todos
         const year = options.option_selected.Year_H                              // default: 2024
         console.log("HHHH ", idDelegate, year)
@@ -180,12 +179,14 @@ const mapProduct = (product) => ({
         const idProduct = options.option_selected.Product_P
         console.log("PPPP ", idDelegate, year, idCompany, idBrick, idProduct)
         
-        data.products = await Queries.getSaleProducts(idDelegate, year, idCompany, idBrick, idProduct)   
+
+        data.products = await Queries.getSaleProducts(idDelegate, 2018, 'Todos', idBrick, idProduct)   
         filters.products.delegates = await Queries.getDelegates(year,idCompany,idBrick,idProduct)
         filters.products.years = await Queries.getYears(idDelegate,idCompany,idBrick,idProduct)
         filters.products.companies = await Queries.getCompanies(idDelegate,year,idBrick,idProduct)
         filters.products.bricks = await Queries.getBricks(idDelegate,year,idCompany,idProduct)
         filters.products.products = await Queries.getProducts(idDelegate,year,idCompany,idBrick)
+
 
         //const data_products = await Queries.getSaleProducts(idDelegate, year, idCompany, idBrick, idProduct)   
         // data.products = setData(data_products, 'produto', 'product_name')
