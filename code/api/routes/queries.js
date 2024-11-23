@@ -45,9 +45,14 @@ module.exports.getSaleTotalProducts = async (idDelegate, idCompany, idBrick, idP
     companyName = idCompany === null ? 'MyPharma' : null;
     idBrick = Number.isInteger(idBrick) ? parseInt(idBrick) : null;
     idProduct = Number.isInteger(idProduct) ? parseInt(idProduct) : null;
-    let query = `SELECT ROW_NUMBER() OVER () -1 as key, product_name, SUM(2018) AS "2018", 
-                SUM(2019) AS "2019", SUM(2020) AS "2020", SUM(2021) AS "2021", SUM(2022) AS "2022",
-                SUM(2023) AS "2023", SUM(2024) AS "2024"
+    let query = `SELECT ROW_NUMBER() OVER () -1 as key, product_name,
+                SUM("2018") AS "2018", 
+                SUM("2019") AS "2019",
+                SUM("2020") AS "2020",
+                SUM("2021") AS "2021",
+                SUM("2022") AS "2022",
+                SUM("2023") AS "2023",
+                SUM("2024") AS "2024"
                 FROM general_table_per_years
                 WHERE (id_delegate = $1 OR $1 IS NULL)
                 AND (company_id = $2 OR $2 IS NULL)
