@@ -227,6 +227,7 @@ router.get('/delegados', async function(req, res, next) {;
 });
 
 
+/*    Get delegate by id   */
 router.get('/delegados/detalhes/:idDelegate', function(req, res, next) { Queries.getDelegates(parseInt(req.params.id), res, req) });
 
 // router.get('/delegados/:id/detalhes/:idDelegate', function(req, res, next) { Queries.getDelegates(parseInt(req.params.id), res, req) });
@@ -234,7 +235,7 @@ router.get('/delegados/detalhes/:idDelegate', function(req, res, next) { Queries
 
 /*    PUT delegate by id   */
 // Route responsible for updating a delegate's details
-router.put('/delegados/:id', function(req, res, next) { Queries.getDelegates(parseInt(req.params.id), res, req) });
+router.put('/delegados/detalhes/:idDelegate', function(req, res, next) { Queries.getDelegates(parseInt(req.params.id), res, req) });
 
 
 /*    POST delegates    */
@@ -253,14 +254,15 @@ router.post('/import/delegados', function(req, res, next) { Queries.createDelega
 
 
 router.get('/medicos', function(req, res, next) { Queries.getDoctors(res, req) });
-//   const data = []
-//   const filters = {
-//     doctors:{},
-//     districts:{},
-//     institution:{}
-//   }
+  const data = []
+  
+  const filters = {
+    doctors: {},
+    districts: {},
+    institution: {}
+  }
 
-//   const options = req.body
+  const options = req.body
 
 //   try{ 
 //       const idDoctor = option.doctor
