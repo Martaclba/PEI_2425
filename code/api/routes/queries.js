@@ -59,7 +59,7 @@ module.exports.getSaleTotalProducts = async (idDelegate, idCompany, idBrick, idP
                 AND (brick = $3 OR $3 IS NULL)
                 AND (product_cnp = $4 OR $4 IS NULL)
                 AND (company_name = $5 OR $5 IS NULL)
-                GROUP BY id_delegate, company_name, company_id, brick, product_name, product_cnp`
+                GROUP BY product_cnp, product_name`
     const results = await db.query(query, [idDelegate, idCompany, idBrick, idProduct, companyName]);
     return results.rows;
   } catch (err) {
@@ -112,7 +112,7 @@ module.exports.getSaleBricks = async (idDelegate, year, idCompany, idBrick) => {
                   AND (company_id = $3 OR $3 IS NULL)
                   AND (brick = $4 OR $4 IS NULL)
                   AND (company_name = $5 OR $5 IS NULL)
-                  GROUP BY id_delegate, year, company_id, company_name, brick`
+                  GROUP BY brick`
     const results = await db.query(query, [idDelegate, year, idCompany, idBrick, companyName]);
     return results.rows;
   } catch (err) {

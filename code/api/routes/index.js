@@ -76,7 +76,7 @@ router.post('/', async function(req, res, next) {
         data.totalProducts = await Queries.getSaleTotalProducts(idDelegate, idCompany, idBrick, idProduct)   
         filters.totalProducts.delegates = await Queries.getDelegates(null, idCompany,idBrick,idProduct)
         filters.totalProducts.companies = await Queries.getCompanies(idDelegate, null, idBrick, idProduct)
-        filters.totalProducts.bricks = await Queries.getBricks(idDelegate, idCompany, null, idProduct)
+        filters.totalProducts.bricks = await Queries.getBricks(idDelegate,null, idCompany, idProduct)
         filters.totalProducts.products = await Queries.getProducts(idDelegate, null,idCompany,idBrick)
     
     }
@@ -169,18 +169,7 @@ router.get('/delegados', function(req, res, next) { Queries.getDelegates(res,req
 //       filters.delegates = await Queries.getDelegates(idDistrict,idRegion)
 //       filters.districts = await Queries.getDistricts(idDelegate,null,null,idRegion)
 //       filters.regions = await Queries.getRegion(idDelegate,null,idDistrict) 
-  
-//   if (Array.isArray(data) && data.length > 0) {
-//     data = data.map((delagate, index) => ({
-//         key: index + 1,
-//         delagado: delagate.delagate_name,
-//         brick: delagate.brick,
-//         distrito: delagate.district_name,
-//         regiao: delagate.region_name,
-//         freguesia: delagate.town_name,
-//         estado: [delagate.state],
-//     }));
-//   }
+
 //     res.status(200).json({ data, filters });
 //   }
 //   catch (err) {
@@ -247,42 +236,7 @@ router.get('/medicos', function(req, res, next) { Queries.getDoctors(res, req) }
 //       filters.delegates = await Queries.getMedicos(idDistrict,idInstitution)
 //       filters.districts = await Queries.getDistricts(null,idDoctors,null,idInstitution)
 //       filters.regions = await Queries.getInstitution(idDoctors,idDistrict) 
-  
-//   if (Array.isArray(data) && data.length > 0) {
-//     data = data.map((doctor, index) => ({
-//         key: index + 1,
-//         medicos: doctor.delagate_name,
-//         brick: doctor.brick,
-//         distrito: doctor.district_name,
-//         instituicao: dotor.institution_name,
-//         especialidade: doctor.especiality_name,
-//         estado: [doctor.state],
-//     }));
-//   }
 
-//     if (Array.isArray(filters.doctors) && filters.doctors.length > 0) {
-//        filters.doctors = filters.doctors
-//          .map((doctor, index) => ({
-//            label: doctor.doctor_name,
-//            value: doctor.idDoctor,
-//         }));
-//     }
-
-//     if (Array.isArray(filters.districts) && filters.districts.length > 0) {
-//       filters.districts = filters.districts
-//         .map((district,index) => ({
-//           label: district.district_name,
-//           value: district.idDistrict,
-//       }));
-//     }
-
-//     if (Array.isArray(filters.institutions) && filters.institutions.length > 0) {
-//       filters.institutions = filters.institutions
-//         .map((region, index) => ({
-//           label: region.institution_name,
-//           value: region.idInstitution,
-//       }));
-//     }
 //     res.status(200).json({ data, filters });
 //   }
 //   catch (err) {
@@ -331,41 +285,7 @@ router.get('/farmacias', function(req, res, next) { Queries.getPharmacies(res, r
 //       filters.pharmacies = await Queries.getDelegates(idDistrict,idRegion)
 //       filters.districts = await Queries.getDistricts(null,null,idPharmacy,idRegion)
 //       filters.regions = await Queries.getRegion(null,idPharmacy,idDistrict) 
-  
-//   if (Array.isArray(data) && data.length > 0) {
-//     data = data.map((delagate, index) => ({
-//         key: index + 1,
-//         farmacia: delagate.delagate_name,
-//         brick: delagate.brick,
-//         distrito: delagate.district_name,
-//         regiao: delagate.region_name,
-//         freguesia: delagate.town_name,
-//     }));
-//   }
 
-//       if (Array.isArray(filters.pharmacies) && filters.pharmacies.length > 0) {
-//         filters.pharmacies = filters.pharmacies
-//           .map((pharmacy, index) => ({
-//             label: pharmacy.pharmacy_name,
-//             value: pharmacy.idPharmacy,
-//         }));
-//     }
-
-//     if (Array.isArray(filters.districts) && filters.districts.length > 0) {
-//       filters.districts = filters.districts
-//         .map((district,index) => ({
-//           label: district.district_name,
-//           value: district.idDistrict,
-//       }));
-//     }
-
-//     if (Array.isArray(filters.regions) && filters.regions.length > 0) {
-//       filters.regions = filters.regions
-//         .map((region, index) => ({
-//           label: region.region_name,
-//           value: region.idRegion,
-//       }));
-//     }
 //     res.status(200).json({ data, filters });
 //   }
 //   catch (err) {
