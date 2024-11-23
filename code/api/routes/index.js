@@ -25,6 +25,8 @@ router.post('/', async function(req, res, next) {
     bricks: {}
   }
 
+  const default_filter = { label: '-- Todos --', value: 'Todos'}
+
   const { type, option_selected } = req.body
   console.log('Type:', type, "Option Select: ", option_selected);
   
@@ -32,24 +34,29 @@ router.post('/', async function(req, res, next) {
     if (type === 'histogram') {
       const idDelegate = option_selected.Delegate_H                    // default: Todos
       const year = option_selected.Year_H                              // default: 2024
-      console.log("HHHH ", idDelegate, year)
 
       data.histogram = await Queries.getSaleHistogram(idDelegate, year)
       filters.histogram.delegates = await Queries.getDelegates(year, null, null, null),
       filters.histogram.years = await Queries.getYears(idDelegate)
+
+      // Add missing default option 
+      filters.histogram.delegates.unshift(default_filter)
     
     } else if (type === 'bricks') {
         const idDelegate = option_selected.Delegate_B
         const year = option_selected.Year_B
         const idCompany = option_selected.Company_B                       // default: Todos
         const idBrick = option_selected.Brick_B                           // default: Todos
-        console.log("BBBB ", idDelegate, year, idCompany, idBrick)
 
         data.bricks= await Queries.getSaleBricks(idDelegate, year, idCompany, idBrick)   
         filters.bricks.delegates = await Queries.getDelegates(year,idCompany,idBrick, null)
         filters.bricks.years = await Queries.getYears(idDelegate,idCompany,idBrick, null)
         filters.bricks.companies = await Queries.getCompanies(idDelegate,year,idBrick, null)
         filters.bricks.bricks = await Queries.getBricks(idDelegate,year,idCompany, null)
+
+        // Add missing default option 
+        filters.bricks.delegates.unshift(default_filter)
+        filters.bricks.bricks.unshift(default_filter)
     
     } else if (type === 'products') {
         const idDelegate = option_selected.Delegate_P
@@ -57,7 +64,6 @@ router.post('/', async function(req, res, next) {
         const idCompany = option_selected.Company_P                        // default: Todos
         const idBrick = option_selected.Brick_P                            // default: Todos
         const idProduct = option_selected.Product_P
-        console.log("PPPP ", idDelegate, year, idCompany, idBrick, idProduct)
         
         data.products = await Queries.getSaleProducts(idDelegate, year, idCompany, idBrick, idProduct)
         filters.products.delegates = await Queries.getDelegates(year,idCompany,idBrick,idProduct)
@@ -65,13 +71,17 @@ router.post('/', async function(req, res, next) {
         filters.products.companies = await Queries.getCompanies(idDelegate,year,idBrick,idProduct)
         filters.products.bricks = await Queries.getBricks(idDelegate,year,idCompany,idProduct)
         filters.products.products = await Queries.getProducts(idDelegate,year,idCompany,idBrick)
-    
+        
+        // Add missing default option 
+        filters.products.delegates.unshift(default_filter)
+        filters.products.bricks.unshift(default_filter)
+        filters.products.products.unshift(default_filter)
+
     } else if (type === 'totalProducts') {
         const idDelegate = option_selected.Delegate_TP
         const idCompany = option_selected.Company_TP                        // default: Todos
         const idBrick = option_selected.Brick_TP                            // default: Todos
         const idProduct = option_selected.Product_TP
-        console.log("TPTP ", idDelegate, idCompany, idBrick, idProduct)
         
         data.totalProducts = await Queries.getSaleTotalProducts(idDelegate, idCompany, idBrick, idProduct)   
         filters.totalProducts.delegates = await Queries.getDelegates(null, idCompany,idBrick,idProduct)
@@ -79,6 +89,10 @@ router.post('/', async function(req, res, next) {
         filters.totalProducts.bricks = await Queries.getBricks(idDelegate,null, idCompany, idProduct)
         filters.totalProducts.products = await Queries.getProducts(idDelegate, null,idCompany,idBrick)
     
+        // Add missing default option 
+        filters.totalProducts.delegates.unshift(default_filter)
+        filters.totalProducts.bricks.unshift(default_filter)
+        filters.totalProducts.products.unshift(default_filter)
     }
       
     res.status(200).json({ data, filters });
@@ -91,7 +105,7 @@ router.post('/', async function(req, res, next) {
   
 
 
-router.get('/:id', function(req, res, next) { 
+router.get('/:id', async function(req, res, next) { 
   const data = {
     histogram: [],
     products: [],
@@ -142,8 +156,16 @@ router.get('/:id', function(req, res, next) {
 
 /*    POST sales   */
 // Route responsible for sending the hmr file to the database
-// TODO
-router.post('/import', function(req, res, next) { Queries.createDelegate(res, req) });
+router.post('/import', function(req, res, next) { 
+
+ /*
+ TODO
+ 
+ */
+
+
+
+});
 
 
 
@@ -151,52 +173,63 @@ router.post('/import', function(req, res, next) { Queries.createDelegate(res, re
 /*    GET delegates   */
 // Route responsible for retrieving the delegates
 // Should return a json structured variable withe relevant information
-router.get('/delegados', function(req, res, next) { Queries.getDelegates(res,req)});
-//   const data = []
-//   const filters = {
-//     delegates:{},
-//     districts:{},
-//     regions:{}
-//   }
 
-//   const options = req.body
+// const data_delegates = [
+//   {  
+//     key: 0,
+//     delegate_name: `Delegado i`,
+//     brick: "123",
+//     district: `Distrito i`,
+//     region: `Região i`,      
+//     town: `Freguesia i`,
+//     state: "Ativo",
+//     id_delegate: 2              // apenas para depois aceder aos detalhes, não será mostrado na tabela
+//   },
+//   {  
+//     key: 1,
+//     delegate_name: `Delegado i`,
+//     brick: "123",
+//     district: `Distrito i`,
+//     region: `Região i`,      
+//     town: `Freguesia i`,
+//     state: "Ativo",
+//     id_delegate: 3             
+//   },
+// ]
 
-//   try{ 
-//       const idDelegate = option.delegate
-//       const idDistrict = option.district
-//       const idRegion = option.region
-//       data = await Queries.getTableDelegates(idDelegate,idDistrict,idRegion)   
-//       filters.delegates = await Queries.getDelegates(idDistrict,idRegion)
-//       filters.districts = await Queries.getDistricts(idDelegate,null,null,idRegion)
-//       filters.regions = await Queries.getRegion(idDelegate,null,idDistrict) 
+router.get('/delegados', async function(req, res, next) {;
+  const data = []
 
-//     res.status(200).json({ data, filters });
-//   }
-//   catch (err) {
-//     res.status(501).json({error: err, msg: "Error obtaining delagates table"});
-//   }
-// });
+  const filters = {
+    delegates: {},
+    districts: {},
+    regions: {}
+  }
+
+  const options = req.body
+
+  try{ 
+      const idDelegate = option.delegate
+      const idDistrict = option.district
+      const idRegion = option.region
+
+      data = await Queries.getTableDelegates(idDelegate,idDistrict,idRegion)
+
+      filters.delegates = await Queries.getDelegates(idDistrict,idRegion)
+      filters.districts = await Queries.getDistricts(idDelegate,null,null,idRegion)
+      filters.regions = await Queries.getRegion(idDelegate,null,idDistrict) 
+  
+    res.status(200).json({ data, filters });
+  }
+  catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining delagates table"});
+  }
+});
 
 
+router.get('/delegados/detalhes/:idDelegate', function(req, res, next) { Queries.getDelegates(parseInt(req.params.id), res, req) });
 
-
-/*    GET delegate by id   */
-// Route responsible for retrieving a delegate's details
-/* Return:
-const delegate = {
-    Nome: {
-        Primeiro: 'John',
-        Ultimo: 'Doe',
-    },
-    Distrito: 'Porto',
-    Regiao: 'Trofa',
-    Freguesia: 'Lousado',                        // Not required
-    Estado: ['Ativo'],
-};
-*/
-router.get('/delegados/delegates/:idDelegate', function(req, res, next) { Queries.getDelegates(parseInt(req.params.id), res, req) });
-
-router.get('/delegados/:id/delegates/:idDelegate', function(req, res, next) { Queries.getDelegates(parseInt(req.params.id), res, req) });
+// router.get('/delegados/:id/detalhes/:idDelegate', function(req, res, next) { Queries.getDelegates(parseInt(req.params.id), res, req) });
 
 
 /*    PUT delegate by id   */
@@ -214,6 +247,7 @@ router.put('/delegados/:id', function(req, res, next) { Queries.getDelegates(par
   // Estado
 router.post('/delegados/registar', function(req, res, next) { Queries.createDelegate(res, req) });
 
+router.post('/import/delegados', function(req, res, next) { Queries.createDelegate(res, req) });
 
 
 

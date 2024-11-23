@@ -23,16 +23,26 @@ module.exports.getSaleHistogram = async (idDelegate, year) => {
   try {
     idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
     year = Number.isInteger(parseInt(year)) ? parseInt(year) : null;
-    let query = `SELECT delegate_name, id_delegate,
-          SUM(jan) AS jan, SUM(feb) AS feb, SUM(mar) AS mar, 
-          SUM(apr) AS apr, SUM(may) AS may, SUM(jun) AS jun, 
-          SUM(jul) AS jul, SUM(aug) AS aug, SUM(sep) AS sep, 
-          SUM(oct) AS oct, SUM(nov) AS nov, SUM(dec) AS dec,
-          FROM general_table
-          WHERE (id_delegate = $1 OR $1 IS NULL) AND (year = $2 OR $2 IS NULL) AND (company_name = 'MyPharma')
-          GROUP BY id_delegate, delegate_name, company_name, year;`
+    let query = `SELECT
+                        SUM(jan) AS jan, SUM(feb) AS feb, SUM(mar) AS mar, 
+                        SUM(apr) AS apr, SUM(may) AS may, SUM(jun) AS jun, 
+                        SUM(jul) AS jul, SUM(aug) AS aug, SUM(sep) AS sep, 
+                        SUM(oct) AS oct, SUM(nov) AS nov, SUM(dec) AS dec
+                        FROM general_table
+                        WHERE (id_delegate = $1 OR $1 IS NULL) AND (year = $2 OR $2 IS NULL) AND (company_name = 'MyPharma');`
+    
     const results = await db.query(query, [idDelegate,year]);
-    return results.rows;
+    
+    const row = results.rows[0];
+    if (row) {
+      const monthlySums = Object.entries(row).map(([month, value]) => ({
+        month: month,
+        value: parseInt(value, 10) // Convert value to a number if necessary
+      }));
+      return monthlySums;
+    } else {
+      return [];
+    }
   } catch (err) {
     return [{error:err, msg:'Error obtaining sales histogram'}]
   }

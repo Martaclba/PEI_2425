@@ -22,8 +22,12 @@ const DemoColumn = ({ dataHistogram }) => {
     );
   }
 
+  const nonZeroValues = dataHistogram
+  .map(item => item.value)
+  .filter(value => value !== 0);
+
   // Find the minimum and maximum values
-  const minValue = Math.min(...dataHistogram.map(item => item.value));
+  const minValue = Math.min(...nonZeroValues);
   const maxValue = Math.max(...dataHistogram.map(item => item.value));
   
   const config = {  
@@ -269,7 +273,7 @@ export default function Vendas() {
 
 
   // Fetch data for each graph on loading the page. Should also return the filter's options 
-  //useFetchSales('/', !triggers.histogram, options.histogram)
+  useFetchSales('/', !triggers.histogram, options.histogram)
   useFetchSales('/', !triggers.products, options.products)
   useFetchSales('/', !triggers.totalProducts, options.totalProducts)
   useFetchSales('/', !triggers.bricks, options.bricks)

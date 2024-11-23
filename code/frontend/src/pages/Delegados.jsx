@@ -15,13 +15,13 @@ import useDelegatesDataStore from '../context/DelegadosData';
 // For the table
 const columns = (navigate) => [
   {
-    key: 'table_delegados',
+    key: 'delegate_name',
     title: 'Delegado',
-    dataIndex: 'delegado',
+    dataIndex: 'delegate_name',
     width: '15%',
     fixed: 'left',
     className: 'fixed-column', 
-    sorter: (a, b) => a.delegado.localeCompare(b.delegado)          
+    sorter: (a, b) => a.delegate_name.localeCompare(b.delegate_name)          
   },
   {
     key: 'brick',
@@ -31,30 +31,30 @@ const columns = (navigate) => [
     sorter: (a, b) => a.brick.localeCompare(b.brick)
   },
   {
-    key: 'distrito',
+    key: 'district',
     title: 'Distrito',
-    dataIndex: 'distrito',
+    dataIndex: 'district',
     width: '15%',
-    sorter: (a, b) => a.distrito.localeCompare(b.distrito)          
+    sorter: (a, b) => a.district.localeCompare(b.district)          
   },
   {
-    key: 'regiao',
+    key: 'region',
     title: 'Região',
-    dataIndex: 'regiao',
+    dataIndex: 'region',
     width: '15%',
-    sorter: (a, b) => a.regiao.localeCompare(b.regiao)
+    sorter: (a, b) => a.region.localeCompare(b.region)
   },
   {
-    key: 'freguesia',
+    key: 'town',
     title: 'Freguesia',
-    dataIndex: 'freguesia',
+    dataIndex: 'town',
     width: '15%',
-    sorter: (a, b) => a.freguesia.localeCompare(b.freguesia)
+    sorter: (a, b) => a.town.localeCompare(b.town)
   },
   {
+    key: 'state',
     title: 'Estado',
-    dataIndex: 'estado',
-    key: 'estado',
+    dataIndex: 'state',
     width: '16%',
     render: (tags) => (
       <>
@@ -79,23 +79,12 @@ const columns = (navigate) => [
     render: (title, entry) => (
       <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%'}}>
         <ConfigProvider theme={themeConfig}>
-          <Button onClick={() => navigate(`/delegados/${entry.key}`)}>Detalhes</Button>  
+          <Button onClick={() => navigate(`/delegados/${entry.id_delegate}`)}>Detalhes</Button>  
         </ConfigProvider>
       </Space>
     ),
   },
 ];
-
-// const dataSource = Array.from({
-//   length: 100,
-// }).map((_, i) => ({
-//   key: i,
-//   delegado: `Delegado ${i}`,
-//   distrito: `Distrito ${i}`,
-//   regiao: `Região ${i}`,      
-//   freguesia: `Freguesia ${i}`,
-//   brick: `Brick ${i}`,
-// }));
 
 export default function Delegados() {  
   const date = getFormattedDate();
