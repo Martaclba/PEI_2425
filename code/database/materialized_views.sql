@@ -1,3 +1,5 @@
+
+-- *********************************************        VIEWS        ********************************************************
 CREATE MATERIALIZED VIEW general_table AS
 SELECT 
     product.name AS product_name,                      -- Product name
@@ -80,6 +82,108 @@ GROUP BY
     company_id,
     brick;
 
+
+CREATE MATERIALIZED VIEW general_bricks AS
+SELECT 
+    hz.brick AS brick,
+    d.id_District AS id_district,
+    d.name AS district,
+    r.id_Region AS id_region,
+    r.name AS region,
+    t.id_Town AS id_parish,
+    t.name AS parish
+FROM 
+    HMR_Zone hz
+JOIN 
+    District d ON hz.fk_id_District = d.id_District
+JOIN 
+    Region r ON hz.fk_id_Region = r.id_Region
+LEFT JOIN 
+    Town t ON hz.fk_id_Town = t.id_Town;
+
+
+CREATE MATERIALIZED VIEW general_delegates AS
+SELECT 
+    del.id_Delegate AS id_delegate,
+    del.name AS delegate,
+    hz.brick AS brick,
+    d.id_District AS id_district,
+    d.name AS district,
+    r.id_Region AS id_region,
+    r.name AS region,
+    t.id_Town AS id_parish,
+    t.name AS parish,
+    del.state AS state
+FROM 
+    Delegate del
+LEFT JOIN 
+    HMR_Zone hz ON del.id_Delegate = hz.fk_id_Delegate
+LEFT JOIN 
+    District d ON hz.fk_id_District = d.id_District
+LEFT JOIN 
+    Region r ON hz.fk_id_Region = r.id_Region
+LEFT JOIN 
+    Town t ON hz.fk_id_Town = t.id_Town;
+
+
+
+CREATE MATERIALIZED VIEW general_doctors AS
+SELECT 
+    doc.professional_id_card AS id_doctor,
+    doc.name AS medico,
+    hz.brick AS brick,
+    d.id_District AS district_id,
+    d.name AS district,
+    inst.id_Institution AS institution_id,
+    inst.name AS institution,
+    sp.id_Specialty AS speciality_id,
+    sp.name AS speciality,
+    doc.state AS state
+FROM 
+    Doctor doc
+LEFT JOIN 
+    Doctor_Activity da ON doc.professional_id_card = da.fk_Doctor
+LEFT JOIN 
+    Institution inst ON da.fk_id_Institution = inst.id_Institution
+LEFT JOIN 
+    Specialty sp ON da.fk_id_Specialty = sp.id_Specialty
+LEFT JOIN 
+    HMR_Zone hz ON da.fk_id_Address = hz.brick
+LEFT JOIN 
+    District d ON hz.fk_id_District = d.id_District;
+
+
+CREATE MATERIALIZED VIEW general_pharmacies AS
+SELECT 
+    ph.id_Pharmacy AS id_pharmacy,
+    ph.name AS pharmacy,
+    hz.brick AS brick,
+    d.id_District AS id_district,
+    d.name AS district,
+    r.id_Region AS id_region,
+    r.name AS region,
+    t.id_Town AS id_parish,
+    t.name AS parish,
+    CONCAT(addr.street, ', ', addr.zip_code, 
+        CASE WHEN addr.building IS NOT NULL THEN ', ' || addr.building ELSE '' END) AS address
+FROM 
+    Pharmacy ph
+LEFT JOIN 
+    Address addr ON ph.fk_id_Address = addr.id_Address
+LEFT JOIN 
+    HMR_Zone hz ON addr.fk_brick = hz.brick
+LEFT JOIN 
+    District d ON hz.fk_id_District = d.id_District
+LEFT JOIN 
+    Region r ON hz.fk_id_Region = r.id_Region
+LEFT JOIN 
+    Town t ON hz.fk_id_Town = t.id_Town;
+
+
+
+
+-- ******************************************************** TRASH *********************************************************************
+
 -- This is to apply filters to general_table
 SELECT 
     product_name, 
@@ -117,6 +221,7 @@ GROUP BY
     company_name, 
     brick, 
     year;
+
 
 -- This is to apply filters to general_table_per_years
 SELECT 
