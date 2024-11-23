@@ -86,7 +86,7 @@ export function useFetchUser(path, type) {
             isMounted = false;
         };
 
-    }, [path, type]);
+    }, [type, url]);
 
     return { data, loading }
 }

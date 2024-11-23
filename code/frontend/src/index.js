@@ -43,7 +43,7 @@ const router = createBrowserRouter([
         element: <ProtectedRoute isAdmin={true}><RegistarDelegado /></ProtectedRoute>,
       },
       {
-        path: "delegados/:key",
+        path: "delegados/detalhes/:id",
         element: <ProtectedRoute isAdmin={true}><EditarDelegado /></ProtectedRoute>,
       },
 
@@ -56,7 +56,7 @@ const router = createBrowserRouter([
         element: <ProtectedRoute isAdmin={true}><RegistarMedico /></ProtectedRoute>,
       },
       {
-        path: "medicos/:key",
+        path: "medicos/detalhes/:id",
         element: <ProtectedRoute><EditarMedico /></ProtectedRoute>,
       },
 
@@ -69,7 +69,7 @@ const router = createBrowserRouter([
         element: <ProtectedRoute isAdmin={true}><RegistarFarmacia /></ProtectedRoute>,
       },
       {
-        path: "farmacias/:key",
+        path: "farmacias/detalhes/:id",
         element: <ProtectedRoute><EditarFarmacia /></ProtectedRoute>,
       },
       
