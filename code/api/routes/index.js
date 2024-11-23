@@ -76,6 +76,7 @@ router.post('/', async function(req, res, next) {
         data.totalProducts = await Queries.getSaleTotalProducts(idDelegate, idCompany, idBrick, idProduct)   
         filters.totalProducts.delegates = await Queries.getDelegates(null, idCompany,idBrick,idProduct)
         filters.totalProducts.companies = await Queries.getCompanies(idDelegate, null, idBrick, idProduct)
+        filters.totalProducts.bricks = await Queries.getBricks(idDelegate, idCompany, null, idProduct)
         filters.totalProducts.products = await Queries.getProducts(idDelegate, null,idCompany,idBrick)
     
     }
