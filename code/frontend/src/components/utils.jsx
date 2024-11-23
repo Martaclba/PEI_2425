@@ -11,12 +11,12 @@ export const getColumnsProdutoTotal = () => {
     // Base columns that are always present
     const baseColumns = [
       {
-        key: 'total_produto',
+        key: 'product_name',
         title: 'Produto',
-        dataIndex: 'total_produto',
+        dataIndex: 'product_name',
         fixed: 'left',
         className: 'fixed-column',
-        sorter: (a, b) => a.total_produto.localeCompare(b.total_produto),
+        sorter: (a, b) => a.product_name.localeCompare(b.product_name),
       },
     ];
   

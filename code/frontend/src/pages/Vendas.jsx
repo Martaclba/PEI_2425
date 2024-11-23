@@ -28,7 +28,7 @@ const DemoColumn = ({ dataHistogram }) => {
   
   const config = {  
     data: dataHistogram,
-    xField: 'type',
+    xField: 'month',
     yField: 'value',
     style:{
       fill: ({ value }) => {
@@ -257,7 +257,6 @@ export default function Vendas() {
     bricks: { option_selected: selectedOption.bricks, type: 'bricks' },
   }), [selectedOption]);
 
-  console.log("WORKIN HERE 22222", data.products)
 
   // This function will request the data after selecting an option on any form
   const onFinish = (type) => (values) => {
@@ -272,8 +271,8 @@ export default function Vendas() {
   // Fetch data for each graph on loading the page. Should also return the filter's options 
   //useFetchSales('/', !triggers.histogram, options.histogram)
   useFetchSales('/', !triggers.products, options.products)
-  //useFetchSales('/', !triggers.totalProducts, options.totalProducts)
-  //useFetchSales('/', !triggers.bricks, options.bricks)
+  useFetchSales('/', !triggers.totalProducts, options.totalProducts)
+  useFetchSales('/', !triggers.bricks, options.bricks)
 
   return (
       <div id="contact">
@@ -525,7 +524,7 @@ export default function Vendas() {
                     <Form.Item className="large-select" label='Brick' name='Brick_B'> 
                       <Select                     
                         placeholder="Brick"
-                        options={filters.bricks.brick} 
+                        options={filters.bricks.bricks} 
                         onChange={() => form_table_brick.submit()}
                         showSearch
                         filterOption={(input, option) => 

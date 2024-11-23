@@ -37,7 +37,6 @@ export function useFetchSales(path, fetchTrigger, options) {
 
         let isMounted = true
 
-        console.log("FILTERS NEEDED: ", options)
 
         // Fetch data from the backend
         const fetchData = async () => {
@@ -47,7 +46,7 @@ export function useFetchSales(path, fetchTrigger, options) {
                 if (response.status === 200){
                     console.log('Data loaded successfully:', response.data);
                     updateSalesData(options.type, response.data.data)
-                    //updateFiltersData(options.type, response.data.filters)
+                    updateFiltersData(options.type, response.data.filters)
                     updateFetchTriggers(options.type)
 
                 } else {
@@ -58,10 +57,8 @@ export function useFetchSales(path, fetchTrigger, options) {
             }
         }
 
-        // console.log("Should Fetch SALES: ", fetchTrigger)
         
-        // Fetch data if there's no data or if there's a trigger (update, for example)
-        // if (isMounted && (!data.lenght || fetchTrigger)) fetchData();
+        // Fetch data if there's a trigger
         if (isMounted && fetchTrigger) fetchData();
 
         return () => {

@@ -2,7 +2,7 @@ import { create } from 'zustand'
 
 // TODO: REMOVER ESTES DEFAULTSSSSSSSSSSSSSSSSSSSSSSSS
 const years_default = [
-    { label: '2018', value: 2018 },
+    { year: '2018', value: 2018 },
     { label: '2019', value: 2019 },
     { label: '2020', value: 2020 },
 ];
@@ -81,10 +81,9 @@ const useSalesDataStore = create((set) => ({
         histogram: { years: years_default, delegates: delegates_default },
         products: { years: years_default, delegates: delegates_default, companies: companies_default, bricks: bricks_default, products: products_default },
         totalProducts: { delegates: delegates_default, companies: companies_default, bricks: bricks_default, products: products_default },
-        bricks: { years: years_default, delegates: delegates_default, companies: companies_default },
+        bricks: { years: years_default, delegates: delegates_default, companies: companies_default, bricks: bricks_default},
     },
 
-    // Store filters form's values to be able to pass them to the fetch hook
     selectedOption: {
         histogram: predefinedValues_histogram,
         products: predefinedValues_table_product,
@@ -104,28 +103,29 @@ const useSalesDataStore = create((set) => ({
         });
     },
 
-    updateFiltersData: (type, filters) =>
+    updateFiltersData: (type, filters) => {
         set((state) => ({
             filters: {
                 ...state.filters,
-                [type]: { ...state.filters[type], ...filters },
+                [type]: filters[type],
             },
-        })),
+        }))
+    },
 
     updateSalesData: (type, data) => {
         set((state) => ({
             data: {
                 ...state.data,
-                [type]: { ...state.data[type], ...data[type] },
+                [type]: data[type],
             },
         }))
     },
 
-    updateSelectedOption: (type, option) => {
+    updateSelectedOption: (type, option) => {       
         set((state) => ({
             selectedOption:{
                 ...state.selectedOption,
-                [type]: { ...state.selectedOption[type], ...option },
+                [type]: option,                     // ver melhor
             }
         }));
     },
@@ -147,7 +147,7 @@ const useSalesDataStore = create((set) => ({
           histogram: { years: years_default, delegates: delegates_default },
           products: { years: years_default, delegates: delegates_default, companies: companies_default, bricks: bricks_default, products: products_default },
           totalProducts: { delegates: delegates_default, companies: companies_default, bricks: bricks_default, products: products_default },
-          bricks: { years: years_default, delegates: delegates_default, companies: companies_default },
+          bricks: { years: years_default, delegates: delegates_default, companies: companies_default,bricks: bricks_default},
         },
         selectedOption: {
             histogram: predefinedValues_histogram,
