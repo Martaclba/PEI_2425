@@ -5,6 +5,7 @@ SELECT
     delegate.name AS delegate_name,                   -- Delegate name
     delegate.id_delegate AS id_delegate,
     company.name AS company_name,                     -- Company name
+    company.id_company AS company_id,                 -- Company id
     hmr_zone.brick AS brick,                          -- Brick (HMR Zone)
     EXTRACT(YEAR FROM sale.registry_date) AS year,    -- Year of the sale
     SUM(CASE WHEN EXTRACT(MONTH FROM sale.registry_date) = 1 THEN sale_product.product_amount ELSE 0 END) AS Jan,  -- January
@@ -36,7 +37,8 @@ GROUP BY
     product_cnp,
     delegate_name,
     id_delegate,
-    company_name, 
+    company_name,
+    company_id, 
     brick, 
     year;
 
@@ -48,6 +50,7 @@ SELECT
     delegate.name AS delegate_name,                  -- Delegate name
     delegate.id_delegate AS id_delegate,
     company.name AS company_name,                    -- Company name
+    company.id_company AS company_id,                 -- Company id
     hmr_zone.brick AS brick,                         -- Brick (HMR Zone)
 	SUM(CASE WHEN EXTRACT(YEAR FROM sale.registry_date) = 2018 THEN sale_product.product_amount ELSE 0 END) AS "2018",  -- Year 2018
     SUM(CASE WHEN EXTRACT(YEAR FROM sale.registry_date) = 2019 THEN sale_product.product_amount ELSE 0 END) AS "2019",  -- Year 2019
@@ -74,6 +77,7 @@ GROUP BY
     delegate_name, 
     id_delegate,
     company_name, 
+    company_id,
     brick;
 
 -- This is to apply filters to general_table
