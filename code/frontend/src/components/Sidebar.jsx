@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { LuStethoscope, LuCross } from "react-icons/lu";
 import { IoPeopleOutline } from "react-icons/io5";
@@ -9,11 +9,9 @@ import { CgProfile } from "react-icons/cg";
 import { MdOutlineLocationOn } from "react-icons/md";
 import {useAuth} from '../context/Auth';
 import "../styles/sidebar.css"
-import { RiRobot2Line } from "react-icons/ri";
 
 
-const Sidebar = () => {
-    const [isOpen, setIsOpen] = useState(false);
+const Sidebar = ({isOpen, setIsOpen}) => {
 
     const navigate = useNavigate();
 

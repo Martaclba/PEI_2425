@@ -1,20 +1,19 @@
-import { getFormattedDate } from '../components/utils';
 
 function Chatbot() {
-    const date = getFormattedDate();
     return (
-        <div id="contact">
+        <div style={{padding: '0.5rem'}}>
+            <div style={{paddingBottom: '1rem'}}>
+                <h1>Chatbot</h1>
+            </div>
+
             <div>
-            <h1>Chatbot</h1>
-            <div id="data-import">
-                {date}
-            </div>
-            </div>
-            <div style={{padding: '1rem'}}>
+                <h3>AAAAAAAAAA</h3>
                 {/* Ponham aqui o código */}
+
+
             </div>
         </div>
     );
-  }
+}
   
-  export default Chatbot;
+export default Chatbot;

@@ -124,7 +124,7 @@ router.post('/:id', async function(req, res, next) {
 
   const { idDelegate } = req.params
   const { type, option_selected } = req.body
-  console.log('Type:', type, "Option Select: ", option_selected);
+  // console.log('Type:', type, "Option Select: ", option_selected);
 
   try {
     if (options.type === 'histogram') {              
@@ -187,37 +187,102 @@ router.post('/import', function(req, res, next) {
 
 });
 
+/*    GET visits   */
+// Route responsible for retrieving the visits of a delegate (id)
+// Should return a json structured variable with relevant information
+
+const data_visits = [
+  {
+    key: 0,
+    data: '12-01-2025',
+    comprador: 'Médico i',                  // pode ser um médico ou uma farmácia
+    distrito: `Distrito i`,
+    regiao: `Região i`,      
+    freguesia: `Freguesia i`,
+    morada: `Rua i`,  
+  },
+  {
+    key: 1,
+    data: '12-01-2025',
+    comprador: 'Farmácia da esquina',      // pode ser um médico ou uma farmácia
+    distrito: `Distrito i`,
+    regiao: `Região i`,      
+    freguesia: `Freguesia i`,
+    morada: `Rua i`,  
+  },
+]
+router.post('/visitas/:id', async function(req, res, next) {
+  const data = []
+
+  const filters = {
+    delegates: {},
+    districts: {},
+    regions: {}
+  }
+
+  const options = req.body
+
+});
+
+
+/*    POST visits    */
+// Route responsible for registering a visit
+const visit = {
+  Entidade: 'Médico',
+  Comprador: 2,
+  date: '24-11-2025',
+}
+router.post('/visitas/registar', async function(req, res, next) {
+
+  const visit = req.body
+
+});
+
+
+
+/*    Get form's data    */
+// Route responsible for retrieving the form's data for the admin
+// Should return a json structured variable with:
+  // the instituitions
+  // the specialties
+  // the districts
+  // the regions
+  // the towns
+  // the products
+  // doctors
+  // pharmacies
+  router.get('/forms', function(req, res, next) { Queries.getSale(res, req) });
+
+  router.get('/forms/:id', function(req, res, next) { Queries.getSale(res, req) });
 
 
 
 /*    GET delegates   */
 // Route responsible for retrieving the delegates
-// Should return a json structured variable withe relevant information
-
-// const data_delegates = [
-//   {  
-//     key: 0,
-//     id_delegate: 2              // apenas para depois aceder aos detalhes, não será mostrado na tabela
-//     delegate_name: `Delegado i`,
-//     brick: "123",
-//     district: `Distrito i`,
-//     region: `Região i`,      
-//     town: `Freguesia i`,
-//     state: "Ativo",
-//   },
-//   {  
-//     key: 1,
-//     id_delegate: 3             
-//     delegate_name: `Delegado i`,
-//     brick: "123",
-//     district: `Distrito i`,
-//     region: `Região i`,      
-//     town: `Freguesia i`,
-//     state: "Ativo",
-//   },
-// ]
-
-router.get('/delegados', async function(req, res, next) {;
+// Should return a json structured variable with relevant information
+const data_delegates = [
+  {  
+    key: 0,
+    id_delegate: 2,                     // apenas para depois aceder aos detalhes, não será mostrado na tabela
+    delegate_name: `Delegado i`,
+    brick: "123",
+    district: `Distrito i`,
+    region: `Região i`,      
+    town: `Freguesia i`,
+    state: "Ativo",
+  },
+  {  
+    key: 1,
+    id_delegate: 3,             
+    delegate_name: `Delegado i`,
+    brick: "123",
+    district: `Distrito i`,
+    region: `Região i`,      
+    town: `Freguesia i`,
+    state: "Ativo",
+  },
+]
+router.post('/delegados', async function(req, res, next) {;
   const data = []
 
   const filters = {
@@ -249,7 +314,7 @@ router.get('/delegados', async function(req, res, next) {;
 
 /*    Get delegate by id   */
 // Route responsible for retrieving a delegate's details
-/* Return:
+// Return:
 const delegate = {
     Nome: {
       Primeiro: 'John',
@@ -260,7 +325,6 @@ const delegate = {
     Freguesia: '',                               // Not required
     Estado: ['Inativo'],
 };
-*/
 router.get('/delegados/detalhes/:idDelegate', function(req, res, next) { 
   
   // Queries.getDelegates(parseInt(req.params.id), res, req) 
@@ -294,7 +358,9 @@ router.post('/import/delegados', function(req, res, next) {
 
 
 
-router.get('/medicos', function(req, res, next) { Queries.getDoctors(res, req) });
+router.post('/medicos', function(req, res, next) { 
+  //Queries.getDoctors(res, req) 
+
   const data = []
   
   const filters = {
@@ -319,11 +385,11 @@ router.get('/medicos', function(req, res, next) { Queries.getDoctors(res, req) }
 //   catch (err) {
 //     res.status(501).json({error: err, msg: "Error obtaining doctors table"});
 //   }
-// });
+});
 
 /*    GET doctor by id   */
 // Route responsible for retrieving a doctors's details
-/* Return:
+//Return:
 const doctor = {
     Nome: 'John',
     Instituicao: 'Hospital do Bonfim',
@@ -339,12 +405,13 @@ const doctor = {
     Estado: ['Inativo'],
     Notas: 'Some default notes here...',         // Not required
 };
-*/
 router.get('/medicos/detalhes/:idDoctor', function(req, res, next) { Queries.getDoctors(parseInt(req.params.id), res, req) });
 
 
 
-router.get('/farmacias', function(req, res, next) { Queries.getPharmacies(res, req) });
+router.post('/farmacias', function(req, res, next) { 
+  //Queries.getPharmacies(res, req) 
+
 //   const data = []
 //   const filters = {
 //     pharmacies:{},
@@ -368,46 +435,28 @@ router.get('/farmacias', function(req, res, next) { Queries.getPharmacies(res, r
 //   catch (err) {
 //     res.status(501).json({error: err, msg: "Error obtaining delagates table"});
 //   }
-// });
+});
 
 /*    GET pharmacy by id   */
 // Route responsible for retrieving a pharmacy's details
-/* Return:
- const pharmacy = {
-    Nome: 'Farmácia A',
-    Distrito: 'Braga',
-    Regiao: 'Celeirós',
-    Freguesia: 'Celeirós',                        // Not required                                  
-    Rua: 'Rua bla bla bla',
-    Codigo_postal: '1234-567',
-    Edificio: '1º Esq',                           // Not required
-    Telefone: '123456789',                         
-    Email: 'example@hotmail.com',                 // Not required
-    Estado: ['Indisponível'],
-    Notas: '',                                    // Not required             
-    Produtos: [{ key: '1', label: 'Produto 1' }]  // Not required 
+//Return:
+const pharmacy = {
+  Nome: 'Farmácia A',
+  Distrito: 'Braga',
+  Regiao: 'Celeirós',
+  Freguesia: 'Celeirós',                        // Not required                                  
+  Rua: 'Rua bla bla bla',
+  Codigo_postal: '1234-567',
+  Edificio: '1º Esq',                           // Not required
+  Telefone: '123456789',                         
+  Email: 'example@hotmail.com',                 // Not required
+  Estado: ['Indisponível'],
+  Notas: '',                                    // Not required             
+  Produtos: [{ key: '1', label: 'Produto 1' }]  // Not required 
 };
-*/
-router.get('/farmacias/detalhes/:idPharmacy', function(req, res, next) { Queries.getPharmacies(parseInt(req.params.id), res, req) });
+router.get('/farmacias/detalhes/:idPharmacy', function(req, res, next) { 
+  Queries.getPharmacies(parseInt(req.params.id), res, req) 
+});
 
-
-
-
-
-
-/*    Get form's data    */
-// Route responsible for retrieving the form's data for the admin
-// Should return a json structured variable with:
-  // the instituitions
-  // the specialties
-  // the districts
-  // the regions
-  // the towns
-  // the products
-  // doctors
-  // pharmacies
-router.get('/forms', function(req, res, next) { Queries.getSale(res, req) });
-
-router.get('/forms/:id', function(req, res, next) { Queries.getSale(res, req) });
 
 module.exports = router;

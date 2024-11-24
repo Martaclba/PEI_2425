@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import { IconContext } from "react-icons";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { Modal, Form, DatePicker, Select, Button, Table, ConfigProvider, Flex, message, Spin } from 'antd';
-import locale from 'antd/locale/pt_PT';
 import dayjs from 'dayjs';
-// import 'dayjs/locale/pt_PT';
 
 import axios from 'axios'
 
@@ -14,9 +12,6 @@ import { useFetchData } from '../components/useFetchData';
 import { useFetchFormData } from '../components/useFetchFormData';
 import useVisitasDataStore from '../context/VisitasData';
 import useFormDataStore from '../context/FormData';
-
-
-// dayjs.locale('pt_PT');
 
 // For the table
 const columns = [
@@ -65,18 +60,6 @@ const columns = [
   },
 ];
 
-// const dataSource = Array.from({
-//   length: 100,
-// }).map((_, i) => ({
-//   key: i,
-//   data: `12/01/2025 ${i}`,
-//   comprador: `Médico ${i}`,
-//   distrito: `Distrito ${i}`,
-//   regiao: `Região ${i}`,      
-//   freguesia: `Freguesia ${i}`,
-//   morada: `Rua ${i}`,
-// }));
-
 const compradores = [
     {
         label: 'Médico',
@@ -124,7 +107,7 @@ export default function Visitas() {
         form.resetFields()
 
         try {
-            const response = await axios.post(process.env.REACT_APP_API_PATH + "/visitas", values_formatted, { headers: { 'Content-Type': 'application/json' } })
+            const response = await axios.post(process.env.REACT_APP_API_PATH + "/visitas/registar", values_formatted, { headers: { 'Content-Type': 'application/json' } })
 
             if(response.status === 200) {
                 message.success("Registado com sucesso")
@@ -210,15 +193,15 @@ export default function Visitas() {
                             </Form.Item>
 
                             <Form.Item
-                                label="Tipo de Comprador"
-                                name="Tipo_comprador"
+                                label="Entidade de Saúde"
+                                name="Entidade"
                                 hasFeedback
-                                rules={[{ required: true, message: 'Por favor selecione um tipo de comprador' }]}
+                                rules={[{ required: true, message: 'Por favor selecione uma entidade' }]}
                             >
                                 <Select 
                                     allowClear
                                     options={compradores}
-                                    placeholder="Selecione um tipo de comprador"
+                                    placeholder="Selecione uma entidade de saúde"
                                     onChange={handleComprador}/>
                             </Form.Item>
 
@@ -269,14 +252,12 @@ export default function Visitas() {
                         >
                             <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
                                 <Form.Item className='large-select' label="Data" name="date">
-                                    {/* <ConfigProvider locale={locale}> */}
                                         <DatePicker 
                                             placeholder='Insira uma data'
                                             style={{width: '100%'}}
                                             onChange={() => form_filtros.submit()}
                                             format="DD-MM-YYYY"
                                         />
-                                    {/* </ConfigProvider> */}
                                 </Form.Item>
                         
                                 <Form.Item className="large-select" label='Comprador' name='comprador'>

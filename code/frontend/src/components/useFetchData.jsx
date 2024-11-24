@@ -36,7 +36,7 @@ export function useFetchData(path, fetchTrigger, selectedOption) {
                 if (response.status === 200){
                     console.log('Data loaded successfully:', response.data);
                     //setData(response.data)
-                    if(path==='/delegados'){
+                    if(path === '/delegados'){
                         updateDelegatesFetchTrigger()
                         // updateDelegatesFiltersData()
                         // updateDelegatesData()
@@ -44,11 +44,11 @@ export function useFetchData(path, fetchTrigger, selectedOption) {
                         updateMedicosFetchTrigger()
                         //updateMedicosFiltersData()
                         //updateMedicosData()
-                    } else if (path==='/farmacias'){
+                    } else if (path === '/farmacias'){
                         updateFarmaciasFetchTrigger()
                         // updateFarmaciasFiltersData()
                         // updateFarmaciasData()
-                    } else if (path==='/visitas'){
+                    } else if (path === '/visitas'){
                         updateVisitasFetchTrigger()
                         // updateVisitasFiltersData()
                         // updateVisitasData()
