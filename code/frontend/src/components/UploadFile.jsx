@@ -2,6 +2,7 @@ import { message } from 'antd';
 
 // Upload a Excel file
 const UploadFileProps = (path, updateFetchTrigger) => ({    
+    name: 'excelFile',
     listType: 'picture',
     showUploadList: false, 
 

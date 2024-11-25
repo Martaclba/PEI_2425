@@ -1,7 +1,49 @@
 const express = require('express');
 const router = express.Router();
+const multer  = require('multer')
 
 var Queries = require('./queries')
+
+// Configure multer storage
+const storage = multer.diskStorage({
+  
+  
+  
+  // Where to store the files
+  destination: function (req, file, cb) {
+
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+
+
+    // Ensure the '../uploads' directory exists
+    cb(null, '/uploads'); 
+  },
+
+  filename: function (req, file, cb) {
+
+    console.log("BBBBBBBBBBBBBBBBBBBBBBBB")
+
+
+    // Use original file name or generate a unique name
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, file.fieldname + '-' + uniqueSuffix)
+  },
+
+  // Function to control which files are accepted (.xlsl)                            
+  fileFilter: (req, file, cb) => {
+    const filetypes = /vnd.openxmlformats-officedocument.spreadsheetml.sheet/;
+    const mimetype = filetypes.test(file.mimetype);
+
+    if (mimetype) {
+        cb(null, true);
+    } else {
+        cb(new Error('Invalid file type. Only Excel files are allowed!'), false);
+    }
+  }
+});
+
+// Configure multer upload settings
+const upload = multer({ storage: storage });
 
 
 /*    GET sales    */ 
@@ -102,8 +144,6 @@ router.post('/', async function(req, res, next) {
 });
   
   
-
-
 router.post('/:id', async function(req, res, next) { 
   const data = {
     histogram: [],
@@ -176,16 +216,20 @@ router.post('/:id', async function(req, res, next) {
 
 /*    POST sales   */
 // Route responsible for sending the hmr file to the database
-router.post('/import', function(req, res, next) { 
-
- /*
- TODO
- 
- */
-
-
-
+router.post('/import/', (req, res, next) => {
+  console.log('Received POST request on /import');                                  // não faz print disto :(((   
+  console.log('Request Headers:', req.headers);
+  console.log('Request Body:', req.body);
+  next(); // Pass control to the next middleware (multer)
+}, upload.single('excelFile'), (req, res) => {
+  if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+  }
+  console.log('File uploaded:', req.file);
+  res.status(200).json({ message: 'File uploaded successfully' });
 });
+
+
 
 /*    GET visits   */
 // Route responsible for retrieving the visits of a delegate (id)
