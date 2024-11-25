@@ -83,27 +83,8 @@ GROUP BY
     brick;
 
 
-CREATE MATERIALIZED VIEW general_bricks AS
-SELECT 
-    hz.brick AS brick,
-    d.id_District AS id_district,
-    d.name AS district,
-    r.id_Region AS id_region,
-    r.name AS region,
-    t.id_Town AS id_parish,
-    t.name AS parish
-FROM 
-    HMR_Zone hz
-JOIN 
-    District d ON hz.fk_id_District = d.id_District
-JOIN 
-    Region r ON hz.fk_id_Region = r.id_Region
-LEFT JOIN 
-    Town t ON hz.fk_id_Town = t.id_Town;
-
-
-CREATE MATERIALIZED VIEW general_delegates AS
-SELECT 
+CREATE MATERIALIZED VIEW general_delegates_and_bricks AS
+SELECT DISTINCT
     del.id_Delegate AS id_delegate,
     del.name AS delegate,
     hz.brick AS brick,
@@ -128,15 +109,15 @@ LEFT JOIN
 
 
 CREATE MATERIALIZED VIEW general_doctors AS
-SELECT 
+SELECT DISTINCT
     doc.professional_id_card AS id_doctor,
     doc.name AS medico,
     hz.brick AS brick,
-    d.id_District AS district_id,
+    d.id_District AS id_district,
     d.name AS district,
-    inst.id_Institution AS institution_id,
+    inst.id_Institution AS id_institution,
     inst.name AS institution,
-    sp.id_Specialty AS speciality_id,
+    sp.id_Specialty AS id_speciality,
     sp.name AS speciality,
     doc.state AS state
 FROM 
@@ -154,7 +135,7 @@ LEFT JOIN
 
 
 CREATE MATERIALIZED VIEW general_pharmacies AS
-SELECT 
+SELECT DISTINCT
     ph.id_Pharmacy AS id_pharmacy,
     ph.name AS pharmacy,
     hz.brick AS brick,
