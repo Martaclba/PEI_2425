@@ -6,11 +6,11 @@ const UploadFileProps = (path, updateFetchTrigger) => ({
     listType: 'picture',
     showUploadList: false, 
 
-    // Only accepts Excel files
+    // Only accepts Excel files (.xlsx)
     accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 
     // Post to the backend URL
-    action: process.env.REACT_APP_API_PATH + '/import' + path,
+    action: 'http://localhost:5123/import/',
     
     // Handling the change event to monitor upload progress and success/failure
     // States: 'done', 'error', 'uploading' and 'removed'
