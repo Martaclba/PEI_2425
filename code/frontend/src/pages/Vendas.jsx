@@ -237,7 +237,7 @@ export default function Vendas() {
     {
       key: '1',
       label:  
-        <Upload {...UploadFileProps(location.pathname, updateFetchTriggers)} maxCount={1}>
+        <Upload {...UploadFileProps('/competition', updateFetchTriggers)} maxCount={1}>
           <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
             Importar Ficheiro Concorrência
           </Button>

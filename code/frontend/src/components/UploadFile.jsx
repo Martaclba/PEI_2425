@@ -10,7 +10,7 @@ const UploadFileProps = (path, updateFetchTrigger) => ({
     accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 
     // Post to the backend URL
-    action: 'http://localhost:5123/import/',
+    action: process.env.REACT_APP_API_PATH + '/import' + path,
     
     // Handling the change event to monitor upload progress and success/failure
     // States: 'done', 'error', 'uploading' and 'removed'

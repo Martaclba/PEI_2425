@@ -28,7 +28,7 @@ export function useFetchFormData(fetchTrigger) {
                     const normalizedData = Object.keys(response.data.data).reduce((acc, key) => {
                         acc[key] = response.data.data[key].map(item => ({
                             ...item,
-                            value: item.value.toString(), // Convert value to string
+                            value: item.value.toString(),
                         }));
                         return acc;
                     }, {});

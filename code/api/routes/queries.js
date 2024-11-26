@@ -261,9 +261,7 @@ module.exports.getSpecialties = async () => {
 // const results = await db.query('SELECT DISTINCT id_town as value, town.name as label FROM town JOIN hmr_zone ON town.id_town = hmr_zone.fk_id_town JOIN delegate ON delegate.id_delegate = hmr_zone.fk_id_delegate WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
 module.exports.getDoctors = async (idDelegate) => {
   try {
-    console.log("IDDELEGATE ANTES DE CONVERTER",idDelegate)
     idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
-    console.log("MERDAAAAAAAA",idDelegate)                                               
     const results = await db.query(`SELECT 
                                         gd.id_doctor AS id,
                                         gd.medico AS doctor,
@@ -290,7 +288,20 @@ module.exports.getPharmacies = async (idDelegate) => {
   try {
     idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
                                                    
-    const results = await db.query('SELECT DISTINCT id_pharmacy as value, name as label FROM general_pharmacies JOIN  WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
+    const results = await db.query(`SELECT 
+                                        gp.id_pharmacy AS id,
+                                        gp.pharmacy AS name,
+                                        gp.brick AS brick
+                                    FROM 
+                                        general_pharmacies gp
+                                    WHERE 
+                                        gp.brick IN (
+                                            SELECT hz.brick 
+                                            FROM general_delegates_and_bricks hz 
+                                            WHERE hz.id_delegate = $1
+                                        )
+                                    ORDER BY 
+                                        gp.pharmacy ASC;`, [idDelegate]);
     return results.rows;
   } catch (err) {
     console.log("ERROR: ", err)

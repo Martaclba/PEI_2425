@@ -44,16 +44,24 @@ router.post('/import/delegados', function(req, res, next) {
 });
 
 
+router.post('/import/competition', upload.single('excelFile'), function(req, res, next) {
+  if (!req.file) {
+      return res.status(400).json({ error: 'No competition sales file uploaded' });
+  }
+
+  console.log('File uploaded:', req.file);
+  res.status(200).json({ message: 'Competition sales file uploaded successfully' });
+});
 
 /*    POST sales (import)   */
 // Route responsible for sending the hmr file to the database
 router.post('/import/', upload.single('excelFile'), function(req, res, next) {
   if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
+      return res.status(400).json({ error: 'No sales file uploaded' });
   }
 
   console.log('File uploaded:', req.file);
-  res.status(200).json({ message: 'File uploaded successfully' });
+  res.status(200).json({ message: 'Sales file uploaded successfully' });
 });
 
 
@@ -114,7 +122,7 @@ router.post('/visitas/:id', async function(req, res, next) {
   const options = req.body
 
   try{
-    
+
     res.status(200).json({data})
   } catch (err) {
     res.status(501).json({error: err, msg: "Error obtaining form's data"});
@@ -139,10 +147,8 @@ router.get('/forms/:id', async function(req, res, next) {
 
   try{
     data.doctors = await Queries.getDoctors(idDelegate)
-    // data.pharmacies = await Queries.getPharmacies(idDelegate)
-    console.log("AQUI DA ISTO: ",JSON.stringify(data.doctors,null,2))
+    data.pharmacies = await Queries.getPharmacies(idDelegate)
     res.status(200).json({data})
-
   } catch (err) {
     res.status(501).json({error: err, msg: "Error obtaining form's data"});
   }
