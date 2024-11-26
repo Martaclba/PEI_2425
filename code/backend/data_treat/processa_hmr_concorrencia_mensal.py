@@ -3,6 +3,7 @@ that esxecutes'''
 
 import pandas as pd
 import re
+import argparse
 
 def processar_ficheiro(nomeficheiro,nomesheet):
     # Carregar o arquivo Excel
@@ -99,4 +100,10 @@ def processar_ficheiro(nomeficheiro,nomesheet):
 
 
 if __name__ == "__main__":
-    processar_ficheiro("hmR_Concorrência_Julho.xlsx","Total Concorrência Regiões")
+
+    parser = argparse.ArgumentParser(description="Process file")
+    parser.add_argument("path", help="path to file")
+
+    args = parser.parse_args()
+
+    processar_ficheiro(args.path,"Total Concorrência Regiões")

@@ -3,11 +3,17 @@ to read and record data from files as
 hmR_Mypharma_Agosto'''
 
 import pandas as pd
+import argparse
 
 # Definir os nomes das colunas manualmente
 
 # Ler o ficheiro Excel a partir da linha 11, ignorando o cabeçalho original, e definindo os nomes das colunas
-df = pd.read_excel('hmR_MyPharma_Agosto.xlsx',sheet_name='Total Mypharma Regiões',dtype=str)
+parser = argparse.ArgumentParser(description="Process file")
+parser.add_argument("path", help="path to file")
+
+args = parser.parse_args()
+
+df = pd.read_excel(args.path,sheet_name='Total Mypharma Regiões',dtype=str)
 df.columns = ['Region', 'Entity', 'SO_Units']
 
 # Preencher para baixo os valores faltantes nas colunas 'Entidade' e 'Empresa'

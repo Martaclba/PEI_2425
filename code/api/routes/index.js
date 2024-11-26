@@ -44,24 +44,37 @@ router.post('/import/delegados', function(req, res, next) {
 });
 
 
-router.post('/import/competition', upload.single('excelFile'), function(req, res, next) {
+router.post('/import/competition', upload.single('excelFile'), async function(req, res, next) {
   if (!req.file) {
       return res.status(400).json({ error: 'No competition sales file uploaded' });
   }
+  const spawnSync = require("node:child_process").spawnSync;
+  try {
+    const child = await spawnSync('python3',["../database/import_conc.py", req.file.destination + "/" + req.file.filename], {capture: ['stdout', 'stderr', 'on']});
+    console.log('File uploaded:', req.file);
+    res.status(201).json({ message: child.stdout });
+  }
+  catch (err) {
+    res.status(530).json({ error:err, msg: child.stdout})
+  }
 
-  console.log('File uploaded:', req.file);
-  res.status(200).json({ message: 'Competition sales file uploaded successfully' });
 });
 
 /*    POST sales (import)   */
 // Route responsible for sending the hmr file to the database
-router.post('/import/', upload.single('excelFile'), function(req, res, next) {
+router.post('/import/', upload.single('excelFile'), async function(req, res, next) {
   if (!req.file) {
       return res.status(400).json({ error: 'No sales file uploaded' });
   }
-
-  console.log('File uploaded:', req.file);
-  res.status(200).json({ message: 'Sales file uploaded successfully' });
+  const spawnSync = require("node:child_process").spawnSync;
+  try {
+    const child = await spawnSync('python3',["../database/import_mp.py", req.file.destination + "/" + req.file.filename], {capture: ['stdout', 'stderr', 'on']});
+    console.log('File uploaded:', req.file);
+    res.status(201).json({ message: child.stdout });
+  }
+  catch (err) {
+    res.status(530).json({ error:err, msg: child.stdout});
+  }
 });
 
 

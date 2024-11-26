@@ -5,6 +5,8 @@ import psycopg
 import tqdm
 import random
 import datetime
+import argparse
+
 
 DB_USER = "mypharma"
 DB_PASSWORD = "mypharma"
@@ -13,6 +15,11 @@ DB_PORT = 5432
 DB_NAME = "mypharma"
 
 conn_string = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+parser = argparse.ArgumentParser(description="Load mypharma monthly file")
+parser.add_argument("path", help="path to file")
+
+args = parser.parse_args()
 
 # Paths
 detector_script = "../datat_treat/detetor_hmr_mp.py"  # Validation script
@@ -23,7 +30,7 @@ registry_date = datetime(datetime.now().year, 8, 1)  # August
 # Step 1: Run the input script to generate the cleaned data
 print(f"Running input script: {input_file}...")
 try:
-    subprocess.run(["python", input_file], check=True)
+    subprocess.run(["python", input_file, args.path], check=True)
     print(f"Input file {input_file} executed successfully.")
 except subprocess.CalledProcessError as e:
     print(f"Failed to execute {input_file}!")
