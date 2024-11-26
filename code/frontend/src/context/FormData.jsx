@@ -12,17 +12,11 @@ const useFormDataStore = create((set) => ({
   pharmacies: [],
 
   updateFormDataStore: (data) => {
-    set({
-      hasFetched: true,
-      districts: data.districts,
-      regions: data.regions,
-      towns: data.towns,
-      instituitions: data.instituitions,
-      specialties: data.specialties,
-      products: data.products,
-      doctors: data.doctors,
-      pharmacies: data.pharmacies,
-    });
+    set((state) => ({
+      ...state,              // Preserve current state
+      hasFetched: true,      // Update hasFetched to true
+      ...data                // Merge in the provided data
+    }));
   },
 
   reset: () => {

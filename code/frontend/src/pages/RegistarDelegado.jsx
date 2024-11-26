@@ -94,7 +94,7 @@ export default function RegistarDelegado() {
                             name="validate_other"
                             onFinish={onFinish}
                             layout='vertical'
-                            initialValues={{Estado: [{label:'Ativo', value:'green'}]}}
+                            initialValues={{ Estado: [{ label:'Ativo', value:'green' }] }}
                         >
 
                             <Form.Item label="Nome" style={{ marginBottom: 0 }}>
@@ -123,7 +123,6 @@ export default function RegistarDelegado() {
                                 label="Distrito"
                                 name="Distrito"
                                 hasFeedback
-                                onSelect={(value, option) => handleSelect('Distrito', option)}
                                 rules={[{required: true, message: 'Por favor insira um distrito',},]}
                             >
 
@@ -131,6 +130,7 @@ export default function RegistarDelegado() {
                                     allowClear                                    
                                     options={districts}
                                     placeholder="Insira um distrito"
+                                    onSelect={(value, option) => handleSelect('Distrito', option)}
                                     filterOption={(inputValue, option) =>
                                         option?.label.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                     }

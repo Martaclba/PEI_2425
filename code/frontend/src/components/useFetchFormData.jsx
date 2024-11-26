@@ -23,7 +23,17 @@ export function useFetchFormData(fetchTrigger) {
 
                 if (response.status === 200){
                     console.log('Data loaded successfully:', response.data.data);
-                    updateData(response.data.data); 
+
+                    // Normalize all values to strings
+                    const normalizedData = Object.keys(response.data.data).reduce((acc, key) => {
+                        acc[key] = response.data.data[key].map(item => ({
+                            ...item,
+                            value: item.value.toString(), // Convert value to string
+                        }));
+                        return acc;
+                    }, {});
+                        
+                    updateData(normalizedData); 
                 } else {
                     console.error('Data loaded failed:', response.status);
                 }

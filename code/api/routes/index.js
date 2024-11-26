@@ -68,9 +68,10 @@ const visit = {
 router.post('/visitas/registar', async function(req, res, next) {
 
   const visit = req.body
+  console.log("VISIT: ", visit)
 
   try {
-
+    
   } catch (err) {
     res.status(501).json({error: err, msg: "Error scheduling a visit"});
   }
@@ -104,18 +105,49 @@ router.post('/visitas/:id', async function(req, res, next) {
   const data = []
 
   const filters = {
-    delegates: {},
+    data: {},
+    comprador: {},
     districts: {},
     regions: {}
   }
 
   const options = req.body
 
+  try{
+    
+    res.status(200).json({data})
+  } catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining form's data"});
+  }
+
 });
 
 
 
 /*    Get form's data    */
+// Route responsible for retrieving the form's data for the delegate
+// Should return a json structured variable with:
+  // doctors
+  // pharmacies
+router.get('/forms/:id', async function(req, res, next) { 
+  const idDelegate = parseInt(req.params.id)
+
+  const data = {
+    doctors: [],
+    pharmacies: [],
+  }
+
+  try{
+    data.doctors = await Queries.getDoctors(idDelegate)
+    // data.pharmacies = await Queries.getPharmacies(idDelegate)
+    console.log("AQUI DA ISTO: ",JSON.stringify(data.doctors,null,2))
+    res.status(200).json({data})
+
+  } catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining form's data"});
+  }
+});// quais são os ficheiros q processam os dados mesmo? temos muita coisa naquelas pastas
+
 // Route responsible for retrieving the form's data for the admin
 // Should return a json structured variable with:
   // the instituitions
@@ -124,40 +156,6 @@ router.post('/visitas/:id', async function(req, res, next) {
   // the regions
   // the towns
   // the products
-  // doctors
-  // pharmacies
-router.get('/forms/:id', async function(req, res, next) { 
-  const idDelegate = req.params
-
-  const data = {
-    // districts: [],
-    // regions: [],
-    // towns: [],
-    // instituitions: [],
-    // specialties: [],
-    // products: [],
-    doctors: [],
-    pharmacies: [],
-  }
-
-  try{
-    // data.districts = await Queries.getDistricts(idDelegate)
-    // data.regions = await Queries.getRegions(idDelegate)
-    // data.towns = await Queries.getTowns(idDelegate)
-    // data.instituitions = await Queries.getInstituitions(idDelegate)
-    // data.specialties = await Queries.getSpecialties(idDelegate)
-    // data.products = await Queries.getProducts(idDelegate, null, null, null)
-    data.doctors = await Queries.getDoctors(idDelegate)
-    data.pharmacies = await Queries.getPharmacies(idDelegate)
-
-    res.status(200).json({data})
-
-  } catch (err) {
-    res.status(501).json({error: err, msg: "Error obtaining form's data"});
-  }
-});
-
-
 router.get('/forms', async function(req, res, next) { 
   const data = {
     districts: [],
@@ -165,20 +163,16 @@ router.get('/forms', async function(req, res, next) {
     towns: [],
     instituitions: [],
     specialties: [],
-    products: [],
-    // doctors: [],
-    // pharmacies: [],
+    products: []
   }
 
   try{
-    // data.districts = await Queries.getDistricts(null)
-    // data.regions = await Queries.getRegions(null)
-    data.towns = await Queries.getTowns(null)
-    // data.instituitions = await Queries.getInstituitions(null)
-    // data.specialties = await Queries.getSpecialties(null)
-    // data.products = await Queries.getProducts(null, null, null, null)
-    // data.doctors = await Queries.getDoctors(null)
-    // data.pharmacies = await Queries.getPharmacies(null)
+    data.districts = await Queries.getDistricts()
+    data.regions = await Queries.getRegions()
+    data.towns = await Queries.getTowns()
+    data.instituitions = await Queries.getInstitutions()
+    data.specialties = await Queries.getSpecialties()
+    data.products = await Queries.getProducts(null, null, null, null)
 
     res.status(200).json({data})
 
@@ -407,12 +401,13 @@ router.post('/:id', async function(req, res, next) {
   const default_filter = { label: '-- Todos --', value: 'Todos'}
   const year = new Date().getFullYear()
 
-  const { idDelegate } = req.params
+  const idDelegate = req.params.id
   const { type, option_selected } = req.body
+
   // console.log('Type:', type, "Option Select: ", option_selected);
 
   try {
-    if (options.type === 'histogram') {              
+    if (type === 'histogram') {              
       data.histogram = await Queries.getSaleHistogram(idDelegate, year)
       filters.histogram.delegates = await Queries.getDelegates(year, null, null, null),
       filters.histogram.years = await Queries.getYears(idDelegate)
@@ -420,22 +415,18 @@ router.post('/:id', async function(req, res, next) {
       // Add missing default option 
       filters.histogram.delegates.unshift(default_filter)
 
-    } else if (options.type === 'bricks') {
+    } else if (type === 'bricks') {
       const idCompany = option_selected.Company_B                       // default: Todos
       const idBrick = option_selected.Brick_B                           // default: Todos
-
-      data.bricks = Queries.getSaleBricks(idDelegate, year, idCompany, idBrick) 
-      filters.bricks.companies = Queries.getCompanies(idDelegate, year, idBrick, null)
-      filters.bricks.bricks = Queries.getBricks(idDelegate, year, idCompany, null)  
 
       data.bricks= await Queries.getSaleBricks(idDelegate, year, idCompany, idBrick)   
       filters.bricks.companies = await Queries.getCompanies(idDelegate,year,idBrick, null)
       filters.bricks.bricks = await Queries.getBricks(idDelegate,year,idCompany, null)
-
+      
       // Add missing default option 
       filters.bricks.bricks.unshift(default_filter)
 
-    } else if (options.type === 'products') {
+    } else if (type === 'products') {
       const idCompany = option_selected.Company_P                        // default: Todos
       const idBrick = option_selected.Brick_P                            // default: Todos
       const idProduct = option_selected.Product_P

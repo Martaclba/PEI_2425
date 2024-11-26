@@ -161,9 +161,9 @@ export default function Visitas() {
   
     const { loading } = useFetchData('/visitas', modalTrigger || !trigger, selectedOption)
 
-    if (loading) {
-        return <Spin fullscreen tip="Carregando dados..." />;
-    }
+    // if (loading) {
+    //     return <Spin fullscreen tip="Carregando dados..." />;
+    // }
 
     return (
         <div id="contact">

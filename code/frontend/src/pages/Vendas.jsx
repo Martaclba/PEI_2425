@@ -239,7 +239,16 @@ export default function Vendas() {
       label:  
         <Upload {...UploadFileProps(location.pathname, updateFetchTriggers)} maxCount={1}>
           <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
-            Importar Ficheiro
+            Importar Ficheiro Concorrência
+          </Button>
+        </Upload>
+    },
+    {
+      key: '2',
+      label:  
+        <Upload {...UploadFileProps(location.pathname, updateFetchTriggers)} maxCount={1}>
+          <Button icon={<HiOutlineUpload />} style={{padding: 0, margin: 0, background: 'none', border: 'none', boxShadow: 'none'}}>
+            Importar Ficheiro MyPharma
           </Button>
         </Upload>
     },

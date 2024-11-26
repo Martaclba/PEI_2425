@@ -45,7 +45,7 @@ module.exports.getSaleHistogram = async (idDelegate, year) => {
     }
   } catch (err) {
     console.log("ERROR: ", err)
-    return [{error:err, msg:'Error obtaining sales histogram'}]
+    throw new Error('Error obtaining sales histogram.');
   }
 };
 
@@ -75,7 +75,7 @@ module.exports.getSaleTotalProducts = async (idDelegate, idCompany, idBrick, idP
     return results.rows;
   } catch (err) {
     console.log("ERROR: ", err)
-    return [{error:err, msg:'Error obtaining total yearly sales by product'}]
+    throw new Error('Error obtaining total yearly sales by product.');
   }
 };
 
@@ -104,7 +104,7 @@ module.exports.getSaleProducts = async (idDelegate, year, idCompany, idBrick, id
     return results.rows;
   } catch (err) {
     console.log("ERROR: ", err)
-    return [{error:err, msg:'Error obtaining sales by products.'}]
+    throw new Error('Error obtaining sales by products.');
   }
 };
 
@@ -130,7 +130,7 @@ module.exports.getSaleBricks = async (idDelegate, year, idCompany, idBrick) => {
     return results.rows;
   } catch (err) {
     console.log("ERROR: ", err)
-    return [{error:err, msg:'Error obtaining sales by bricks.'}]
+    throw new Error('Error obtaining sales by bricks.');
   }
 };
 
@@ -145,7 +145,7 @@ module.exports.getDelegates = async (year, idCompany, idBrick, idProduct) => {
     return results.rows;
   } catch (err) {
     console.log("ERROR: ", err)
-    return {error:err, msg:'Error obtaining delegates.'}
+    throw new Error('Error obtaining delegates.');
   }
 };
 
@@ -159,7 +159,7 @@ module.exports.getYears = async (idDelegate,idCompany,idBrick,idProduct) => {
     return results.rows;
   } catch (err) {
     console.log("ERROR: ", err)
-    return {error:err, msg:'Error obtaining years.'}
+    throw new Error('Error obtaining years.');
   }
 };
 
@@ -173,7 +173,7 @@ module.exports.getCompanies = async (idDelegate, year, idBrick, idProduct) => {
     return results.rows;
   } catch (err) {
     console.log("ERROR: ", err)
-    return {error:err, msg:'Error obtaining companies.'}
+    throw new Error('Error obtaining companies.');
   }
 };
 
@@ -187,7 +187,7 @@ module.exports.getBricks = async (idDelegate,year,idCompany,idProduct) => {
     return results.rows;
   } catch (err) {
     console.log("ERROR: ", err)
-    return {error:err, msg:'Error obtaining bricks.'}
+    throw new Error('Error obtaining bricks.');
   }
 };
 
@@ -201,81 +201,88 @@ module.exports.getProducts = async (idDelegate,year,idCompany,idBrick) => {
     return results.rows;
   } catch (err) {
     console.log("ERROR: ", err)
-    return {error:err, msg:'Error obtaining products.'}
+    throw new Error('Error obtaining products.');
   }
 };
 
 
-module.exports.getDistricts = async (idDelegate) => {
+module.exports.getDistricts = async () => {
   try {
-    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
-                                                   
-    const results = await db.query('SELECT DISTINCT id_district as value, name as label FROM district WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
+    const results = await db.query('SELECT DISTINCT id_district as value, name as label FROM district ORDER BY label ASC;', []);
     return results.rows;
   } catch (err) {
     console.log("ERROR: ", err)
-    return {error:err, msg:'Error obtaining districts.'}
+    throw new Error('Error obtaining districts.');
   }
 };
 
 
-module.exports.getRegions = async (idDelegate) => {
-  try {
-    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
-                                                   
-    const results = await db.query('SELECT DISTINCT id_region as value, name as label FROM region WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
+module.exports.getRegions = async () => {
+  try {                                               
+    const results = await db.query('SELECT DISTINCT id_region as value, name as label FROM region ORDER BY label ASC;', []);
     return results.rows;
   } catch (err) {
     console.log("ERROR: ", err)
-    return {error:err, msg:'Error obtaining regions.'}
+    throw new Error('Error obtaining regions.');
   }
 };
 
-module.exports.getTowns = async (idDelegate) => {
+module.exports.getTowns = async () => {
   try {
-    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
-
-    const results = await db.query('SELECT DISTINCT id_town as value, town.name as label FROM town JOIN hmr_zone ON town.id_town = hmr_zone.fk_id_town JOIN delegate ON delegate.id_delegate = hmr_zone.fk_id_delegate WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
+    const results = await db.query('SELECT DISTINCT id_town as value, name as label FROM town ORDER BY label ASC;', []);
     return results.rows;
   } catch (err) {
     console.log("ERROR: ", err)
-    return {error:err, msg:'Error obtaining towns.'}
+    throw new Error('Error obtaining towns.');
   }
 };
 
-module.exports.getInstitutions = async (idDelegate) => {
+module.exports.getInstitutions = async () => {
   try {
-    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
-                                                   
-    const results = await db.query('SELECT DISTINCT id_institution as value, name as label FROM institution WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
+    const results = await db.query('SELECT DISTINCT id_institution as value, name as label FROM institution ORDER BY label ASC;', []);
     return results.rows;
   } catch (err) {
     console.log("ERROR: ", err)
-    return {error:err, msg:'Error obtaining institutions.'}
+    throw new Error('Error obtaining institutions.');
   }
 };
 
-module.exports.getSpecialties = async (idDelegate) => {
+module.exports.getSpecialties = async () => {
   try {
-    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
-
-    const results = await db.query('SELECT DISTINCT id_specialty as value, name as label FROM town WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
+    const results = await db.query('SELECT DISTINCT id_specialty as value, name as label FROM specialty ORDER BY label ASC;', []);
     return results.rows;
   } catch (err) {
     console.log("ERROR: ", err)
-    return {error:err, msg:'Error obtaining specialties.'}
+    throw new Error('Error obtaining specialties.');
   }
 };
 
+
+// const results = await db.query('SELECT DISTINCT id_town as value, town.name as label FROM town JOIN hmr_zone ON town.id_town = hmr_zone.fk_id_town JOIN delegate ON delegate.id_delegate = hmr_zone.fk_id_delegate WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
 module.exports.getDoctors = async (idDelegate) => {
   try {
+    console.log("IDDELEGATE ANTES DE CONVERTER",idDelegate)
     idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
-                                                   
-    const results = await db.query('SELECT DISTINCT id_doctor as value, name as label FROM doctor WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
+    console.log("MERDAAAAAAAA",idDelegate)                                               
+    const results = await db.query(`SELECT 
+                                        gd.id_doctor AS id,
+                                        gd.medico AS doctor,
+                                        gd.brick AS brick
+                                    FROM 
+                                        general_doctors gd
+                                    WHERE 
+                                        gd.brick IN (
+                                            SELECT hz.brick 
+                                            FROM general_delegates_and_bricks hz 
+                                            WHERE hz.id_delegate = $1
+                                        )
+                                    ORDER BY 
+                                        gd.medico ASC;
+                                `, [idDelegate]);
     return results.rows;
   } catch (err) {
     console.log("ERROR: ", err)
-    return {error:err, msg:'Error obtaining doctors.'}
+    throw new Error('Error obtaining doctors.');
   }
 };
 
@@ -283,11 +290,11 @@ module.exports.getPharmacies = async (idDelegate) => {
   try {
     idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
                                                    
-    const results = await db.query('SELECT DISTINCT id_pharmacy as value, name as label FROM pharmacy WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
+    const results = await db.query('SELECT DISTINCT id_pharmacy as value, name as label FROM general_pharmacies JOIN  WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
     return results.rows;
   } catch (err) {
     console.log("ERROR: ", err)
-    return {error:err, msg:'Error obtaining pharmacies.'}
+    throw new Error('Error obtaining pharmacies.');
   }
 };
 
@@ -378,10 +385,7 @@ module.exports.getVisits = (res, req) => {
 }
 
 // Add visit
-// TODO - NOT TESTED
-module.exports.createVisit = (res, req) => {
-  const { visit } = req.body;
-
+module.exports.createVisit = (visit) => {
   db.query('INSERT INTO visit (date, visit_state, fk_Brick, fk_doctor, fk_pharmacy) VALUES (?, ?, ?, ?, ?)', [visit.date, visit.visit_state, visit.fk_Brick, visit.fk_doctor, visit.fk_pharmacy], (err,results) => {
     if (err) {
       res.status(521).json({error: err, msg: "Could not add new Visit"});
