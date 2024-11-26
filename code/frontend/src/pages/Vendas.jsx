@@ -144,7 +144,7 @@ const columns_brick = [
     dataIndex: 'brick',
     fixed: 'left',
     className: 'fixed-column',
-    sorter: (a, b) => a.brick.localeCompare(b.brick)          
+    sorter: (a, b) => a.brick - b.brick          
   },
   {
     key: 'jan',
