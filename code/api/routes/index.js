@@ -69,6 +69,12 @@ router.post('/visitas/registar', async function(req, res, next) {
 
   const visit = req.body
 
+  try {
+
+  } catch (err) {
+    res.status(501).json({error: err, msg: "Error scheduling a visit"});
+  }
+  
 });
 
 /*    GET visits   */
@@ -120,10 +126,66 @@ router.post('/visitas/:id', async function(req, res, next) {
   // the products
   // doctors
   // pharmacies
-router.get('/forms/:id', function(req, res, next) { Queries.getSale(res, req) });
+router.get('/forms/:id', async function(req, res, next) { 
+  const idDelegate = req.params
+
+  const data = {
+    // districts: [],
+    // regions: [],
+    // towns: [],
+    // instituitions: [],
+    // specialties: [],
+    // products: [],
+    doctors: [],
+    pharmacies: [],
+  }
+
+  try{
+    // data.districts = await Queries.getDistricts(idDelegate)
+    // data.regions = await Queries.getRegions(idDelegate)
+    // data.towns = await Queries.getTowns(idDelegate)
+    // data.instituitions = await Queries.getInstituitions(idDelegate)
+    // data.specialties = await Queries.getSpecialties(idDelegate)
+    // data.products = await Queries.getProducts(idDelegate, null, null, null)
+    data.doctors = await Queries.getDoctors(idDelegate)
+    data.pharmacies = await Queries.getPharmacies(idDelegate)
+
+    res.status(200).json({data})
+
+  } catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining form's data"});
+  }
+});
 
 
-router.get('/forms', function(req, res, next) { Queries.getSale(res, req) });
+router.get('/forms', async function(req, res, next) { 
+  const data = {
+    districts: [],
+    regions: [],
+    towns: [],
+    instituitions: [],
+    specialties: [],
+    products: [],
+    // doctors: [],
+    // pharmacies: [],
+  }
+
+  try{
+    // data.districts = await Queries.getDistricts(null)
+    // data.regions = await Queries.getRegions(null)
+    data.towns = await Queries.getTowns(null)
+    // data.instituitions = await Queries.getInstituitions(null)
+    // data.specialties = await Queries.getSpecialties(null)
+    // data.products = await Queries.getProducts(null, null, null, null)
+    // data.doctors = await Queries.getDoctors(null)
+    // data.pharmacies = await Queries.getPharmacies(null)
+
+    res.status(200).json({data})
+
+  } catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining form's data"});
+  }
+});
 
 
 
@@ -397,6 +459,7 @@ router.post('/:id', async function(req, res, next) {
 });
 
 router.post('/', async function(req, res, next) { 
+
   const data = {
     histogram: [],
     products: [],
@@ -487,9 +550,4 @@ router.post('/', async function(req, res, next) {
   }
 });
   
-    
-
-
-
-
 module.exports = router;

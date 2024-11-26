@@ -71,6 +71,12 @@ export default function RegistarDelegado() {
         }
     };
 
+    const [form] = Form.useForm(); 
+    const handleSelect = (fieldName, option) => {
+        // Update the form field with the label when an option is selected
+        form.setFieldValue(fieldName, option.label);
+    };
+
     return(
         <div id="contact" style={{height: '100%'}}>
             <div>
@@ -84,6 +90,7 @@ export default function RegistarDelegado() {
             <div style={{width: '100%', height: '80%', justifySelf: 'center', alignContent: 'center'}}>
                 <Card>
                         <Form  
+                            form={form}
                             name="validate_other"
                             onFinish={onFinish}
                             layout='vertical'
@@ -116,15 +123,16 @@ export default function RegistarDelegado() {
                                 label="Distrito"
                                 name="Distrito"
                                 hasFeedback
+                                onSelect={(value, option) => handleSelect('Distrito', option)}
                                 rules={[{required: true, message: 'Por favor insira um distrito',},]}
                             >
 
                                 <AutoComplete
-                                    allowClear
+                                    allowClear                                    
                                     options={districts}
                                     placeholder="Insira um distrito"
                                     filterOption={(inputValue, option) =>
-                                        option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                        option?.label.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                     }
                                 />  
                             </Form.Item>
@@ -140,8 +148,9 @@ export default function RegistarDelegado() {
                                     allowClear
                                     options={regions}
                                     placeholder="Insira uma região"
+                                    onSelect={(value, option) => handleSelect('Regiao', option)}
                                     filterOption={(inputValue, option) =>
-                                        option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                        option?.label.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                     }
                                 />   
                             </Form.Item>
@@ -155,8 +164,9 @@ export default function RegistarDelegado() {
                                     allowClear
                                     options={towns}
                                     placeholder="Insira uma freguesia"
+                                    onSelect={(value, option) => handleSelect('Freguesia', option)}
                                     filterOption={(inputValue, option) =>
-                                        option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                        option?.label.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                     }
                                 />  
                             </Form.Item>

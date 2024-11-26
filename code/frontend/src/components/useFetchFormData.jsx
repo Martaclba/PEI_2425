@@ -4,55 +4,6 @@ import axios from 'axios';
 import useFormDataStore from '../context/FormData';
 import { useAuth } from '../context/Auth';
 
-const initialState = [{
-    districts: [
-        { label: 'Porto', value: 0 },
-        { label: 'Braga', value: 1 },
-        { label: 'Aveiro', value: 2 },
-    ],
-
-    regions: [
-        { label: 'Trofa', value: 0 },
-        { label: 'Faro', value: 1 },
-        { label: 'Braga', value: 2 },
-    ],
-
-    towns: [
-        { label: 'Ribeirão', value: 0 },
-        { label: 'Panoias', value: 1 },
-        { label: 'Lousado', value: 2 },
-    ],
-
-    instituitions: [
-        { label: 'Hospital da Luz', value: 0 },
-        { label: 'Hospital Trofa Saúde', value: 1 },
-        { label: 'Hospital de Braga', value: 2 },
-    ],
-
-    specialties: [
-        { label: 'Pediatra', value: 0 },
-        { label: 'Cardiologista', value: 1  },
-        { label: 'Ortopedista', value: 2 },
-    ],  
-
-    products: [
-        { label: 'Produto 0', value: 0 },
-        { label: 'Produto 1', value: 1  },
-        { label: 'Produto 2', value: 2 },
-    ],  
-    
-    doctors: [
-        { label: 'Médico 0', value: 0 },
-        { label: 'Médico 1', value: 1 },
-        { label: 'Médico 2', value: 2 },
-    ],  
-
-    pharmacies: [
-        { label: 'Farmácia 0', value: 0 },
-        { label: 'Farmácia 1', value: 1 },
-        { label: 'Farmácia 2', value: 2 },
-    ],  
-}];
 
 export function useFetchFormData(fetchTrigger) {
     const { state } = useAuth()
@@ -71,14 +22,13 @@ export function useFetchFormData(fetchTrigger) {
                 const response = await axios.get(url, { headers: { 'Content-Type': 'application/json' } });
 
                 if (response.status === 200){
-                    console.log('Data loaded successfully:', response.data);
-                    updateData(response.data); 
+                    console.log('Data loaded successfully:', response.data.data);
+                    updateData(response.data.data); 
                 } else {
                     console.error('Data loaded failed:', response.status);
                 }
             } catch (error) {
                 console.error('Error loading data :', error);
-                updateData(initialState);              // TODO: REMOVER DEPOIS
             }
         }
         

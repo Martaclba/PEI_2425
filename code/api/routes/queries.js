@@ -44,6 +44,7 @@ module.exports.getSaleHistogram = async (idDelegate, year) => {
       return [];
     }
   } catch (err) {
+    console.log("ERROR: ", err)
     return [{error:err, msg:'Error obtaining sales histogram'}]
   }
 };
@@ -73,6 +74,7 @@ module.exports.getSaleTotalProducts = async (idDelegate, idCompany, idBrick, idP
     const results = await db.query(query, [idDelegate, idCompany, idBrick, idProduct, companyName]);
     return results.rows;
   } catch (err) {
+    console.log("ERROR: ", err)
     return [{error:err, msg:'Error obtaining total yearly sales by product'}]
   }
 };
@@ -101,6 +103,7 @@ module.exports.getSaleProducts = async (idDelegate, year, idCompany, idBrick, id
 
     return results.rows;
   } catch (err) {
+    console.log("ERROR: ", err)
     return [{error:err, msg:'Error obtaining sales by products.'}]
   }
 };
@@ -126,6 +129,7 @@ module.exports.getSaleBricks = async (idDelegate, year, idCompany, idBrick) => {
     const results = await db.query(query, [idDelegate, year, idCompany, idBrick, companyName]);
     return results.rows;
   } catch (err) {
+    console.log("ERROR: ", err)
     return [{error:err, msg:'Error obtaining sales by bricks.'}]
   }
 };
@@ -140,6 +144,7 @@ module.exports.getDelegates = async (year, idCompany, idBrick, idProduct) => {
     const results = await db.query('SELECT DISTINCT id_delegate as value, delegate_name as label FROM general_table WHERE (year = $1 OR $1 IS NULL) AND (company_id = $2 OR $2 IS NULL) AND (brick = $3 OR $3 IS NULL) AND (product_cnp = $4 OR $4 IS NULL) ORDER BY label ASC;', [year, idCompany, idBrick, idProduct]);
     return results.rows;
   } catch (err) {
+    console.log("ERROR: ", err)
     return {error:err, msg:'Error obtaining delegates.'}
   }
 };
@@ -153,6 +158,7 @@ module.exports.getYears = async (idDelegate,idCompany,idBrick,idProduct) => {
     const results = await db.query('SELECT DISTINCT year as value FROM general_table WHERE (id_delegate = $1 OR $1 IS NULL) AND (company_id = $2 OR $2 IS NULL) AND (brick = $3 OR $3 IS NULL) AND (product_cnp = $4 OR $4 IS NULL) ORDER BY value ASC;', [idDelegate, idCompany, idBrick, idProduct]);
     return results.rows;
   } catch (err) {
+    console.log("ERROR: ", err)
     return {error:err, msg:'Error obtaining years.'}
   }
 };
@@ -166,6 +172,7 @@ module.exports.getCompanies = async (idDelegate, year, idBrick, idProduct) => {
     const results = await db.query('SELECT DISTINCT company_name AS label, company_id AS value FROM general_table WHERE (id_delegate = $1 OR $1 IS NULL) AND (year = $2 OR $2 IS NULL) AND (brick = $3 OR $3 IS NULL) AND (product_cnp = $4 OR $4 IS NULL) ORDER BY label ASC;', [idDelegate, year, idBrick, idProduct]);
     return results.rows;
   } catch (err) {
+    console.log("ERROR: ", err)
     return {error:err, msg:'Error obtaining companies.'}
   }
 };
@@ -179,6 +186,7 @@ module.exports.getBricks = async (idDelegate,year,idCompany,idProduct) => {
     const results = await db.query('SELECT DISTINCT brick as value FROM general_table WHERE (id_delegate = $1 OR $1 IS NULL) AND (year = $2 OR $2 IS NULL) AND (company_id = $3 OR $3 IS NULL) AND (product_cnp = $4 OR $4 IS NULL) ORDER BY value ASC;', [idDelegate, year, idCompany, idProduct]);
     return results.rows;
   } catch (err) {
+    console.log("ERROR: ", err)
     return {error:err, msg:'Error obtaining bricks.'}
   }
 };
@@ -192,21 +200,97 @@ module.exports.getProducts = async (idDelegate,year,idCompany,idBrick) => {
     const results = await db.query('SELECT DISTINCT product_cnp as value, product_name as label FROM general_table WHERE (id_delegate = $1 OR $1 IS NULL) AND (year = $2 OR $2 IS NULL) AND (company_id = $3 OR $3 IS NULL) AND (brick = $4 OR $4 IS NULL) ORDER BY label ASC;', [idDelegate, year, idCompany, idBrick]);
     return results.rows;
   } catch (err) {
+    console.log("ERROR: ", err)
     return {error:err, msg:'Error obtaining products.'}
   }
 };
 
 
-// QUERY TEST
-// IGNORE
-module.exports.getTowns = async () => {
+module.exports.getDistricts = async (idDelegate) => {
   try {
-    const results = await db.query('SELECT * FROM town ORDER BY id_town ASC');
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+                                                   
+    const results = await db.query('SELECT DISTINCT id_district as value, name as label FROM district WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
     return results.rows;
   } catch (err) {
-    throw err;
+    console.log("ERROR: ", err)
+    return {error:err, msg:'Error obtaining districts.'}
   }
 };
+
+
+module.exports.getRegions = async (idDelegate) => {
+  try {
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+                                                   
+    const results = await db.query('SELECT DISTINCT id_region as value, name as label FROM region WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    return {error:err, msg:'Error obtaining regions.'}
+  }
+};
+
+module.exports.getTowns = async (idDelegate) => {
+  try {
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+
+    const results = await db.query('SELECT DISTINCT id_town as value, town.name as label FROM town JOIN hmr_zone ON town.id_town = hmr_zone.fk_id_town JOIN delegate ON delegate.id_delegate = hmr_zone.fk_id_delegate WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    return {error:err, msg:'Error obtaining towns.'}
+  }
+};
+
+module.exports.getInstitutions = async (idDelegate) => {
+  try {
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+                                                   
+    const results = await db.query('SELECT DISTINCT id_institution as value, name as label FROM institution WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    return {error:err, msg:'Error obtaining institutions.'}
+  }
+};
+
+module.exports.getSpecialties = async (idDelegate) => {
+  try {
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+
+    const results = await db.query('SELECT DISTINCT id_specialty as value, name as label FROM town WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    return {error:err, msg:'Error obtaining specialties.'}
+  }
+};
+
+module.exports.getDoctors = async (idDelegate) => {
+  try {
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+                                                   
+    const results = await db.query('SELECT DISTINCT id_doctor as value, name as label FROM doctor WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    return {error:err, msg:'Error obtaining doctors.'}
+  }
+};
+
+module.exports.getPharmacies = async (idDelegate) => {
+  try {
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+                                                   
+    const results = await db.query('SELECT DISTINCT id_pharmacy as value, name as label FROM pharmacy WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    return {error:err, msg:'Error obtaining pharmacies.'}
+  }
+};
+
 
 
 // ! - DEPRECATED BELOW

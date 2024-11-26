@@ -14,14 +14,14 @@ const useFormDataStore = create((set) => ({
   updateFormDataStore: (data) => {
     set({
       hasFetched: true,
-      districts: data[0].districts,
-      regions: data[0].regions,
-      towns: data[0].towns,
-      instituitions: data[0].instituitions,
-      specialties: data[0].specialties,
-      products: data[0].products,
-      doctors: data[0].doctors,
-      pharmacies: data[0].pharmacies,
+      districts: data.districts,
+      regions: data.regions,
+      towns: data.towns,
+      instituitions: data.instituitions,
+      specialties: data.specialties,
+      products: data.products,
+      doctors: data.doctors,
+      pharmacies: data.pharmacies,
     });
   },
 
