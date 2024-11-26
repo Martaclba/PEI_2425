@@ -58,7 +58,6 @@ export function useFetchData(path, fetchTrigger, selectedOption) {
                 }
             } catch (error) {
                 console.error('Error loading data :', error);
-                console.log("BBBBBBB",selectedOption)
                 if(path==='/delegados'){
                     updateDelegatesFetchTrigger()
                     //updateDelegatesData()

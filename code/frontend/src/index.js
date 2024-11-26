@@ -53,7 +53,7 @@ const router = createBrowserRouter([
       },
       {
         path: "medicos/registar/",
-        element: <ProtectedRoute isAdmin={true}><RegistarMedico /></ProtectedRoute>,
+        element: <ProtectedRoute><RegistarMedico /></ProtectedRoute>,
       },
       {
         path: "medicos/detalhes/:id",

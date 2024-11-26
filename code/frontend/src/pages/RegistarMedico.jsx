@@ -8,20 +8,6 @@ import { getFormattedDate } from '../components/utils';
 import useFormDataStore from '../context/FormData';
 import { useFetchFormData } from '../components/useFetchFormData';
 
-const states= [
-    {
-        value: 'blue',
-        label: 'Indisponível',
-    },
-    {
-        value: 'volcano',
-        label: 'Inativo',
-    },
-    {
-        value: 'green',
-        label: 'Ativo',
-    },
-];
 
 const renderDisabledTag = (props) => {
     const { label, value, closable, onClose } = props;
@@ -73,6 +59,12 @@ export default function RegistarMedico() {
         }
     };
 
+    const [form] = Form.useForm(); 
+    const handleSelect = (fieldName, option) => {
+        // Update the form field with the label when an option is selected
+        form.setFieldValue(fieldName, option.label);
+    };
+
     return(
         <div id="contact" style={{height: '100%'}}>
             <div>
@@ -85,6 +77,7 @@ export default function RegistarMedico() {
 
             <div style={{width: '100%', height: '80%', justifySelf: 'center', alignContent: 'center'}}>
                         <Form  
+                            form={form}
                             name="validate_other"
                             onFinish={onFinish}
                             layout='vertical'
@@ -117,6 +110,7 @@ export default function RegistarMedico() {
                                                 allowClear
                                                 options={instituitions}
                                                 placeholder="Insira uma instituição"
+                                                onSelect={(value, option) => handleSelect('Instituicao', option)}
                                                 filterOption={(inputValue, option) =>
                                                     option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                                 }
@@ -135,6 +129,7 @@ export default function RegistarMedico() {
                                                 allowClear
                                                 options={specialties}
                                                 placeholder="Insira uma especialidade"
+                                                onSelect={(value, option) => handleSelect('Especialidade', option)}
                                                 filterOption={(inputValue, option) =>
                                                     option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                                 }
@@ -153,6 +148,7 @@ export default function RegistarMedico() {
                                                 allowClear
                                                 options={districts}
                                                 placeholder="Insira um distrito"
+                                                onSelect={(value, option) => handleSelect('Distrito', option)}
                                                 filterOption={(inputValue, option) =>
                                                     option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                                 }
@@ -171,6 +167,7 @@ export default function RegistarMedico() {
                                                 allowClear
                                                 options={regions}
                                                 placeholder="Insira uma região"
+                                                onSelect={(value, option) => handleSelect('Regiao', option)}
                                                 filterOption={(inputValue, option) =>
                                                     option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                                 }
@@ -187,6 +184,7 @@ export default function RegistarMedico() {
                                                 allowClear
                                                 options={towns}
                                                 placeholder="Insira uma freguesia"
+                                                onSelect={(value, option) => handleSelect('Freguesia', option)}
                                                 filterOption={(inputValue, option) =>
                                                     option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                                 }
@@ -235,9 +233,10 @@ export default function RegistarMedico() {
                                                 <Form.Item
                                                     name="Telefone"
                                                     hasFeedback
-                                                    rules={[{
-                                                        required: true,
-                                                        message: 'Por favor insira um telefone'}]}
+                                                    rules={[
+                                                        {pattern: /^\d{9}$/, message: 'Por favor insira 9 digitos'},
+                                                        {required: true, message: 'Por favor insira um telefone'}
+                                                    ]}
                                                     style={{ flex: 0.4}}
                                                 >
                                                     <Input allowClear placeholder="Insira um telefone" />
@@ -260,14 +259,9 @@ export default function RegistarMedico() {
                                             name="Estado">
 
                                             <Select 
-                                                allowClear
                                                 mode='multiple'         
                                                 disabled                                     
-                                                tagRender={renderDisabledTag}                                 
-                                                placeholder="Insira um estado"
-                                                options={states}
-                                                filterOption={(input, option) => 
-                                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                                tagRender={renderDisabledTag}/>
                                         </Form.Item>
 
                                         <Form.Item

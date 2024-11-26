@@ -78,6 +78,10 @@ export default function RegistarFarmacia() {
         }
     };
     
+    const handleSelect = (fieldName, option) => {
+        // Update the form field with the label when an option is selected
+        form.setFieldValue(fieldName, option.label);
+    };
 
     return(
         <div id="contact" style={{height: '100%'}}>
@@ -124,6 +128,7 @@ export default function RegistarFarmacia() {
                                             allowClear
                                             options={districts}
                                             placeholder="Insira um distrito"
+                                            onSelect={(value, option) => handleSelect('Distrito', option)}
                                             filterOption={(inputValue, option) =>
                                                 option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                             }
@@ -142,6 +147,7 @@ export default function RegistarFarmacia() {
                                             allowClear
                                             options={regions}
                                             placeholder="Insira uma região"
+                                            onSelect={(value, option) => handleSelect('Regiao', option)}
                                             filterOption={(inputValue, option) =>
                                                 option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                             }
@@ -157,6 +163,7 @@ export default function RegistarFarmacia() {
                                             allowClear
                                             options={towns}
                                             placeholder="Insira uma freguesia"
+                                            onSelect={(value, option) => handleSelect('Freguesia', option)}
                                             filterOption={(inputValue, option) =>
                                                 option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                             }
@@ -201,9 +208,10 @@ export default function RegistarFarmacia() {
                                             <Form.Item
                                                 name="Telefone"
                                                 hasFeedback
-                                                rules={[{
-                                                    required: true,
-                                                    message: 'Por favor insira um telefone'}]}
+                                                rules={[
+                                                    {pattern: /^\d{9}$/, message: 'Por favor insira 9 digitos'},
+                                                    {required: true, message: 'Por favor insira um telefone'}
+                                                ]}
                                                 style={{ flex: 0.4}}
                                             >
                                                 <Input allowClear placeholder="Insira um telefone" />

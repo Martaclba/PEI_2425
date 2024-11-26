@@ -257,15 +257,12 @@ module.exports.getSpecialties = async () => {
   }
 };
 
-
-// const results = await db.query('SELECT DISTINCT id_town as value, town.name as label FROM town JOIN hmr_zone ON town.id_town = hmr_zone.fk_id_town JOIN delegate ON delegate.id_delegate = hmr_zone.fk_id_delegate WHERE (id_delegate = $1 OR $1 IS NULL) ORDER BY label ASC;', [idDelegate]);
 module.exports.getDoctors = async (idDelegate) => {
   try {
     idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
     const results = await db.query(`SELECT 
-                                        gd.id_doctor AS id,
-                                        gd.medico AS doctor,
-                                        gd.brick AS brick
+                                        gd.id_doctor AS value,
+                                        gd.medico AS label
                                     FROM 
                                         general_doctors gd
                                     WHERE 
@@ -286,12 +283,12 @@ module.exports.getDoctors = async (idDelegate) => {
 
 module.exports.getPharmacies = async (idDelegate) => {
   try {
-    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
-                                                   
-    const results = await db.query(`SELECT 
-                                        gp.id_pharmacy AS id,
-                                        gp.pharmacy AS name,
-                                        gp.brick AS brick
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;                                                
+    console.log("idDelegate dentro de getPharmacies: ",idDelegate)                                  
+
+    const results  = await db.query(`SELECT 
+                                        gp.id_pharmacy AS value,
+                                        gp.pharmacy AS label
                                     FROM 
                                         general_pharmacies gp
                                     WHERE 
@@ -308,8 +305,6 @@ module.exports.getPharmacies = async (idDelegate) => {
     throw new Error('Error obtaining pharmacies.');
   }
 };
-
-
 
 // ! - DEPRECATED BELOW
 

@@ -8,20 +8,6 @@ import { getFormattedDate } from '../components/utils';
 import useFormDataStore from '../context/FormData';
 import { useFetchFormData } from '../components/useFetchFormData';
 
-const states= [
-    {
-        value: 'blue',
-        label: 'Indisponível',
-    },
-    {
-        value: 'volcano',
-        label: 'Inativo',
-    },
-    {
-        value: 'green',
-        label: 'Ativo',
-    },
-];
 
 const renderDisabledTag = (props) => {
     const { label, value, closable, onClose } = props;
@@ -176,14 +162,9 @@ export default function RegistarDelegado() {
                                 name="Estado">
 
                                 <Select 
-                                    allowClear
                                     mode='multiple'         
                                     disabled                                     
-                                    tagRender={renderDisabledTag}                                 
-                                    placeholder="Insira um estado"
-                                    options={states}
-                                    filterOption={(input, option) => 
-                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
+                                    tagRender={renderDisabledTag}/>
                             </Form.Item>
 
                             <Form.Item>

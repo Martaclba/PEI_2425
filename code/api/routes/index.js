@@ -135,19 +135,36 @@ router.post('/visitas/:id', async function(req, res, next) {
 /*    Get form's data    */
 // Route responsible for retrieving the form's data for the delegate
 // Should return a json structured variable with:
+  // the instituitions
+  // the specialties
+  // the districts
+  // the regions
+  // the towns
   // doctors
   // pharmacies
 router.get('/forms/:id', async function(req, res, next) { 
   const idDelegate = parseInt(req.params.id)
 
   const data = {
+    districts: [],
+    regions: [],
+    towns: [],
+    instituitions: [],
+    specialties: [],
     doctors: [],
     pharmacies: [],
   }
 
   try{
+    data.districts = await Queries.getDistricts()
+    data.regions = await Queries.getRegions()
+    data.towns = await Queries.getTowns()
+    data.instituitions = await Queries.getInstitutions()
+    data.specialties = await Queries.getSpecialties()
+
     data.doctors = await Queries.getDoctors(idDelegate)
     data.pharmacies = await Queries.getPharmacies(idDelegate)
+    
     res.status(200).json({data})
   } catch (err) {
     res.status(501).json({error: err, msg: "Error obtaining form's data"});
