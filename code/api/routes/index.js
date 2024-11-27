@@ -79,72 +79,6 @@ router.post('/import/', upload.single('excelFile'), async function(req, res, nex
 
 
 
-/*    POST visits    */
-// Route responsible for registering a visit
-const visit = {
-  Entidade: 'Médico',
-  Comprador: 2,
-  date: '24-11-2025',
-}
-router.post('/visitas/registar', async function(req, res, next) {
-
-  const visit = req.body
-  console.log("VISIT: ", visit)
-
-  try {
-    
-  } catch (err) {
-    res.status(501).json({error: err, msg: "Error scheduling a visit"});
-  }
-  
-});
-
-/*    GET visits   */
-// Route responsible for retrieving the visits of a delegate (id)
-// Should return a json structured variable with relevant information
-const data_visits = [
-  {
-    key: 0,
-    data: '12-01-2025',
-    comprador: 'Médico i',                  // pode ser um médico ou uma farmácia
-    distrito: `Distrito i`,
-    regiao: `Região i`,      
-    freguesia: `Freguesia i`,
-    morada: `Rua i`,  
-  },
-  {
-    key: 1,
-    data: '12-01-2025',
-    comprador: 'Farmácia da esquina',      // pode ser um médico ou uma farmácia
-    distrito: `Distrito i`,
-    regiao: `Região i`,      
-    freguesia: `Freguesia i`,
-    morada: `Rua i`,  
-  },
-]
-router.post('/visitas/:id', async function(req, res, next) {
-  const data = []
-
-  const filters = {
-    data: {},
-    comprador: {},
-    districts: {},
-    regions: {}
-  }
-
-  const options = req.body
-
-  try{
-
-    res.status(200).json({data})
-  } catch (err) {
-    res.status(501).json({error: err, msg: "Error obtaining form's data"});
-  }
-
-});
-
-
-
 /*    Get form's data    */
 // Route responsible for retrieving the form's data for the delegate
 // Should return a json structured variable with:
@@ -182,8 +116,8 @@ router.get('/forms/:id', async function(req, res, next) {
   } catch (err) {
     res.status(501).json({error: err, msg: "Error obtaining form's data"});
   }
-});// quais são os ficheiros q processam os dados mesmo? temos muita coisa naquelas pastas
-
+});
+  
 // Route responsible for retrieving the form's data for the admin
 // Should return a json structured variable with:
   // the instituitions
@@ -219,6 +153,94 @@ router.get('/forms', async function(req, res, next) {
 
 
 
+
+
+/*    POST visits    */
+// Route responsible for registering a visit
+const visit = {
+  Entidade: 'Médico',
+  Comprador: 2,
+  date: '24-11-2025',
+}
+router.post('/visitas/registar', async function(req, res, next) {
+
+  const visit = req.body
+  console.log("VISIT: ", visit)
+
+  try {
+    
+  } catch (err) {
+    res.status(501).json({error: err, msg: "Error scheduling a visit"});
+  }
+  
+});
+
+
+/*    GET visits   */
+// Route responsible for retrieving the visits of a delegate (id)
+// Should return a json structured variable with relevant information
+const data_visits = [
+  {
+    key: 0,
+    data: '12-01-2025',
+    comprador: 'Médico i',                  // pode ser um médico ou uma farmácia
+    distrito: `Distrito i`,
+    regiao: `Região i`,      
+    freguesia: `Freguesia i`,
+    morada: `Rua i`,  
+  },
+  {
+    key: 1,
+    data: '12-01-2025',
+    comprador: 'Farmácia da esquina',      // pode ser um médico ou uma farmácia
+    distrito: `Distrito i`,
+    regiao: `Região i`,      
+    freguesia: `Freguesia i`,
+    morada: `Rua i`,  
+  },
+]
+router.post('/visitas/:id', async function(req, res, next) {
+  const data = []
+
+  const filters = {
+    date: [],
+    entities: [], 
+    districts: [],
+    regions: []
+  }
+  const default_filter = { label: '-- Todos --', value: 'Todos'}
+  const idDelegate = req.params.id
+
+  const option_selected = req.body
+  console.log(option_selected)
+
+  try{
+    const date = option_selected.date
+    const entity = option_selected.entity                       // default: Todos
+    const district = option_selected.district                   // default: Todos
+    const region = option_selected.region                       // default: Todos
+
+    data = await Queries.getVisits(idDelegate)   
+    filters.date = await Queries.getDelegates(year,idCompany,idBrick, null)
+    filters.entities = await Queries.getYears(idDelegate,idCompany,idBrick, null)
+    filters.districts = await Queries.getCompanies(idDelegate,year,idBrick, null)
+    filters.regions = await Queries.getBricks(idDelegate,year,idCompany, null)
+
+    // Add missing default option 
+    filters.date.unshift(default_filter)
+    filters.entities.unshift(default_filter)
+    filters.districts.unshift(default_filter)
+    filters.regions.unshift(default_filter)
+
+    res.status(200).json({ data, filters })
+  } catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining scheduled visits"});
+  }
+
+});
+
+
+
 /*    POST delegates    */
 // Route responsible for registering a delegate
 router.post('/delegados/registar', function(req, res, next) { 
@@ -230,30 +252,8 @@ router.post('/delegados/registar', function(req, res, next) {
 /*    GET delegates   */
 // Route responsible for retrieving the delegates
 // Should return a json structured variable with relevant information
-const data_delegates = [
-  {  
-    key: 0,
-    id_delegate: 2,                     // apenas para depois aceder aos detalhes, não será mostrado na tabela
-    delegate_name: `Delegado i`,
-    brick: "123",
-    district: `Distrito i`,
-    region: `Região i`,      
-    town: `Freguesia i`,
-    state: "Ativo",
-  },
-  {  
-    key: 1,
-    id_delegate: 3,             
-    delegate_name: `Delegado i`,
-    brick: "123",
-    district: `Distrito i`,
-    region: `Região i`,      
-    town: `Freguesia i`,
-    state: "Ativo",
-  },
-]
 router.post('/delegados', async function(req, res, next) {;
-  const data = []
+  let data = []
 
   const filters = {
     delegates: {},
@@ -263,22 +263,22 @@ router.post('/delegados', async function(req, res, next) {;
 
   const options = req.body
 
-  // try { 
-  //     const idDelegate = options.delegate
-  //     const idDistrict = options.district
-  //     const idRegion = options.region
+  try { 
+      const idDelegate = options.delegado
+      const idDistrict = options.distrito
+      const idRegion = options.regiao
 
-  //     data = await Queries.getTableDelegates(idDelegate,idDistrict,idRegion)
+      data = await Queries.getTableDelegates(idDelegate,idDistrict,idRegion)
 
-  //     filters.delegates = await Queries.getDelegates(idDistrict,idRegion)
-  //     filters.districts = await Queries.getDistricts(idDelegate,null,null,idRegion)
-  //     filters.regions = await Queries.getRegion(idDelegate,null,idDistrict) 
+      filters.delegates = await Queries.getDelegatesFilters('general_delegates_and_bricks',idDistrict,idRegion)
+      filters.districts = await Queries.getDistrictsFilters('general_delegates_and_bricks',idDelegate,idRegion)
+      filters.regions = await Queries.getRegionsFilters('general_delegates_and_bricks',idDelegate,idDistrict) 
   
-  //   res.status(200).json({ data, filters });
-  // }
-  // catch (err) {
-  //   res.status(501).json({error: err, msg: "Error obtaining delegates table"});
-  // }
+    res.status(200).json({ data, filters });
+  }
+  catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining delegates table"});
+  }
 });
 
 
