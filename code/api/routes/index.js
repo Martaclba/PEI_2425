@@ -107,7 +107,7 @@ router.get('/forms/:id', async function(req, res, next) {
     data.regions = await Queries.getRegions()
     data.towns = await Queries.getTowns()
     data.instituitions = await Queries.getInstitutions()
-    data.specialties = await Queries.getSpecialties()
+    data.specialties = await Queries.getSpecialities()
 
     data.doctors = await Queries.getDoctors(idDelegate)
     data.pharmacies = await Queries.getPharmacies(idDelegate)
@@ -141,7 +141,7 @@ router.get('/forms', async function(req, res, next) {
     data.regions = await Queries.getRegions()
     data.towns = await Queries.getTowns()
     data.instituitions = await Queries.getInstitutions()
-    data.specialties = await Queries.getSpecialties()
+    data.specialties = await Queries.getSpecialities()
     data.products = await Queries.getProducts(null, null, null, null)
 
     res.status(200).json({data})
@@ -214,28 +214,28 @@ router.post('/visitas/:id', async function(req, res, next) {
   const option_selected = req.body
   console.log(option_selected)
 
-  try{
-    const date = option_selected.date
-    const entity = option_selected.entity                       // default: Todos
-    const district = option_selected.district                   // default: Todos
-    const region = option_selected.region                       // default: Todos
+  // try{
+  //   const date = option_selected.date
+  //   const entity = option_selected.entity                       // default: Todos
+  //   const district = option_selected.district                   // default: Todos
+  //   const region = option_selected.region                       // default: Todos
 
-    data = await Queries.getVisits(idDelegate)   
-    filters.date = await Queries.getDelegates(year,idCompany,idBrick, null)
-    filters.entities = await Queries.getYears(idDelegate,idCompany,idBrick, null)
-    filters.districts = await Queries.getCompanies(idDelegate,year,idBrick, null)
-    filters.regions = await Queries.getBricks(idDelegate,year,idCompany, null)
+  //   data = await Queries.getVisits(idDelegate)   
+  //   filters.date = await Queries.getDelegates(year,idCompany,idBrick, null)
+  //   filters.entities = await Queries.getYears(idDelegate,idCompany,idBrick, null)
+  //   filters.districts = await Queries.getCompanies(idDelegate,year,idBrick, null)
+  //   filters.regions = await Queries.getBricks(idDelegate,year,idCompany, null)
 
-    // Add missing default option 
-    filters.date.unshift(default_filter)
-    filters.entities.unshift(default_filter)
-    filters.districts.unshift(default_filter)
-    filters.regions.unshift(default_filter)
+  //   // Add missing default option 
+  //   filters.date.unshift(default_filter)
+  //   filters.entities.unshift(default_filter)
+  //   filters.districts.unshift(default_filter)
+  //   filters.regions.unshift(default_filter)
 
-    res.status(200).json({ data, filters })
-  } catch (err) {
-    res.status(501).json({error: err, msg: "Error obtaining scheduled visits"});
-  }
+  //   res.status(200).json({ data, filters })
+  // } catch (err) {
+  //   res.status(501).json({error: err, msg: "Error obtaining scheduled visits"});
+  // }
 
 });
 
@@ -263,6 +263,8 @@ router.post('/delegados', async function(req, res, next) {;
 
   const options = req.body
 
+  const default_filter = { label: '-- Todos --', value: 'Todos'}
+
   try { 
       const idDelegate = options.delegado
       const idDistrict = options.distrito
@@ -274,6 +276,11 @@ router.post('/delegados', async function(req, res, next) {;
       filters.districts = await Queries.getDistrictsFilters('general_delegates_and_bricks',idDelegate,idRegion)
       filters.regions = await Queries.getRegionsFilters('general_delegates_and_bricks',idDelegate,idDistrict) 
   
+        // Add missing default option 
+        filters.delegates.unshift(default_filter)
+        filters.districts.unshift(default_filter)
+        filters.regions.unshift(default_filter)
+
     res.status(200).json({ data, filters });
   }
   catch (err) {

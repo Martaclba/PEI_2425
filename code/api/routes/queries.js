@@ -357,7 +357,7 @@ module.exports.getInstitutions = async () => {
   }
 };
 
-module.exports.getSpecialties = async () => {
+module.exports.getSpecialities = async () => {
   try {
     const results = await db.query('SELECT DISTINCT id_specialty as value, name as label FROM specialty ORDER BY label ASC;', []);
     return results.rows;

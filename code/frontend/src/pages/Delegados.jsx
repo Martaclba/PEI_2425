@@ -171,7 +171,7 @@ export default function Delegados() {
                     <Form.Item className="large-select" label='Delegado' name='delegado'>
                       <Select                       
                         placeholder="Delegado"
-                        options={filters.delegados} 
+                        options={filters.delegates} 
                         onChange={() => form.submit()}
                         showSearch
                         filterOption={(input, option) => 
@@ -182,7 +182,7 @@ export default function Delegados() {
                     <Form.Item className="large-select" label='Distrito' name='distrito'>
                       <Select                     
                         placeholder="Distrito"
-                        options={filters.distritos} 
+                        options={filters.districts} 
                         onChange={() => form.submit()}
                         showSearch
                         filterOption={(input, option) => 
@@ -192,7 +192,7 @@ export default function Delegados() {
                     <Form.Item className="large-select" label='Região' name='regiao'>
                       <Select                     
                         placeholder="Região"
-                        options={filters.regioes} 
+                        options={filters.regions} 
                         onChange={() => form.submit()}
                         showSearch
                         filterOption={(input, option) => 

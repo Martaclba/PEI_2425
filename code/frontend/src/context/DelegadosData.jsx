@@ -25,7 +25,6 @@ const useDelegatesDataStore = create((set) => ({
     },
 
     updateDelegatesFiltersData: (filters) => {
-        console.log("AQUI",filters)
         set(() => ({
             filters: filters,
         }))
