@@ -15,13 +15,13 @@ import useMedicosDataStore from '../context/MedicosData';
 
 const columns = (navigate) => [
   {
+    key: 'doctor_name',
     title: 'Médico',
     width: '16%',
-    dataIndex: 'medico',
-    key: 'medico',
+    dataIndex: 'doctor_name',
     fixed: 'left',
     className: 'fixed-column', 
-    sorter: (a, b) => a.medico.localeCompare(b.medico)
+    sorter: (a, b) => a.doctor_name.localeCompare(b.doctor_name)
   },
   {
     key: 'brick',
@@ -31,43 +31,43 @@ const columns = (navigate) => [
     sorter: (a, b) => a.brick.localeCompare(b.brick)
   },
   {
+    key: 'district',
     title: 'Distrito',
-    dataIndex: 'distrito',
-    key: 'distrito',
+    dataIndex: 'district',
     width: '16%',
-    sorter: (a, b) => a.distrito.localeCompare(b.distrito)
+    sorter: (a, b) => a.district.localeCompare(b.district)
   },
   {
+    key: 'institution',
     title: 'Instituição',
     width: '16%',
-    dataIndex: 'instituicao',
-    key: 'instituicao',
-    sorter: (a, b) => a.instituicao.localeCompare(b.instituicao)
+    dataIndex: 'institution',
+    sorter: (a, b) => a.institution.localeCompare(b.institution)
   },
   {
+    key: 'specialty',
     title: 'Especialidade',
-    dataIndex: 'especialidade',
-    key: 'especialidade',
+    dataIndex: 'specialty',
     width: '16%',
-    sorter: (a, b) => a.especialidade.localeCompare(b.especialidade)
+    sorter: (a, b) => a.specialty.localeCompare(b.specialty)
   },
-  {
-    title: 'Estado',
-    dataIndex: 'estado',
-    key: 'estado',
-    width: '16%',
-    render: (tag) => {
-      let color = tag === 'Ativo' ? 'green' : 'blue';
-      if (tag === 'Inativo') {
-        color = 'volcano';
-      }
-      return (
-        <Tag color={color} key={tag}>
-          {tag.toUpperCase()}
-        </Tag>
-      );
-    },
-  },
+  // {
+  //   key: 'state',
+  //   title: 'Estado',
+  //   dataIndex: 'state',
+  //   width: '16%',
+  //   render: (tag) => {
+  //     let color = tag === 'Ativo' ? 'green' : 'blue';
+  //     if (tag === 'Inativo') {
+  //       color = 'volcano';
+  //     }
+  //     return (
+  //       <Tag color={color} key={tag}>
+  //         {tag.toUpperCase()}
+  //       </Tag>
+  //     );
+  //   },
+  // },
   {
     title: '',
     dataIndex: 'address',
@@ -76,25 +76,14 @@ const columns = (navigate) => [
     render: (title, entry) => (
       <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%'}}>
               <ConfigProvider theme={themeConfig}>
-                <Button onClick={() => navigate(`/medicos/detalhes/${entry.key}`)}>Detalhes</Button>  
+                <Button onClick={() => navigate(`/medicos/detalhes/${entry.id_doctor}`)}>Detalhes</Button>  
               </ConfigProvider>
       </Space>
     ),
   },
 ];
 
-const dataSource = Array.from({
-  length: 100,
-}).map((_, i) => ({
-  key: i,
-  medico: `Médico ${i}`,
-  brick: `Brick ${i}`,
-  instituicao: `Hospital ${i}`,
-  especialidade: `Especialidade ${i}`,
-  estado: i % 2 === 0 ? 'Ativo' : 'Indisponivel',
-  distrito: `Braga ${i}`
-}));
- 
+
 
 export default function Medicos() {  
   const date = getFormattedDate();
@@ -143,9 +132,9 @@ export default function Medicos() {
     // first time reloading
   const { loading } = useFetchData('/medicos', location.state?.shouldFetchData || !trigger, selectedOption)
     
-  if (loading) {
-    return <Spin fullscreen tip="Carregando dados..." />;
-  }
+  // if (loading) {
+  //   return <Spin fullscreen tip="Carregando dados..." />;
+  // }
   
   return (
     <div id="contact">
@@ -182,7 +171,7 @@ export default function Medicos() {
                   <Form.Item className="large-select" label='Médico' name='medico'>
                     <Select                       
                       placeholder="Médico"
-                      options={filters.medicos} 
+                      options={filters.doctors} 
                       onChange={() => form.submit()}
                       showSearch
                       filterOption={(input, option) => 
@@ -193,7 +182,7 @@ export default function Medicos() {
                   <Form.Item className="large-select" label='Distrito' name='distrito'>
                     <Select                     
                       placeholder="Distrito"
-                      options={filters.distritos} 
+                      options={filters.districts} 
                       onChange={() => form.submit()}
                       showSearch
                       filterOption={(input, option) => 
@@ -203,7 +192,7 @@ export default function Medicos() {
                   <Form.Item className="large-select" label='Instituição' name='instituicao'>
                     <Select                     
                       placeholder="Instituição"
-                      options={filters.instituicoes} 
+                      options={filters.institutions} 
                       onChange={() => form.submit()}
                       showSearch
                       filterOption={(input, option) => 
@@ -214,7 +203,7 @@ export default function Medicos() {
             </div>
           <Table 
             columns={columns(navigate)}
-            dataSource={dataSource}
+            dataSource={data}
             scroll={{x: 'max-content'}}
             pagination={{ pageSize: 7, showSizeChanger: false }}
             showSorterTooltip={false}                             

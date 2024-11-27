@@ -149,116 +149,6 @@ module.exports.getDelegates = async (year, idCompany, idBrick, idProduct) => {
   }
 };
 
-module.exports.getTableDelegates = async (idDelegate,idDistrict,idRegion) => {
-  try {
-    
-    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
-    idDistrict = Number.isInteger(idDistrict) ? parseInt(idDistrict) : null;
-    idRegion = Number.isInteger(idRegion) ? parseInt(idRegion) : null;
-    console.log("delegatesssss :",idDelegate)
-    console.log("districtsssss :",idDistrict)
-    console.log("regioessssssss :",idRegion)
-    const results = await db.query(`SELECT DISTINCT ROW_NUMBER() OVER () -1 as key, 
-                                    id_delegate, 
-                                    delegate AS delegate_name, 
-                                    brick, district, region, 
-                                    parish AS town, 
-                                    state 
-                                        FROM general_delegates_and_bricks
-                                        WHERE (id_delegate = $1 OR $1 IS NULL) 
-                                        AND (id_district = $2 OR $2 IS NULL) 
-                                        AND (id_region = $3 OR $3 IS NULL) 
-                                    ORDER BY delegate_name ASC;`, [idDelegate, idDistrict, idRegion]);
-      return results.rows;
-  } catch (err) {
-    console.log("ERROR: ", err)
-    throw new Error('Error obtaining delegates table.');
-  }
-};
-
-module.exports.getDelegatesFilters = async (tableName, idDelegate, idRegion) => {
-  try {    
-
-    // Verificar se o nome da tabela é válido (segurança contra injeção SQL)
-    const validTables = ['general_delegates_and_bricks'];
-    if (!validTables.includes(tableName)) {
-      throw new Error('Invalid table name');
-    }
-
-    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
-    idRegion = Number.isInteger(idRegion) ? parseInt(idRegion) : null;
-    
-    const results = await db.query(`SELECT DISTINCT 
-                                      id_delegate AS value, 
-                                      delegate AS label
-                                      FROM ${tableName}
-                                      WHERE (id_delegate = $1 OR $1 IS NULL) 
-                                      AND (id_region = $2 OR $2 IS NULL) 
-                                      ORDER BY label ASC;`, [idDelegate, idRegion]);
-    console.log("COISSSASS AQUIOO",JSON.stringify(results.rows,null,2))
-    return results.rows;
-  } catch (err) {
-    console.log("ERROR: ", err)
-    throw new Error('Error obtaining delegates filters.');
-  }
-};
-
-module.exports.getDistrictsFilters = async (tableName, idDelegate, idRegion) => {
-  try {    
-
-    // Verificar se o nome da tabela é válido (segurança contra injeção SQL)
-    const validTables = ['general_delegates_and_bricks'];
-    if (!validTables.includes(tableName)) {
-      throw new Error('Invalid table name');
-    }
-    
-    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
-    idRegion = Number.isInteger(idRegion) ? parseInt(idRegion) : null;                                                               
-    
-    const results = await db.query(`SELECT DISTINCT 
-                                      id_district AS value, 
-                                      district AS label 
-                                      FROM ${tableName}
-                                      WHERE (id_delegate = $1 OR $1 IS NULL) 
-                                      AND (id_region = $2 OR $2 IS NULL) 
-                                      ORDER BY label ASC;`, [idDelegate, idRegion]);
-    console.log("COISSSASS AQUIOO",)
-    return results.rows;
-  } catch (err) {
-    console.log("ERROR: ", err)
-    throw new Error('Error obtaining districts filters.');
-  }
-};
-
-module.exports.getRegionsFilters = async (tableName, idDelegate, idDistrict) => {
-  try {    
-
-    // Verificar se o nome da tabela é válido (segurança contra injeção SQL)
-    const validTables = ['general_delegates_and_bricks'];
-    if (!validTables.includes(tableName)) {
-      throw new Error('Invalid table name');
-    }
-    
-    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
-    idDistrict = Number.isInteger(idDistrict) ? parseInt(idDistrict) : null;                                                               
-    
-    const results = await db.query(`SELECT DISTINCT 
-                                      id_region AS value, 
-                                      region AS label 
-                                      FROM ${tableName}
-                                      WHERE (id_delegate = $1 OR $1 IS NULL) 
-                                      AND (id_district = $2 OR $2 IS NULL) 
-                                      ORDER BY label ASC;`, [idDelegate, idDistrict]);
-    console.log("COISSSASS AQUIOO",)
-    return results.rows;
-  } catch (err) {
-    console.log("ERROR: ", err)
-    throw new Error('Error obtaining delegates filters.');
-  }
-};
-
-
-
 module.exports.getYears = async (idDelegate,idCompany,idBrick,idProduct) => {
   try {
     idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
@@ -394,7 +284,6 @@ module.exports.getDoctors = async (idDelegate) => {
 module.exports.getPharmacies = async (idDelegate) => {
   try {
     idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;                                                
-    console.log("idDelegate dentro de getPharmacies: ",idDelegate)                                  
 
     const results  = await db.query(`SELECT 
                                         gp.id_pharmacy AS value,
@@ -415,6 +304,339 @@ module.exports.getPharmacies = async (idDelegate) => {
     throw new Error('Error obtaining pharmacies.');
   }
 };
+
+
+
+module.exports.getTableDelegates = async (idDelegate,idDistrict,idRegion) => {
+  try {
+    
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+    idDistrict = Number.isInteger(idDistrict) ? parseInt(idDistrict) : null;
+    idRegion = Number.isInteger(idRegion) ? parseInt(idRegion) : null;
+
+    const results = await db.query(`SELECT DISTINCT ROW_NUMBER() OVER () -1 as key, 
+                                    id_delegate, 
+                                    delegate AS delegate_name, 
+                                    brick, district, region, 
+                                    parish AS town, 
+                                    state 
+                                        FROM general_delegates_and_bricks
+                                        WHERE (id_delegate = $1 OR $1 IS NULL) 
+                                        AND (id_district = $2 OR $2 IS NULL) 
+                                        AND (id_region = $3 OR $3 IS NULL) 
+                                    ORDER BY delegate_name ASC;`, [idDelegate, idDistrict, idRegion]);
+      return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining delegates table.');
+  }
+};
+// TINHA UMA CENA MAL AQUI. idDelegate em vez de idDistrict
+module.exports.getDelegates_DelegatesFilters = async (idDistric, idRegion) => {
+  try {    
+    idDistric = Number.isInteger(idDistric) ? parseInt(idDistric) : null;
+    idRegion = Number.isInteger(idRegion) ? parseInt(idRegion) : null;
+    
+    const results = await db.query(`SELECT DISTINCT 
+                                      id_delegate AS value, 
+                                      delegate AS label
+                                      FROM general_delegates_and_bricks
+                                      WHERE (id_district = $1 OR $1 IS NULL) 
+                                      AND (id_region = $2 OR $2 IS NULL) 
+                                      ORDER BY label ASC;`, [idDistric, idRegion]);
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining delegates filters.');
+  }
+};
+
+module.exports.getDelegates_DistrictsFilters = async (idDelegate, idRegion) => {
+  try {      
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+    idRegion = Number.isInteger(idRegion) ? parseInt(idRegion) : null;                                                               
+    
+    const results = await db.query(`SELECT DISTINCT 
+                                      id_district AS value, 
+                                      district AS label 
+                                      FROM general_delegates_and_bricks
+                                      WHERE (id_delegate = $1 OR $1 IS NULL) 
+                                      AND (id_region = $2 OR $2 IS NULL) 
+                                      ORDER BY label ASC;`, [idDelegate, idRegion]);
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining delegates districts filters.');
+  }
+};
+
+module.exports.getDelegates_RegionsFilters = async (idDelegate, idDistrict) => {
+  try {        
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+    idDistrict = Number.isInteger(idDistrict) ? parseInt(idDistrict) : null;                                                               
+    
+    const results = await db.query(`SELECT DISTINCT 
+                                      id_region AS value, 
+                                      region AS label 
+                                      FROM general_delegates_and_bricks
+                                      WHERE (id_delegate = $1 OR $1 IS NULL) 
+                                      AND (id_district = $2 OR $2 IS NULL) 
+                                      ORDER BY label ASC;`, [idDelegate, idDistrict]);
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining delegates regions filters.');
+  }
+};
+
+
+
+module.exports.getTablePharmacies = async (idPharmacy,idDistrict,idRegion, idDelegate) => {
+  try {
+    
+    idPharmacy = Number.isInteger(idPharmacy) ? parseInt(idPharmacy) : null;
+    idDistrict = Number.isInteger(idDistrict) ? parseInt(idDistrict) : null;
+    idRegion = Number.isInteger(idRegion) ? parseInt(idRegion) : null;
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+
+    const results = await db.query(`SELECT DISTINCT ROW_NUMBER() OVER () -1 as key, 
+                                    id_pharmacy, 
+                                    pharmacy AS pharmacy_name, 
+                                    brick, district, region, 
+                                    parish AS town, 
+                                    address 
+                                        FROM general_pharmacies AS gp
+                                        WHERE 
+                                        gp.brick IN (
+                                          SELECT hz.brick 
+                                          FROM general_delegates_and_bricks hz 
+                                          WHERE hz.id_delegate = $4 OR $4 IS NULL
+                                        )
+                                        AND (id_pharmacy = $1 OR $1 IS NULL) 
+                                        AND (id_district = $2 OR $2 IS NULL) 
+                                        AND (id_region = $3 OR $3 IS NULL)
+                                    ORDER BY pharmacy_name ASC;`, [idPharmacy, idDistrict, idRegion, idDelegate]);
+      return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining pharmacies table.');
+  }
+};
+
+module.exports.getPharmacies_PharmaciesFilters = async (idDistrict, idRegion, idDelegate) => {
+  try {    
+    idDistrict = Number.isInteger(idDistrict) ? parseInt(idDistrict) : null;
+    idRegion = Number.isInteger(idRegion) ? parseInt(idRegion) : null;
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+
+    const results = await db.query(`SELECT DISTINCT 
+                                      id_pharmacy AS value, 
+                                      pharmacy AS label
+                                      FROM general_pharmacies AS gp
+                                      WHERE
+                                      gp.brick IN (
+                                        SELECT hz.brick 
+                                        FROM general_delegates_and_bricks hz 
+                                        WHERE hz.id_delegate = $3 OR $3 IS NULL
+                                      )
+                                      AND (id_district = $1 OR $1 IS NULL) 
+                                      AND (id_region = $2 OR $2 IS NULL) 
+                                      ORDER BY label ASC;`, [idDistrict, idRegion, idDelegate]);
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining pharmacies filters.');
+  }
+};
+
+module.exports.getPharmacies_DistrictsFilters = async (idPharmacy,idRegion, idDelegate) => {
+  try {     
+    idPharmacy = Number.isInteger(idPharmacy) ? parseInt(idPharmacy) : null; 
+    idRegion = Number.isInteger(idRegion) ? parseInt(idRegion) : null;                                                               
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+    
+    const results = await db.query(`SELECT DISTINCT 
+                                      id_district AS value, 
+                                      district AS label 
+                                      FROM general_pharmacies AS gp
+                                      WHERE
+                                      gp.brick IN (
+                                        SELECT hz.brick 
+                                        FROM general_delegates_and_bricks hz 
+                                        WHERE hz.id_delegate = $3 OR $3 IS NULL
+                                      )
+                                      AND (id_pharmacy = $1 OR $1 IS NULL) 
+                                      AND (id_region = $2 OR $2 IS NULL) 
+                                      ORDER BY label ASC;`, [idPharmacy,idRegion, idDelegate]);
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining pharmacies districts filters.');
+  }
+};
+
+module.exports.getPharmacies_RegionsFilters = async (idPharmacy,idDistrict, idDelegate) => {
+  try {        
+    idPharmacy = Number.isInteger(idPharmacy) ? parseInt(idPharmacy) : null;
+    idDistrict = Number.isInteger(idDistrict) ? parseInt(idDistrict) : null;                                                               
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+    
+    const results = await db.query(`SELECT DISTINCT 
+                                      id_region AS value, 
+                                      region AS label 
+                                      FROM general_pharmacies AS gp
+                                      WHERE
+                                      gp.brick IN (
+                                        SELECT hz.brick 
+                                        FROM general_delegates_and_bricks hz 
+                                        WHERE hz.id_delegate = $3 OR $3 IS NULL
+                                      )
+                                      AND (id_pharmacy = $1 OR $1 IS NULL) 
+                                      AND (id_district = $2 OR $2 IS NULL) 
+                                      ORDER BY label ASC;`, [idPharmacy, idDistrict, idDelegate]);
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining pharmacies regions filters.');
+  }
+};
+
+
+
+module.exports.getTableDoctors = async (idDoctor,idDistrict,idInstitution, idDelegate) => {
+  try {
+    
+    idDoctor = Number.isInteger(idDoctor) ? parseInt(idDoctor) : null;
+    idDistrict = Number.isInteger(idDistrict) ? parseInt(idDistrict) : null;
+    idInstitution = Number.isInteger(idInstitution) ? parseInt(idInstitution) : null;
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+
+    const results = await db.query(`SELECT DISTINCT ROW_NUMBER() OVER () -1 as key, 
+                                    id_doctor, 
+                                    medico AS doctor_name, 
+                                    brick, district, 
+                                    institution, speciality AS specialty, state
+                                        FROM general_doctors AS gd
+                                        WHERE 
+                                        gd.brick IN (
+                                          SELECT hz.brick 
+                                          FROM general_delegates_and_bricks hz 
+                                          WHERE hz.id_delegate = $4 OR $4 IS NULL
+                                        )
+                                        AND (id_doctor = $1 OR $1 IS NULL) 
+                                        AND (id_district = $2 OR $2 IS NULL) 
+                                        AND (id_institution = $3 OR $3 IS NULL)
+                                    ORDER BY doctor_name ASC;`, [idDoctor, idDistrict, idInstitution, idDelegate]);
+      return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining doctors table.');
+  }
+};
+
+module.exports.getDoctors_DoctorsFilters = async (idDistrict, idInstitution, idDelegate) => {
+  try {    
+    idDistrict = Number.isInteger(idDistrict) ? parseInt(idDistrict) : null;
+    idInstitution = Number.isInteger(idInstitution) ? parseInt(idInstitution) : null;
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+
+    const results = await db.query(`SELECT DISTINCT 
+                                      id_doctor AS value, 
+                                      medico AS label
+                                      FROM general_doctors AS gd
+                                      WHERE 
+                                        gd.brick IN (
+                                          SELECT hz.brick 
+                                          FROM general_delegates_and_bricks hz 
+                                          WHERE hz.id_delegate = $3 OR $3 IS NULL
+                                        )
+                                      AND (id_district = $1 OR $1 IS NULL) 
+                                      AND (id_institution = $2 OR $2 IS NULL) 
+                                      ORDER BY label ASC;`, [idDistrict, idInstitution, idDelegate]);
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining doctors filters.');
+  }
+};
+
+module.exports.getDoctors_DistrictsFilters = async (idDoctor,idInstitution, idDelegate) => {
+  try {     
+    idDoctor = Number.isInteger(idDoctor) ? parseInt(idDoctor) : null; 
+    idInstitution = Number.isInteger(idInstitution) ? parseInt(idInstitution) : null;                                                               
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+    
+    const results = await db.query(`SELECT DISTINCT 
+                                      id_district AS value, 
+                                      district AS label 
+                                      FROM general_doctors AS gd
+                                      WHERE 
+                                        gd.brick IN (
+                                          SELECT hz.brick 
+                                          FROM general_delegates_and_bricks hz 
+                                          WHERE hz.id_delegate = $3 OR $3 IS NULL
+                                        )
+                                      AND (id_doctor = $1 OR $1 IS NULL) 
+                                      AND (id_institution = $2 OR $2 IS NULL) 
+                                      ORDER BY label ASC;`, [idDoctor,idInstitution, idDelegate]);
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining doctors districts filters.');
+  }
+};
+
+module.exports.getDoctors_InstitutionsFilters = async (idDoctor,idDistrict, idDelegate) => {
+  try {        
+    idDoctor = Number.isInteger(idDoctor) ? parseInt(idDoctor) : null;
+    idDistrict = Number.isInteger(idDistrict) ? parseInt(idDistrict) : null;                                                               
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+    
+    const results = await db.query(`SELECT DISTINCT 
+                                      id_institution AS value, 
+                                      institution AS label 
+                                      FROM general_doctors AS gd
+                                      WHERE 
+                                        gd.brick IN (
+                                          SELECT hz.brick 
+                                          FROM general_delegates_and_bricks hz 
+                                          WHERE hz.id_delegate = $3 OR $3 IS NULL
+                                        )
+                                      AND (id_doctor = $1 OR $1 IS NULL) 
+                                      AND (id_district = $2 OR $2 IS NULL) 
+                                      ORDER BY label ASC;`, [idDoctor, idDistrict, idDelegate]);
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining doctors regions filters.');
+  }
+};
+
+module.exports.createDoctor = (doctor) => {
+  
+  // Optional fields
+  const town = doctor.Freguesia || null
+  const building = doctor.Edificio || null
+  const email = doctor.Email || null
+  const notes = doctor.Notas || null
+
+  // Format address
+
+  db.query(`INSERT INTO sale (notes, registry_date, fk_brick, fk_doctor, fk_pharmacy) 
+            VALUES (?, ?, ?, ?, ?)`, 
+            [doctor.notes, doctor.registry_date, doctor.fk_brick, doctor.fk_doctor, doctor.fk_pharmacy], 
+      
+  (err,results) => {  
+    if (err) {
+      console.log("ERROR: ", err)
+      throw new Error('Could not add new doctor.');
+    }
+    // res.status(201).json({msg: "Doctor successfully added"})
+  })
+}
+
+
+
 
 // ! - DEPRECATED BELOW
 

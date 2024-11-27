@@ -13,30 +13,13 @@ import useFarmaciasDataStore from '../context/FarmaciasData';
 
 const columns = (navigate) => [
   {
-    key: 'farmacia',
+    key: 'pharmacy_name',
     title: 'Farmácia',
-    dataIndex: 'farmacia',
+    dataIndex: 'pharmacy_name',
     width: '15%',
     fixed: 'left',
-    className: 'fixed-column', 
-    filters: [
-      {
-        text: 'Farmácia 1',
-        value: 'Farmácia 1',
-      },
-      {
-        text: 'Farmácia 31',
-        value: 'Farmácia 31',
-      },
-      {
-        text: 'Farmácia 2',
-        value: 'Farmácia 2',
-      },
-    ],
-    filterMode: 'tree',
-    filterSearch: true,
-    onFilter: (value, record) => record.farmacia.startsWith(value),
-    sorter: (a, b) => a.farmacia.localeCompare(b.farmacia)          
+    className: 'fixed-column',
+    sorter: (a, b) => a.pharmacy_name.localeCompare(b.pharmacy_name)          
   },
   {
     key: 'brick',
@@ -46,32 +29,32 @@ const columns = (navigate) => [
     sorter: (a, b) => a.brick.localeCompare(b.brick)
   },
   {
-    key: 'distrito',
+    key: 'district',
     title: 'Distrito',
-    dataIndex: 'distrito',
+    dataIndex: 'district',
     width: '15%',
-    sorter: (a, b) => a.distrito.localeCompare(b.distrito) 
+    sorter: (a, b) => a.district.localeCompare(b.district) 
   },
   {
-    key: 'regiao',
+    key: 'region',
     title: 'Região',
-    dataIndex: 'regiao',
+    dataIndex: 'region',
     width: '15%',
-    sorter: (a, b) => a.regiao.localeCompare(b.regiao) 
+    sorter: (a, b) => a.region.localeCompare(b.region) 
   },
   {
-    key: 'freguesia',
+    key: 'town',
     title: 'Freguesia',
-    dataIndex: 'freguesia',
+    dataIndex: 'town',
     width: '15%',
-    sorter: (a, b) => a.freguesia.localeCompare(b.freguesia) 
+    sorter: (a, b) => a.town.localeCompare(b.town) 
   },
   {
-    key: 'morada',
+    key: 'address',
     title: 'Morada',
-    dataIndex: 'morada',
+    dataIndex: 'address',
     width: '30%',
-    sorter: (a, b) => a.morada.localeCompare(b.morada) 
+    sorter: (a, b) => a.address.localeCompare(b.address) 
   },
   {
     key: 'action',
@@ -80,25 +63,12 @@ const columns = (navigate) => [
     render: (title, entry) => (
       <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%'}}>
               <ConfigProvider theme={themeConfig}>
-                <Button onClick={() => navigate(`/farmacias/detalhes/${entry.key}`)}>Detalhes</Button>  
+                <Button onClick={() => navigate(`/farmacias/detalhes/${entry.id_pharmacy}`)}>Detalhes</Button>  
               </ConfigProvider>
       </Space>
     ),
   },
 ];
-
-const dataSource = Array.from({
-  length: 100,
-}).map((_, i) => ({
-  key: i,
-  farmacia: `Farmácia ${i}`,
-  brick:`Brick ${i}`,
-  distrito: `Distrito ${i}`,
-  regiao: `Região ${i}`,      
-  freguesia: `Freguesia ${i}`,
-  morada: `Morada ${i}`,    
-  contacto: '252 543 667',    
-}));
  
 
 export default function Farmacias() {  
@@ -132,9 +102,9 @@ export default function Farmacias() {
 
   const { loading } = useFetchData('/farmacias', location.state?.shouldFetchData || !trigger, selectedOption)
 
-  if (loading) {
-    return <Spin fullscreen tip="Carregando dados..." />;
-  }
+  // if (loading) {
+  //   return <Spin fullscreen tip="Carregando dados..." />;
+  // }
 
   return (
     <div id="contact">
@@ -171,7 +141,7 @@ export default function Farmacias() {
                   <Form.Item className="large-select" label='Farmácia' name='farmacia'>
                     <Select                       
                       placeholder="Farmácia"
-                      options={filters.farmacias} 
+                      options={filters.pharmacies} 
                       onChange={() => form.submit()}
                       showSearch
                       filterOption={(input, option) => 
@@ -182,7 +152,7 @@ export default function Farmacias() {
                   <Form.Item className="large-select" label='Distrito' name='distrito'>
                     <Select                     
                       placeholder="Distrito"
-                      options={filters.distritos} 
+                      options={filters.districts} 
                       onChange={() => form.submit()}
                       showSearch
                       filterOption={(input, option) => 
@@ -192,7 +162,7 @@ export default function Farmacias() {
                   <Form.Item className="large-select" label='Região' name='regiao'>
                     <Select                     
                       placeholder="Região"
-                      options={filters.regioes} 
+                      options={filters.regions} 
                       onChange={() => form.submit()}
                       showSearch
                       filterOption={(input, option) => 
@@ -203,7 +173,7 @@ export default function Farmacias() {
             </div>
           <Table 
             columns={columns(navigate)}
-            dataSource={dataSource}
+            dataSource={data}
             scroll={{x: 'max-content'}}
             pagination={{ pageSize: 7, showSizeChanger: false }}
             showSorterTooltip={false}                            
