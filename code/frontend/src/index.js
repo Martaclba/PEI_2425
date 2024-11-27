@@ -57,7 +57,7 @@ const router = createBrowserRouter([
       },
       {
         path: "medicos/detalhes/:id",
-        element: <ProtectedRoute><EditarMedico /></ProtectedRoute>,
+        element: <ProtectedRoute isAdmin={true}><EditarMedico /></ProtectedRoute>,
       },
 
       {
@@ -70,7 +70,7 @@ const router = createBrowserRouter([
       },
       {
         path: "farmacias/detalhes/:id",
-        element: <ProtectedRoute><EditarFarmacia /></ProtectedRoute>,
+        element: <ProtectedRoute isAdmin={true}><EditarFarmacia /></ProtectedRoute>,
       },
       
       {

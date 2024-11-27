@@ -119,19 +119,20 @@ SELECT DISTINCT
     inst.name AS institution,
     sp.id_Specialty AS id_speciality,
     sp.name AS speciality,
-    doc.state AS state
+    doc.state AS state,
+    addr.street AS street,
+    addr.zip_code AS zip_code,
+    addr.building AS building,
+    CONCAT(addr.street, ', ', addr.zip_code, 
+        CASE WHEN addr.building IS NOT NULL THEN ', ' || addr.building ELSE '' END) AS full_address
 FROM 
     Doctor doc
-LEFT JOIN 
-    Doctor_Activity da ON doc.professional_id_card = da.fk_Doctor
-LEFT JOIN 
-    Institution inst ON da.fk_id_Institution = inst.id_Institution
-LEFT JOIN 
-    Specialty sp ON da.fk_id_Specialty = sp.id_Specialty
-LEFT JOIN 
-    HMR_Zone hz ON da.fk_id_Address = hz.brick
-LEFT JOIN 
-    District d ON hz.fk_id_District = d.id_District;
+LEFT JOIN Doctor_Activity da ON doc.professional_id_card = da.fk_Doctor
+LEFT JOIN Institution inst ON da.fk_id_Institution = inst.id_Institution
+LEFT JOIN Specialty sp ON da.fk_id_Specialty = sp.id_Specialty
+LEFT JOIN Address addr ON da.fk_id_Address = addr.id_Address
+LEFT JOIN HMR_Zone hz ON addr.fk_brick = hz.brick
+LEFT JOIN District d ON hz.fk_id_District = d.id_District;
 
 
 CREATE MATERIALIZED VIEW general_pharmacies AS

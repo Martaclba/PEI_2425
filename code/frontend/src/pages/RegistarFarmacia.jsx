@@ -31,11 +31,11 @@ export default function RegistarFarmacia() {
     const navigate = useNavigate()
 
     // State for the product list (initialy empty)
-    const [produtos, setProdutos] = useState([]); 
+    const [produtoLista, setProdutoLista] = useState([]); 
 
     // Function to remove a product from the list
     const deleteProduto = (key) => {
-        setProdutos(produtos.filter(produto => produto.key !== key));
+        setProdutoLista(produtoLista.filter(produto => produto.key !== key));
     };
 
     // Predefined data
@@ -43,14 +43,14 @@ export default function RegistarFarmacia() {
         Estado: [{label:'Ativo', value:'green'}],
     };
     
-    // Update the "Produtos" form field whenever "produtos" state changes
+    // Update the "Produtos" form field whenever "produtoLista" state changes
     const [form] = Form.useForm();
     useEffect(() => {
-        form.setFieldsValue({ Produtos: produtos });
-    }, [produtos, form]);
+        form.setFieldsValue({ Produtos: produtoLista });
+    }, [produtoLista, form]);
 
     // Get state from Zustand store
-    const { hasFetched, districts, regions, towns } = useFormDataStore((state) => state) 
+    const { hasFetched, districts, regions, towns, products } = useFormDataStore((state) => state) 
 
     // If the form data fetch didnt happen, then fetch the data, 
     // update the store and set the form's selects
@@ -257,7 +257,7 @@ export default function RegistarFarmacia() {
                                             <List 
                                                 id='Product_List'
                                                 bordered
-                                                dataSource={produtos}
+                                                dataSource={produtoLista}
                                                 rows={10}
                                                 style={{ maxHeight: '225px', overflow: 'auto' }}
                                                 renderItem={(produto) => (
@@ -277,7 +277,7 @@ export default function RegistarFarmacia() {
                                             )}/>
                                             
                                             {/* Pass down the state and set function to AddProduto_Component */}
-                                            <AddProdutoComponent produtos={produtos} setProdutos={setProdutos}/>
+                                            <AddProdutoComponent produtoLista={produtoLista} setProdutoLista={setProdutoLista} produtos_items={products}/>
                                         </div>
                                     </Form.Item>
 

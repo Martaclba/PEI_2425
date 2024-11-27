@@ -51,27 +51,27 @@ const columns = (navigate) => [
     width: '15%',
     sorter: (a, b) => a.town.localeCompare(b.town)
   },
-  {
-    key: 'state',
-    title: 'Estado',
-    dataIndex: 'state',
-    width: '16%',
-    render: (tags) => (
-      <>
-        {tags.map((tag) => {
-          let color = tag === 'Ativo' ? 'green' : 'geekblue';
-          if (tag === 'Inativo') {
-            color = 'volcano';
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
-  },
+  // {
+  //   key: 'state',
+  //   title: 'Estado',
+  //   dataIndex: 'state',
+  //   width: '16%',
+  //   render: (tags) => (
+  //     <>
+  //       {tags.map((tag) => {
+  //         let color = tag === 'Ativo' ? 'green' : 'geekblue';
+  //         if (tag === 'Inativo') {
+  //           color = 'volcano';
+  //         }
+  //         return (
+  //           <Tag color={color} key={tag}>
+  //             {tag.toUpperCase()}
+  //           </Tag>
+  //         );
+  //       })}
+  //     </>
+  //   ),
+  // },
   {
     key: 'action',
     title: '',
@@ -132,9 +132,9 @@ export default function Delegados() {
     // first time reloading
   const { loading } = useFetchData('/delegados', location.state?.shouldFetchData || !trigger, selectedOption)
     
-  if (loading) {
-    return <Spin fullscreen tip="Carregando dados..." />;
-  }
+  // if (loading) {
+  //   return <Spin fullscreen tip="Carregando dados..." />;
+  // }
 
   return (
       <div id="contact">

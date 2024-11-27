@@ -149,6 +149,116 @@ module.exports.getDelegates = async (year, idCompany, idBrick, idProduct) => {
   }
 };
 
+module.exports.getTableDelegates = async (idDelegate,idDistrict,idRegion) => {
+  try {
+    
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+    idDistrict = Number.isInteger(idDistrict) ? parseInt(idDistrict) : null;
+    idRegion = Number.isInteger(idRegion) ? parseInt(idRegion) : null;
+    console.log("delegatesssss :",idDelegate)
+    console.log("districtsssss :",idDistrict)
+    console.log("regioessssssss :",idRegion)
+    const results = await db.query(`SELECT DISTINCT ROW_NUMBER() OVER () -1 as key, 
+                                    id_delegate, 
+                                    delegate AS delegate_name, 
+                                    brick, district, region, 
+                                    parish AS town, 
+                                    state 
+                                        FROM general_delegates_and_bricks
+                                        WHERE (id_delegate = $1 OR $1 IS NULL) 
+                                        AND (id_district = $2 OR $2 IS NULL) 
+                                        AND (id_region = $3 OR $3 IS NULL) 
+                                    ORDER BY delegate_name ASC;`, [idDelegate, idDistrict, idRegion]);
+      return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining delegates table.');
+  }
+};
+
+module.exports.getDelegatesFilters = async (tableName, idDelegate, idRegion) => {
+  try {    
+
+    // Verificar se o nome da tabela é válido (segurança contra injeção SQL)
+    const validTables = ['general_delegates_and_bricks'];
+    if (!validTables.includes(tableName)) {
+      throw new Error('Invalid table name');
+    }
+
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+    idRegion = Number.isInteger(idRegion) ? parseInt(idRegion) : null;
+    
+    const results = await db.query(`SELECT DISTINCT 
+                                      id_delegate AS value, 
+                                      delegate AS label
+                                      FROM ${tableName}
+                                      WHERE (id_delegate = $1 OR $1 IS NULL) 
+                                      AND (id_region = $2 OR $2 IS NULL) 
+                                      ORDER BY label ASC;`, [idDelegate, idRegion]);
+    console.log("COISSSASS AQUIOO",JSON.stringify(results.rows,null,2))
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining delegates filters.');
+  }
+};
+
+module.exports.getDistrictsFilters = async (tableName, idDelegate, idRegion) => {
+  try {    
+
+    // Verificar se o nome da tabela é válido (segurança contra injeção SQL)
+    const validTables = ['general_delegates_and_bricks'];
+    if (!validTables.includes(tableName)) {
+      throw new Error('Invalid table name');
+    }
+    
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+    idRegion = Number.isInteger(idRegion) ? parseInt(idRegion) : null;                                                               
+    
+    const results = await db.query(`SELECT DISTINCT 
+                                      id_district AS value, 
+                                      district AS label 
+                                      FROM ${tableName}
+                                      WHERE (id_delegate = $1 OR $1 IS NULL) 
+                                      AND (id_region = $2 OR $2 IS NULL) 
+                                      ORDER BY label ASC;`, [idDelegate, idRegion]);
+    console.log("COISSSASS AQUIOO",)
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining districts filters.');
+  }
+};
+
+module.exports.getRegionsFilters = async (tableName, idDelegate, idDistrict) => {
+  try {    
+
+    // Verificar se o nome da tabela é válido (segurança contra injeção SQL)
+    const validTables = ['general_delegates_and_bricks'];
+    if (!validTables.includes(tableName)) {
+      throw new Error('Invalid table name');
+    }
+    
+    idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
+    idDistrict = Number.isInteger(idDistrict) ? parseInt(idDistrict) : null;                                                               
+    
+    const results = await db.query(`SELECT DISTINCT 
+                                      id_region AS value, 
+                                      region AS label 
+                                      FROM ${tableName}
+                                      WHERE (id_delegate = $1 OR $1 IS NULL) 
+                                      AND (id_district = $2 OR $2 IS NULL) 
+                                      ORDER BY label ASC;`, [idDelegate, idDistrict]);
+    console.log("COISSSASS AQUIOO",)
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining delegates filters.');
+  }
+};
+
+
+
 module.exports.getYears = async (idDelegate,idCompany,idBrick,idProduct) => {
   try {
     idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;

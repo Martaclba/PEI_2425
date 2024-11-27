@@ -8,11 +8,9 @@ import useFarmaciasDataStore from '../context/FarmaciasData';
 import useVisitasDataStore from '../context/VisitasData';
 
 export function useFetchData(path, fetchTrigger, selectedOption) {                                     
-    const [data, setData] = useState([]);                                              
-    const [filters, setFilters] = useState({});                                              
     const [loading, setLoading] = useState(true);
     const { state } = useAuth()
-    //const updateFetchTrigger = useDelegatesDataStore((state) => state.updateFetchTrigger)
+
     const { updateDelegatesFetchTrigger, updateDelegatesFiltersData, updateDelegatesData} = useDelegatesDataStore();
     const { updateMedicosFetchTrigger, updateMedicosFiltersData, updateMedicosData} = useMedicosDataStore();
     const { updateFarmaciasFetchTrigger, updateFarmaciasFiltersData, updateFarmaciasData} = useFarmaciasDataStore();
@@ -35,11 +33,11 @@ export function useFetchData(path, fetchTrigger, selectedOption) {
 
                 if (response.status === 200){
                     console.log('Data loaded successfully:', response.data);
-                    //setData(response.data)
+
                     if(path === '/delegados'){
                         updateDelegatesFetchTrigger()
-                        // updateDelegatesFiltersData()
-                        // updateDelegatesData()
+                        updateDelegatesData(response.data.data)
+                        updateDelegatesFiltersData(response.data.filters)
                     } else if (path ==='/medicos'){
                         updateMedicosFetchTrigger()
                         //updateMedicosFiltersData()
@@ -57,31 +55,15 @@ export function useFetchData(path, fetchTrigger, selectedOption) {
                     console.error('Data loaded failed:', response.status);
                 }
             } catch (error) {
-                console.error('Error loading data :', error);
-                if(path==='/delegados'){
-                    updateDelegatesFetchTrigger()
-                    //updateDelegatesData()
-                    //updateDelegatesFiltersData()
-                } else if (path ==='/medicos'){
-                    updateMedicosFetchTrigger()
-                    //updateMedicosFiltersData()
-                    //updateMedicosData()
-                } else if (path==='/farmacias'){
-                    updateFarmaciasFetchTrigger()
-                    // updateFarmaciasFiltersData()
-                    // updateFarmaciasData()
-                } else if (path==='/visitas'){
-                    updateVisitasFetchTrigger()
-                    // updateVisitasFiltersData()
-                    // updateVisitasData()
-                }
-            } finally {setLoading(false)}
+                console.error('Error loading data :', error);            
+            } finally {
+                setLoading(false)
+            }
         }
 
         console.log("Should Fetch Data: ", fetchTrigger)
         
-        // Fetch data if there's no data or if there's a trigger (update, for example)
-        // if (isMounted && (!data.lenght || fetchTrigger)) fetchData();
+        // Fetch data if there's a trigger (update, for example)
         if (isMounted && fetchTrigger) fetchData();
 
         return () => {

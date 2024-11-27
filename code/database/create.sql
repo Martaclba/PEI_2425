@@ -198,3 +198,40 @@ ALTER TABLE town ADD CONSTRAINT unique_town_name UNIQUE (name);
 ALTER TABLE company ADD CONSTRAINT unique_company_name UNIQUE (name);
 
 ALTER TABLE product ADD CONSTRAINT unique_product_company UNIQUE (name, fk_id_company);
+
+
+-- Alterar a tabela Delegate
+ALTER TABLE Delegate 
+ALTER COLUMN state TYPE VARCHAR 
+USING CASE 
+    WHEN state = TRUE THEN 'Ativo'
+    WHEN state = FALSE THEN 'Inativo'
+    ELSE 'Indisponível'
+END;
+
+-- Alterar a tabela Doctor
+ALTER TABLE Doctor 
+ALTER COLUMN state TYPE VARCHAR 
+USING CASE 
+    WHEN state = TRUE THEN 'Ativo'
+    WHEN state = FALSE THEN 'Inativo'
+    ELSE 'Indisponível'
+END;
+
+-- Alterar a tabela Doctor_Activity
+ALTER TABLE Doctor_Activity 
+ALTER COLUMN state TYPE VARCHAR 
+USING CASE 
+    WHEN state = TRUE THEN 'Ativo'
+    WHEN state = FALSE THEN 'Inativo'
+    ELSE 'Indisponível'
+END;
+
+-- Alterar a tabela Pharmacy
+ALTER TABLE Pharmacy 
+ALTER COLUMN state TYPE VARCHAR 
+USING CASE 
+    WHEN state = TRUE THEN 'Ativo'
+    WHEN state = FALSE THEN 'Inativo'
+    ELSE 'Indisponível'
+END;

@@ -29,9 +29,10 @@ const useVisitasDataStore = create((set) => ({
     data: [],
     
     filters: {
-        compradores: compradores_default, 
-        distritos: distritos_default,
-        regioes: regioes_default
+        date: [],
+        entities: [], 
+        districts: [],
+        regions: []
     },
 
     selectedOption: {

@@ -220,6 +220,22 @@ export default function Visitas() {
                                 </Form.Item>
                             )}
 
+                            
+                            {/* {showComprador && (
+                                <Form.Item
+                                    label="Morada"
+                                    name="Morada"
+                                    hasFeedback
+                                    rules={[{ required: true, message: `Por favor selecione uma morada` }]}
+                                >
+                                    <Select 
+                                        allowClear
+                                        optionLabelProp='label'
+                                        options={adresses}
+                                        placeholder="Selecione uma morada"/>
+                                </Form.Item>
+                            )} */}
+
                             <Form.Item>
                                 <Flex gap="large">
                                     <Button type="primary" htmlType="submit">
