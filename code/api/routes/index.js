@@ -35,15 +35,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-/*    POST delegates (import) */
-// Route responsible for registering multiple delegates via file uploading
-router.post('/import/delegados', function(req, res, next) { 
-  
-  // Queries.createDelegate(res, req) 
-
-});
-
-
+/*    POST sales competition (import)   */
+// Route responsible for sending the hmr file to the database
 router.post('/import/competition', upload.single('excelFile'), async function(req, res, next) {
   if (!req.file) {
       return res.status(400).json({ error: 'No competition sales file uploaded' });
@@ -188,16 +181,7 @@ const data_visits = [
     regiao: `Região i`,      
     freguesia: `Freguesia i`,
     morada: `Rua i`,  
-  },
-  {
-    key: 1,
-    data: '12-01-2025',
-    comprador: 'Farmácia da esquina',      // pode ser um médico ou uma farmácia
-    distrito: `Distrito i`,
-    regiao: `Região i`,      
-    freguesia: `Freguesia i`,
-    morada: `Rua i`,  
-  },
+  }
 ]
 router.post('/visitas/:id', async function(req, res, next) {
   const data = []
@@ -261,25 +245,25 @@ router.post('/delegados', async function(req, res, next) {;
     regions: {}
   }
 
-  const options = req.body
+  const option = req.body
 
   const default_filter = { label: '-- Todos --', value: 'Todos'}
 
   try { 
-      const idDelegate = options.delegado
-      const idDistrict = options.distrito
-      const idRegion = options.regiao
+      const idDelegate = option.delegado
+      const idDistrict = option.distrito
+      const idRegion = option.regiao
 
       data = await Queries.getTableDelegates(idDelegate,idDistrict,idRegion)
 
-      filters.delegates = await Queries.getDelegatesFilters('general_delegates_and_bricks',idDistrict,idRegion)
-      filters.districts = await Queries.getDistrictsFilters('general_delegates_and_bricks',idDelegate,idRegion)
-      filters.regions = await Queries.getRegionsFilters('general_delegates_and_bricks',idDelegate,idDistrict) 
+      filters.delegates = await Queries.getDelegates_DelegatesFilters(idDistrict,idRegion)
+      filters.districts = await Queries.getDelegates_DistrictsFilters(idDelegate,idRegion)
+      filters.regions = await Queries.getDelegates_RegionsFilters(idDelegate,idDistrict) 
   
-        // Add missing default option 
-        filters.delegates.unshift(default_filter)
-        filters.districts.unshift(default_filter)
-        filters.regions.unshift(default_filter)
+      // Add missing default option 
+      filters.delegates.unshift(default_filter)
+      filters.districts.unshift(default_filter)
+      filters.regions.unshift(default_filter)
 
     res.status(200).json({ data, filters });
   }
@@ -318,84 +302,201 @@ router.put('/delegados/detalhes/:idDelegate', function(req, res, next) {
 
 
 
-router.post('/medicos', function(req, res, next) { 
-  //Queries.getDoctors(res, req) 
+/*    GET doctor by id   */
+// Route responsible for retrieving a doctors's details
+router.get('/medicos/detalhes/:idDoctor', function(req, res, next) { 
 
-  const data = []
+  Queries.getDoctors(parseInt(req.params.id), res, req) 
+
+});
+
+/*    POST doctor    */
+// Route responsible for registering a doctor
+const doctor = {
+  Nome: 'John',
+  Instituicao: 'Hospital do Bonfim',
+  Especialidade: 'Pediatra',
+  Distrito: 'Braga',
+  Regiao: 'Braga',
+  Freguesia: '',                               // Not required
+  Rua: 'Rua bla bla bla',
+  Codigo_postal: '1234-567',
+  Edificio: '1º Esq',                          // Not required
+  Telefone: '123456789',
+  Email: 'example@hotmail.com',                // Not required
+  Estado: ['Inativo'],
+  Notas: 'Some default notes here...',         // Not required
+};
+router.post('/medicos/registar', function(req, res, next) { 
+  
+  const doctor = req.body
+
+  console.log("DOCTOR: ", doctor) 
+
+  try {
+    Queries.createDoctor(doctor)
+
+    res.status(201).json({msg: "Doctor successfully registered"})
+  } catch (err) {
+    res.status(521).json({error: err, msg: "Error registering a doctor"});
+  }
+
+});
+
+
+router.post('/medicos/:id', async function(req, res, next) { 
+  let data = []
   
   const filters = {
     doctors: {},
     districts: {},
-    institution: {}
+    institutions: {}
   }
 
-  const options = req.body
+  const option = req.body
 
-//   try{ 
-//       const idDoctor = option.doctor
-//       const idDistrict = option.district
-//       const idInstitution = option.region
-//       data = await Queries.getTableDoctors(idDoctors,idDistrict,idInstitution)   
-//       filters.delegates = await Queries.getMedicos(idDistrict,idInstitution)
-//       filters.districts = await Queries.getDistricts(null,idDoctors,null,idInstitution)
-//       filters.regions = await Queries.getInstitution(idDoctors,idDistrict) 
+  const idDelegate = req.params.id
 
-//     res.status(200).json({ data, filters });
-//   }
-//   catch (err) {
-//     res.status(501).json({error: err, msg: "Error obtaining doctors table"});
-//   }
+  const default_filter = { label: '-- Todos --', value: 'Todos'}
+
+  try{ 
+      const idDoctor = option.medico
+      const idDistrict = option.distrito
+      const idInstitution = option.instituicao
+
+      data = await Queries.getTableDoctors(idDoctor,idDistrict,idInstitution, idDelegate)   
+      
+      filters.doctors = await Queries.getDoctors_DoctorsFilters(idDistrict,idInstitution, idDelegate)
+      filters.districts = await Queries.getDoctors_DistrictsFilters(idDoctor,idInstitution,idDelegate)
+      filters.institutions = await Queries.getDoctors_InstitutionsFilters(idDoctor,idDistrict, idDelegate) 
+
+      // Add missing default option 
+      filters.doctors.unshift(default_filter)
+      filters.districts.unshift(default_filter)
+      filters.institutions.unshift(default_filter)
+
+    res.status(200).json({ data, filters });
+  }
+  catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining doctors table"});
+  }
 });
 
-/*    GET doctor by id   */
-// Route responsible for retrieving a doctors's details
-//Return:
-const doctor = {
-    Nome: 'John',
-    Instituicao: 'Hospital do Bonfim',
-    Especialidade: 'Pediatra',
-    Distrito: 'Braga',
-    Regiao: 'Braga',
-    Freguesia: '',                               // Not required
-    Rua: 'Rua bla bla bla',
-    Codigo_postal: '1234-567',
-    Edificio: '1º Esq',                          // Not required
-    Telefone: '123456789',
-    Email: 'example@hotmail.com',                // Not required
-    Estado: ['Inativo'],
-    Notas: 'Some default notes here...',         // Not required
-};
-router.get('/medicos/detalhes/:idDoctor', function(req, res, next) { Queries.getDoctors(parseInt(req.params.id), res, req) });
+router.post('/medicos', async function(req, res, next) { 
+  let data = []
+  
+  const filters = {
+    doctors: {},
+    districts: {},
+    institutions: {}
+  }
 
+  const option = req.body
 
+  const default_filter = { label: '-- Todos --', value: 'Todos'}
 
-router.post('/farmacias', function(req, res, next) { 
-  //Queries.getPharmacies(res, req) 
+  try{ 
+      const idDoctor = option.medico
+      const idDistrict = option.distrito
+      const idInstitution = option.instituicao
 
-//   const data = []
-//   const filters = {
-//     pharmacies:{},
-//     districts:{},
-//     regions:{}
-//   }
+      data = await Queries.getTableDoctors(idDoctor,idDistrict,idInstitution, null)   
+      
+      filters.doctors = await Queries.getDoctors_DoctorsFilters(idDistrict,idInstitution, null)
+      filters.districts = await Queries.getDoctors_DistrictsFilters(idDoctor,idInstitution,null)
+      filters.institutions = await Queries.getDoctors_InstitutionsFilters(idDoctor,idDistrict, null) 
 
-//   const options = req.bo
+      // Add missing default option 
+      filters.doctors.unshift(default_filter)
+      filters.districts.unshift(default_filter)
+      filters.institutions.unshift(default_filter)
 
-//   try{ 
-//       const idPharmacy = option.pharmacy
-//       const idDistrict = option.district
-//       const idRegion = option.region
-//       data = await Queries.getTablePharmacies(idPharmacy,idDistrict,idRegion)   
-//       filters.pharmacies = await Queries.getDelegates(idDistrict,idRegion)
-//       filters.districts = await Queries.getDistricts(null,null,idPharmacy,idRegion)
-//       filters.regions = await Queries.getRegion(null,idPharmacy,idDistrict) 
-
-//     res.status(200).json({ data, filters });
-//   }
-//   catch (err) {
-//     res.status(501).json({error: err, msg: "Error obtaining delagates table"});
-//   }
+    res.status(200).json({ data, filters });
+  }
+  catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining doctors table"});
+  }
 });
+
+
+
+router.post('/farmacias/:id', async function(req, res, next) { 
+  let data = []
+
+  const filters = {
+    pharmacies: {},
+    districts: {},
+    regions: {}
+  }
+
+  const idDelegate = req.params.id
+
+  const option = req.body
+
+  const default_filter = { label: '-- Todos --', value: 'Todos'}
+
+  try{ 
+    const idPharmacy = option.farmacia
+    const idDistrict = option.distrito
+    const idRegion = option.regiao
+    
+    data = await Queries.getTablePharmacies(idPharmacy,idDistrict,idRegion, idDelegate)
+
+    filters.pharmacies = await Queries.getPharmacies_PharmaciesFilters(idDistrict,idRegion, idDelegate)
+    filters.districts = await Queries.getPharmacies_DistrictsFilters(idPharmacy,idRegion, idDelegate)
+    filters.regions = await Queries.getPharmacies_RegionsFilters(idPharmacy,idDistrict, idDelegate) 
+
+    // Add missing default option 
+    filters.pharmacies.unshift(default_filter)
+    filters.districts.unshift(default_filter)
+    filters.regions.unshift(default_filter)
+
+    res.status(200).json({ data, filters });
+  }
+  catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining pharmacies table"});
+  }
+});
+
+router.post('/farmacias', async function(req, res, next) { 
+  let data = []
+
+  const filters = {
+    pharmacies: {},
+    districts: {},
+    regions: {}
+  }
+
+  const option = req.body
+
+  const default_filter = { label: '-- Todos --', value: 'Todos'}
+
+  try{ 
+    const idPharmacy = option.farmacia
+    const idDistrict = option.distrito
+    const idRegion = option.regiao
+    
+    data = await Queries.getTablePharmacies(idPharmacy,idDistrict,idRegion, null)
+
+    filters.pharmacies = await Queries.getPharmacies_PharmaciesFilters(idDistrict,idRegion, null)
+    filters.districts = await Queries.getPharmacies_DistrictsFilters(idPharmacy,idRegion, null)
+    filters.regions = await Queries.getPharmacies_RegionsFilters(idPharmacy,idDistrict, null) 
+
+    // Add missing default option 
+    filters.pharmacies.unshift(default_filter)
+    filters.districts.unshift(default_filter)
+    filters.regions.unshift(default_filter)
+
+    res.status(200).json({ data, filters });
+  }
+  catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining pharmacies table"});
+  }
+});
+
+
+
+
 
 /*    GET pharmacy by id   */
 // Route responsible for retrieving a pharmacy's details
@@ -415,7 +516,7 @@ const pharmacy = {
   Produtos: [{ key: '1', label: 'Produto 1' }]  // Not required 
 };
 router.get('/farmacias/detalhes/:idPharmacy', function(req, res, next) { 
-  Queries.getPharmacies(parseInt(req.params.id), res, req) 
+  Queries.getPharmacies(parseInt(req.params.idPharmacy), res, req) 
 });
 
 
@@ -447,7 +548,6 @@ router.post('/:id', async function(req, res, next) {
   const idDelegate = req.params.id
   const { type, option_selected } = req.body
 
-  // console.log('Type:', type, "Option Select: ", option_selected);
 
   try {
     if (type === 'histogram') {              
