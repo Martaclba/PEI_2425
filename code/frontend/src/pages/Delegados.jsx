@@ -28,7 +28,7 @@ const columns = (navigate) => [
     title: 'Brick',
     dataIndex: 'brick',
     width: '15%',
-    sorter: (a, b) => a.brick.localeCompare(b.brick)
+    sorter: (a, b) => a.brick - b.brick
   },
   {
     key: 'district',

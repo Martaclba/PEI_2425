@@ -43,7 +43,7 @@ const columns = (navigate) => [
     title: 'Brick',
     dataIndex: 'brick',
     width: '15%',
-    sorter: (a, b) => a.brick.localeCompare(b.brick)
+    sorter: (a, b) => a.brick - b.brick
   },
   {
     key: 'distrito',
@@ -92,7 +92,7 @@ const dataSource = Array.from({
 }).map((_, i) => ({
   key: i,
   farmacia: `Farmácia ${i}`,
-  brick:`Brick ${i}`,
+  brick: i,
   distrito: `Distrito ${i}`,
   regiao: `Região ${i}`,      
   freguesia: `Freguesia ${i}`,

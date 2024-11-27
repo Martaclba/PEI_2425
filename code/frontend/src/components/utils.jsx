@@ -37,3 +37,22 @@ export const getColumnsProdutoTotal = () => {
     // Combine the base columns with the dynamically generated year columns
     return [...baseColumns, ...yearColumns];
   };
+
+//Compare dates on the visitas table
+export function compareDates(date1, date2) {
+    // Parse the dates
+    const [day1, month1, year1] = date1.split('-').map(Number);
+    const [day2, month2, year2] = date2.split('-').map(Number);
+    
+    const d1 = new Date(year1, month1 - 1, day1); // JavaScript months are 0-indexed
+    const d2 = new Date(year2, month2 - 1, day2);
+    
+    // Compare the dates
+    if (d1 < d2) {
+        return -1;
+    } else if (d1 > d2) {
+        return 1;
+    } else {
+        return 0;
+    }
+}

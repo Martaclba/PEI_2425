@@ -12,6 +12,7 @@ import { useFetchData } from '../components/useFetchData';
 import { useFetchFormData } from '../components/useFetchFormData';
 import useVisitasDataStore from '../context/VisitasData';
 import useFormDataStore from '../context/FormData';
+import { compareDates } from '../components/utils';
 
 // For the table
 const columns = [
@@ -22,11 +23,11 @@ const columns = [
     width: '15%',
     fixed: 'left',
     className: 'fixed-column', 
-    sorter: (a, b) => a.data.localeCompare(b.data)          
+    sorter: (a, b) => compareDates(a.data,b.data)          
   },
   {
     key: 'comprador',
-    title: 'Comprador',
+    title: 'Entidade de Saúde',
     dataIndex: 'comprador',
     width: '15%',
     sorter: (a, b) => a.comprador.localeCompare(b.comprador)          
@@ -193,7 +194,7 @@ export default function Visitas() {
                             </Form.Item>
 
                             <Form.Item
-                                label="Entidade de Saúde"
+                                label="Tipo de Entidade de Saúde"
                                 name="Entidade"
                                 hasFeedback
                                 rules={[{ required: true, message: 'Por favor selecione uma entidade' }]}
@@ -276,9 +277,9 @@ export default function Visitas() {
                                         />
                                 </Form.Item>
                         
-                                <Form.Item className="large-select" label='Comprador' name='comprador'>
+                                <Form.Item className="large-select" label='Entidade de Saúde' name='comprador'>
                                     <Select                       
-                                        placeholder="Comprador"
+                                        placeholder="Entidade de Saúde"
                                         options={filters.compradores} 
                                         onChange={() => form_filtros.submit()}
                                         showSearch

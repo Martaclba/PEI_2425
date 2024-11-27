@@ -28,7 +28,7 @@ const columns = (navigate) => [
     title: 'Brick',
     dataIndex: 'brick',
     width: '15%',
-    sorter: (a, b) => a.brick.localeCompare(b.brick)
+    sorter: (a, b) => a.brick - b.brick
   },
   {
     title: 'Distrito',
@@ -88,7 +88,7 @@ const dataSource = Array.from({
 }).map((_, i) => ({
   key: i,
   medico: `Médico ${i}`,
-  brick: `Brick ${i}`,
+  brick: i,
   instituicao: `Hospital ${i}`,
   especialidade: `Especialidade ${i}`,
   estado: i % 2 === 0 ? 'Ativo' : 'Indisponivel',
