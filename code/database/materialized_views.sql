@@ -164,7 +164,18 @@ LEFT JOIN
 LEFT JOIN 
     Representative rep ON ph.fk_id_Representative = rep.id_Representative;
 
-
+CREATE MATERIALIZED VIEW general_visit_local AS
+SELECT 
+    v.id_Visit AS id_visit,
+    COALESCE(gd.id_doctor, gp.id_pharmacy) AS id_entity_, -- ID do médico ou da farmácia
+    COALESCE(gd.medico, gp.representative) AS entidade_saude, -- Nome do médico ou representante
+    COALESCE(gd.institution, gp.pharmacy) AS local -- Nome do hospital ou farmácia
+FROM 
+    Visit v
+LEFT JOIN 
+    general_doctors gd ON v.fk_Doctor = gd.id_doctor
+LEFT JOIN 
+    general_pharmacies gp ON v.fk_Pharmacy = gp.id_pharmacy;
 
 
 -- ******************************************************** TRASH *********************************************************************

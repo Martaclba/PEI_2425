@@ -44,6 +44,7 @@ const columns = [
     title: 'Local',
     dataIndex: 'local',
     width: '15%',
+    sorter: (a, b) => a.local.localeCompare(b.local) 
   },
 ];
 
@@ -73,7 +74,8 @@ export default function Visitas() {
     const { trigger, data, filters, selectedOption } = useVisitasDataStore(state => state);
     const { updateVisitasFetchTrigger, updateSelectedOption } = useVisitasDataStore();
     const { hasFetched, doctors, pharmacies, instituitions } = useFormDataStore((state) => state) 
-    
+    const [institutions, setInstitutions] = useState([]);
+
     // If the form data fetch didnt happen, then fetch the data, 
     // update the store and set the form's selects
     useFetchFormData(!hasFetched)
@@ -120,7 +122,7 @@ export default function Visitas() {
     const handleComprador = (value, option) => {
         // Clear the Comprador field when Tipo_comprador changes or is cleared
         // Reset Comprador state and field
-        form.setFieldsValue({ Comprador: undefined });
+        form.setFieldsValue({ Comprador: undefined, Local: undefined });
 
         setShowComprador(false); // Hide by default
         
@@ -132,6 +134,20 @@ export default function Visitas() {
         }
     }
 
+    // Fetch institutions for the selected doctor
+    const getInstitutions = async (doctorId) => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_PATH}/institutions/${doctorId}`);
+            
+            if (response.status === 200) {                
+                setInstitutions(response.data);
+            } else {
+                message.error("Erro ao buscar instituições.");
+            }
+        } catch (error) {
+            message.error("Erro ao buscar instituições.");
+        }
+    };
 
     const [form_filtros] = Form.useForm();
     const onFinish = (values) => {
@@ -203,7 +219,14 @@ export default function Visitas() {
                                         allowClear
                                         optionLabelProp='label'
                                         options={options}
-                                        placeholder={placeholder}/>
+                                        placeholder={placeholder}
+                                        onChange={(value) => {
+                                            if (tipoComprador === 'Médico') {
+                                                // Fetch institutions when a doctor is selected
+                                                getInstitutions(value); 
+                                            }
+                                        }}
+                                    />
                                 </Form.Item>
                             )}
                             
@@ -217,7 +240,7 @@ export default function Visitas() {
                                     <Select 
                                         allowClear
                                         optionLabelProp='label'
-                                        options={instituitions}
+                                        options={institutions}
                                         placeholder="Selecione uma instituição"/>
                                 </Form.Item>
                             )}

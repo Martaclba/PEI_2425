@@ -87,9 +87,9 @@ module.exports.getSaleProducts = async (idDelegate, year, idCompany, idBrick, id
     companyName = idCompany === null ? 'MyPharma' : null;
     idBrick = Number.isInteger(idBrick) ? parseInt(idBrick) : null;
     idProduct = Number.isInteger(idProduct) ? parseInt(idProduct) : null;
-    let query = `SELECT ROW_NUMBER() OVER () -1 as key,  product_name,  CAST(SUM(jan) AS INT) AS jan,
-             CAST(SUM(feb) AS INT) AS feb, CAST(SUM(mar) AS INT) AS mar, CAST(SUM(apr)) AS INT) AS apr, CAST(SUM(may) AS INT) AS may,
-             CAST(SUM(jun) AS INT) AS jun, CAST(SUM(jul) AS INT) AS jul, CAST(SUM(aug) AS INT) AS aug,  CAST(SUM(sep) AS INT) AS sep,
+    let query = `SELECT ROW_NUMBER() OVER () -1 as key,  product_name, CAST(SUM(jan) AS INT) AS jan,
+             CAST(SUM(feb) AS INT) AS feb, CAST(SUM(mar) AS INT) AS mar, CAST(SUM(apr) AS INT) AS apr, CAST(SUM(may) AS INT) AS may,
+             CAST(SUM(jun) AS INT) AS jun, CAST(SUM(jul) AS INT) AS jul, CAST(SUM(aug) AS INT) AS aug, CAST(SUM(sep) AS INT) AS sep,
              CAST(SUM(oct) AS INT) AS oct, CAST(SUM(nov) AS INT) AS nov, CAST(SUM(dec) AS INT) AS dec
             FROM general_table
             WHERE (id_delegate = $1 OR $1 IS NULL)
@@ -116,7 +116,7 @@ module.exports.getSaleBricks = async (idDelegate, year, idCompany, idBrick) => {
     companyName = idCompany === null ? 'MyPharma' : null;
     idBrick = Number.isInteger(idBrick) ? parseInt(idBrick) : null;
     let query = `SELECT ROW_NUMBER() OVER () -1 as key, brick, CAST(SUM(jan) AS INT) AS jan,
-                    CAST(SUM(feb) AS INT) AS feb, CAST(SUM(mar) AS INT) AS mar, CAST(SUM(apr)) AS INT) AS apr, CAST(SUM(may) AS INT) AS may,
+                    CAST(SUM(feb) AS INT) AS feb, CAST(SUM(mar) AS INT) AS mar, CAST(SUM(apr) AS INT) AS apr, CAST(SUM(may) AS INT) AS may,
                     CAST(SUM(jun) AS INT) AS jun, CAST(SUM(jul) AS INT) AS jul, CAST(SUM(aug) AS INT) AS aug,  CAST(SUM(sep) AS INT) AS sep,
                     CAST(SUM(oct) AS INT) AS oct, CAST(SUM(nov) AS INT) AS nov, CAST(SUM(dec) AS INT) AS dec
                   FROM general_table
@@ -389,6 +389,28 @@ module.exports.getDelegates_RegionsFilters = async (idDelegate, idDistrict) => {
   }
 };
 
+module.exports.createDelegate = async (delegate) => {
+  
+  // Optional fields
+  const town = delegate.Freguesia? delegate.Freguesia : null;
+  
+  // 
+  const name = delegate.Primeiro + delegate.Ultimo;
+  const state = delegate.Estado[0].label
+  // const registry_date = Date.now()
+
+  try{
+    const results = await db.query('INSERT INTO delegate (name, state) VALUES ($1, $2) RETURNING id_delegate;',  [name, state])
+    
+    // Access the generated ID from the result
+    const id_delegate = results.rows[0].id_delegate;
+
+    
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Could not add new delegate.');
+  }
+}
 
 
 module.exports.getTablePharmacies = async (idPharmacy,idDistrict,idRegion, idDelegate) => {
@@ -667,18 +689,7 @@ module.exports.createSale= (res, req) => {
   })
 }
 
-// Add delegate
-// TODO - NOT TESTED 
-// TODO - adicionar contacto
-module.exports.createDelegate= (res, req) => {
-  const { del } = req.body;
-  db.query('INSERT INTO delegate (name, registry_date, state, fk_id_contact) VALUES (?, ?, ?, ?)', [del.name, del.registry_date, true, del.fk_id_contact], (err,results) => {
-    if (err) {
-      res.status(503).json({error: err, msg: "Could not add new Delegate"});
-    }
-    res.status(201).json({msg: "Delegate successfully added with ID: ${results.insertId}"})
-  })
-}
+
 
 
 // Obtain delegate by id 

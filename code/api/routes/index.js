@@ -145,7 +145,17 @@ router.get('/forms', async function(req, res, next) {
 });
 
 
+router.get('/institutions/:idDoctor', async function(req, res, next) { 
 
+  try{
+
+
+    // res.status(200).json({data})
+
+  } catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining form's data"});
+  }
+});
 
 
 /*    POST visits    */
@@ -202,20 +212,19 @@ router.post('/visitas/:id', async function(req, res, next) {
      const date = option_selected.date
      const entity = option_selected.entity                       
 
-     data = await Queries.getVisits(idDelegate,date,entity) 
-     filters.date = await Queries.getDate(idDelegate,entity)  
-     filters.entities = await Queries.getEntities(idDelegate,data)
-  }
+    //  data = await Queries.getVisits(idDelegate,date,entity) 
+    //  filters.date = await Queries.getDate(idDelegate,entity)  
+    //  filters.entities = await Queries.getEntities(idDelegate,data)
   //   // Add missing default option 
   //   filters.date.unshift(default_filter)
   //   filters.entities.unshift(default_filter)
   //   filters.districts.unshift(default_filter)
   //   filters.regions.unshift(default_filter)
 
-    //    res.status(200).json({ data, filters })
-    // } catch (err) {
-    //  res.status(501).json({error: err, msg: "Error obtaining scheduled visits"});
-    // }
+    res.status(200).json({ data, filters })
+  } catch (err) {
+     res.status(501).json({error: err, msg: "Error obtaining scheduled visits"});
+  }
   
 });
 
@@ -223,10 +232,30 @@ router.post('/visitas/:id', async function(req, res, next) {
 
 /*    POST delegates    */
 // Route responsible for registering a delegate
+
+/*
+
+{
+  Primeiro: 'asda', 
+  Ultimo: 'asd', 
+  Distrito: 'adsd', 
+  Regiao: 'asdasd', 
+  Freguesia: 'asd', 
+  Estado: [{label: 'Ativo', value: 'green'}]
+}
+
+*/
 router.post('/delegados/registar', function(req, res, next) { 
   
-  // Queries.createDelegate(res, req) 
+  const delegate = req.body
 
+  try {
+    Queries.createDelegate(delegate)
+
+    res.status(201).json({msg: "Doctor successfully registered"})
+  } catch (err) {
+    res.status(503).json({error: err, msg: "Error registering a doctor"});
+  }
 });
 
 /*    GET delegates   */
