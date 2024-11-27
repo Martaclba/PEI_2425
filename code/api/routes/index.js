@@ -9,6 +9,37 @@ const path = require('path');
 const dirPath = path.join(__dirname, '../uploads');
 
 
+//
+function splitName(fullName) {
+  // Trim any leading or trailing whitespace
+  fullName = fullName.trim();
+  if (!fullName) {
+    return { Primeiro: '', Ultimo: '' };
+  }
+  
+  if (fullName.length === 2) {
+    return{ Primeiro: fullName[0], Ultimo: fullName[1] }
+  };
+  
+  const parts = fullName.split(' ');
+  const primeiro = parts[0] || ''; 
+  const ultimo = parts.slice(1).join(' ') || ''; 
+
+  return { Primeiro: primeiro, Ultimo: ultimo, }
+}
+
+//
+function parseAddress(address) {
+  // Split the address by commas and trim spaces around the parts
+  const parts = address.split(',').map(part => part.trim());
+
+  return {
+    Rua: parts[0] || '',          
+    Codigo_Postal: parts[1] || '', 
+    Edificio: parts[2] || ''       
+  };
+}
+
 // Configure multer storage
 const storage = multer.diskStorage({  
   // Where to store the files
@@ -298,23 +329,39 @@ router.post('/delegados', async function(req, res, next) {;
 });
 
 
+
 /*    Get delegate by id   */
 // Route responsible for retrieving a delegate's details
 // Return:
-const delegate = {
+router.get('/delegados/detalhes/:brick', async function(req, res, next) { 
+  let delegate_raw = {}
+  const delegate = {
     Nome: {
-      Primeiro: 'John',
-      Ultimo : 'Doe'
+      Primeiro: '',
+      Ultimo : ''
     },
-    Distrito: 'Braga',
-    Regiao: 'Braga',
+    Distrito: '',
+    Regiao: '',
     Freguesia: '',                               // Not required
-    Estado: ['Inativo'],
-};
-router.get('/delegados/detalhes/:idDelegate', function(req, res, next) { 
-  
-  // Queries.getDelegates(parseInt(req.params.id), res, req) 
+    Estado: [],
+  }
 
+  const brick = parseInt(req.params.brick)
+
+  try {
+    
+    delegate_raw = await Queries.getDelegateById(brick)
+    
+    delegate.Nome = splitName(delegate_raw.delegate)
+    delegate.Distrito = delegate_raw.district
+    delegate.Regiao = delegate_raw.region
+    delegate.Freguesia = delegate_raw.parish
+    delegate.Estado.push(delegate_raw.state)
+
+    res.status(200).json(delegate);
+  } catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining delegate's details"});
+  }
 });
 
 /*    PUT delegate by id   */
@@ -329,29 +376,55 @@ router.put('/delegados/detalhes/:idDelegate', function(req, res, next) {
 
 /*    GET doctor by id   */
 // Route responsible for retrieving a doctors's details
-router.get('/medicos/detalhes/:idDoctor', function(req, res, next) { 
+router.get('/medicos/detalhes/:idDoctor',async function(req, res, next) { 
+  let doctor_raw = {}
 
-  Queries.getDoctors(parseInt(req.params.id), res, req) 
+  const doctor = {
+    Nome: '',
+    Instituicao: '',
+    Especialidade: '',
+    Distrito: '',
+    Regiao: '',
+    Freguesia: '',            // Not required
+    Rua: '',
+    Codigo_postal: '',
+    Edificio: '',             // Not required
+    Telefone: '',
+    Email: '',                // Not required
+    Estado: [],
+    Notas: '',
+  }
 
+  const idDoctor = parseInt(req.params.idDoctor)
+
+  try {    
+    doctor_raw = await Queries.getDoctorById(idDoctor)
+    const address = parseAddress(doctor_raw.full_address)
+    
+    doctor.Nome = doctor_raw.medico
+    doctor.Instituicao = doctor_raw.instituition
+    doctor.Especialidade = doctor_raw.specialty
+    doctor.Distrito = doctor_raw.district
+    doctor.Regiao = doctor_raw.region
+    doctor.Freguesia = doctor_raw.town
+    doctor.Rua = address.Rua
+    doctor.Codigo_postal = address.Codigo_Postal
+    doctor.Edificio = address.Edificio
+    doctor.Telefone = doctor_raw.phone
+    doctor.Email = doctor_raw.email
+    doctor.Estado.push(doctor_raw.state)
+    doctor.Notas = doctor_raw.notes
+
+    console.log("GET DOCTOR: ", doctor)
+
+    res.status(200).json(doctor);
+  } catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining doctor's details"});
+  } 
 });
 
 /*    POST doctor    */
 // Route responsible for registering a doctor
-const doctor = {
-  Nome: 'John',
-  Instituicao: 'Hospital do Bonfim',
-  Especialidade: 'Pediatra',
-  Distrito: 'Braga',
-  Regiao: 'Braga',
-  Freguesia: '',                               // Not required
-  Rua: 'Rua bla bla bla',
-  Codigo_postal: '1234-567',
-  Edificio: '1º Esq',                          // Not required
-  Telefone: '123456789',
-  Email: 'example@hotmail.com',                // Not required
-  Estado: ['Inativo'],
-  Notas: 'Some default notes here...',         // Not required
-};
 router.post('/medicos/registar', function(req, res, next) { 
   
   const doctor = req.body
@@ -526,22 +599,49 @@ router.post('/farmacias', async function(req, res, next) {
 /*    GET pharmacy by id   */
 // Route responsible for retrieving a pharmacy's details
 //Return:
-const pharmacy = {
-  Nome: 'Farmácia A',
-  Distrito: 'Braga',
-  Regiao: 'Celeirós',
-  Freguesia: 'Celeirós',                        // Not required                                  
-  Rua: 'Rua bla bla bla',
-  Codigo_postal: '1234-567',
-  Edificio: '1º Esq',                           // Not required
-  Telefone: '123456789',                         
-  Email: 'example@hotmail.com',                 // Not required
-  Estado: ['Indisponível'],
-  Notas: '',                                    // Not required             
-  Produtos: [{ key: '1', label: 'Produto 1' }]  // Not required 
-};
-router.get('/farmacias/detalhes/:idPharmacy', function(req, res, next) { 
-  Queries.getPharmacies(parseInt(req.params.idPharmacy), res, req) 
+router.get('/farmacias/detalhes/:idPharmacy', async function(req, res, next) {
+  let pharmacy_raw = {}
+
+  const pharmacy = {
+    Nome: '',
+    Distrito: '',
+    Regiao: '',
+    Freguesia: '',       // Not required                                  
+    Rua: '',
+    Codigo_postal: '',
+    Edificio: '',        // Not required
+    Telefone: '',                         
+    Email: '',           // Not required
+    Representante: '',
+    Estado: [],
+    Notas: '',           // Not required             
+    Produtos: []         // Not required 
+  }
+
+  const idPharmacy = parseInt(req.params.idPharmacy)
+
+  try {    
+    pharmacy_raw = await Queries.getPharmacyById(idPharmacy)
+    const address = parseAddress(pharmacy_raw.address)
+    
+    pharmacy.Nome = pharmacy_raw.pharmacy
+    pharmacy.Distrito = pharmacy_raw.district
+    pharmacy.Regiao = pharmacy_raw.region
+    pharmacy.Freguesia = pharmacy_raw.town
+    pharmacy.Rua = address.Rua
+    pharmacy.Codigo_postal = address.Codigo_Postal
+    pharmacy.Edificio = address.Edificio
+    pharmacy.Representante = pharmacy_raw.representative
+    pharmacy.Telefone = pharmacy_raw.phone
+    pharmacy.Email = pharmacy_raw.email
+    pharmacy.Estado.push(pharmacy_raw.state)
+    pharmacy.Notas = pharmacy_raw.notes
+    // pharmacy.Produtos = 'AAAAAAA'
+
+    res.status(200).json(pharmacy);
+  } catch (err) {
+    res.status(501).json({error: err, msg: "Error obtaining pharmacy's details"});
+  }  
 });
 
 

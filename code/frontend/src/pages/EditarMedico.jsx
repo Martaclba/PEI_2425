@@ -75,7 +75,7 @@ export default function EditarMedico() {
     useFetchFormData(!hasFetched)
 
     // Fetch the user's info
-    const { data, loading } = useFetchUser(location.pathname, 'doctor')
+    const { data, loading } = useFetchUser(location.pathname)
 
     
     // State to control edit mode

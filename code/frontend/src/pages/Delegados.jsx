@@ -79,7 +79,7 @@ const columns = (navigate) => [
     render: (title, entry) => (
       <Space style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: '100%'}}>
         <ConfigProvider theme={themeConfig}>
-          <Button onClick={() => navigate(`/delegados/detalhes/${entry.id_delegate}`)}>Detalhes</Button>  
+          <Button onClick={() => navigate(`/delegados/detalhes/${entry.brick}`)}>Detalhes</Button>  
         </ConfigProvider>
       </Space>
     ),

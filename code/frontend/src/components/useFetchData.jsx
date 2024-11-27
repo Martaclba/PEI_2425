@@ -69,7 +69,7 @@ export function useFetchData(path, fetchTrigger, selectedOption) {
         return () => {
             isMounted = false;
         };
-    }, [fetchTrigger, url]);
+    }, [fetchTrigger, path, selectedOption, updateDelegatesData, updateDelegatesFetchTrigger, updateDelegatesFiltersData, updateFarmaciasData, updateFarmaciasFetchTrigger, updateFarmaciasFiltersData, updateMedicosData, updateMedicosFetchTrigger, updateMedicosFiltersData, updateVisitasFetchTrigger, url]);
 
     return {loading}
 }

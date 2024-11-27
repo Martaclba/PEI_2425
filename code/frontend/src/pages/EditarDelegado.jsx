@@ -72,7 +72,7 @@ export default function EditarDelegado() {
   useFetchFormData(!hasFetched)
 
   // Fetch the user's info
-  const { data, loading } = useFetchUser(location.pathname, 'delegate')
+  const { data, loading } = useFetchUser(location.pathname)
 
   // State to control edit mode
   const [isEditing, setIsEditing] = useState(false)

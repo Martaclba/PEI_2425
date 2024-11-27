@@ -405,12 +405,36 @@ module.exports.createDelegate = async (delegate) => {
     // Access the generated ID from the result
     const id_delegate = results.rows[0].id_delegate;
 
-    
+    // const results2 = await db.query(`SELECT DISTINCT 
+    //                                     id_region AS value, 
+    //                                     region AS label 
+    //                                     FROM general_delegates_and_bricks
+    //                                     WHERE (id_delegate = $1 OR $1 IS NULL) 
+    //                                   ORDER BY label ASC;`, [id_delegate]);
+
   } catch (err) {
     console.log("ERROR: ", err)
     throw new Error('Could not add new delegate.');
   }
 }
+
+module.exports.getDelegateById = async (brick) => {
+  
+  try {
+    const result = await db.query(`SELECT  
+                                    delegate, district, 
+                                    region, COALESCE(parish, '') AS town, state
+                                    FROM general_delegates_and_bricks 
+                                    WHERE brick = $1`, 
+                                  [brick])
+
+    return result.rows[0]
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining delegate.');
+  }
+}
+
 
 
 module.exports.getTablePharmacies = async (idPharmacy,idDistrict,idRegion, idDelegate) => {
@@ -442,6 +466,37 @@ module.exports.getTablePharmacies = async (idPharmacy,idDistrict,idRegion, idDel
   } catch (err) {
     console.log("ERROR: ", err)
     throw new Error('Error obtaining pharmacies table.');
+  }
+};
+
+module.exports.getPharmacyById = async (idPharmacy) => {
+  
+  try {
+    const result = await db.query(`SELECT DISTINCT 
+                                    ROW_NUMBER() OVER () -1 AS key, 
+                                    gp.pharmacy, 
+                                    gp.district, 
+                                    gp.region, 
+                                    COALESCE(gp.parish, '') AS town, 
+                                    gp.address, 
+                                    p.state, 
+                                    p.notes,
+                                    r.name AS representative, 
+                                    c.phone, 
+                                    c.email
+                                  FROM general_pharmacies gp
+                                  JOIN pharmacy p ON gp.id_pharmacy = p.id_pharmacy
+                                  JOIN representative r ON gp.id_representative = r.id_representative
+                                  JOIN contact c ON r.fk_id_contact = c.id_contact
+                                  WHERE gp.id_pharmacy = $1`, 
+                                  
+                                  [idPharmacy]);
+
+      // console.log(result.rows)
+      return result.rows[0];
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining pharmacies consult.');
   }
 };
 
@@ -657,7 +712,40 @@ module.exports.createDoctor = (doctor) => {
   })
 }
 
+module.exports.getDoctorById = async (idDoctor) => {
+  try {
+    const result = await db.query(`SELECT DISTINCT 
+                                    ROW_NUMBER() OVER () -1 AS key, 
+                                    gd.medico,
+                                    gd.institution,
+                                    gd.speciality, 
+                                    gd.district, 
+                                    gd.full_address, 
+                                    gd.state, 
+                                    da.notes, 
+                                    c.phone, 
+                                    c.email,                                  
+                                    d.name AS district,
+                                    r.name AS region,
+                                    t.name AS town
+                                  FROM general_doctors gd
+                                  JOIN doctor_activity da ON gd.id_doctor = da.fk_doctor
+                                  JOIN contact c ON da.fk_id_contact = c.id_contact
+                                  JOIN hmr_zone hmr ON gd.brick = hmr.brick
+                                  JOIN district d ON hmr.fk_id_district = d.id_district
+                                  JOIN region r ON hmr.fk_id_region = r.id_region
+                                  JOIN town t ON hmr.fk_id_town = t.id_town
+                                  WHERE gd.id_doctor = $1`, 
+                                  
+                                  [idDoctor]);
 
+      console.log(result.rows)
+      return result.rows[0];
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining doctors consult.');
+  }
+};
 
 
 // ! - DEPRECATED BELOW
@@ -692,16 +780,6 @@ module.exports.createSale= (res, req) => {
 
 
 
-// Obtain delegate by id 
-// TODO - NOT TESTED 
-module.exports.getDelegateById = (delegate_id, res, req) => {
-  db.query('SELECT * FROM delegate WHERE id = ?', [delegate_id], (err,results) => {
-    if (err) {
-      res.status(504).json({error: err, msg: "Could not obtain Delegate with ID: ${delegate_id}"});
-    }
-    res.status(200).json(results.rows)
-  })
-}
 
 // Update delegate by id
 // TODO - NOT TESTED 

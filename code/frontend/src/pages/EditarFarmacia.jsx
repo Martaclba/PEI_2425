@@ -75,7 +75,7 @@ export default function EditarFarmacia() {
     useFetchFormData(!hasFetched)
 
     // Fetch the user's info
-    const { data, loading } = useFetchUser(location.pathname, 'doctor')
+    const { data, loading } = useFetchUser(location.pathname)
 
     // State to control edit mode
     const [isEditing, setIsEditing] = useState(false);
@@ -353,6 +353,17 @@ export default function EditarFarmacia() {
                                                 disabled={!isEditing}                                      
                                                 onChange={changeState}/>
                                         </Form.Item>
+
+                                        <Form.Item
+                                            label="Representante" 
+                                            name="Representante"
+                                            hasFeedback
+                                            rules={[{ 
+                                                required: true, 
+                                                message: "Por favor insira o nome de um representante" }]}
+                                        >
+                                            <Input allowClear placeholder="Nome" disabled={!isEditing} />
+                                        </Form.Item> 
 
                                         <Form.Item
                                             label="Notas"
