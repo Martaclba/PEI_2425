@@ -33,30 +33,16 @@ const columns = [
     sorter: (a, b) => a.comprador.localeCompare(b.comprador)          
   },
   {
-    key: 'distrito',
-    title: 'Distrito',
-    dataIndex: 'distrito',
+    key: 'brick',
+    title: 'Brick',
+    dataIndex: 'brick',
     width: '15%',
-    sorter: (a, b) => a.distrito.localeCompare(b.distrito)          
+    sorter: (a, b) => a.brick - b.brick          
   },
   {
-    key: 'regiao',
-    title: 'Região',
-    dataIndex: 'regiao',
-    width: '15%',
-    sorter: (a, b) => a.regiao.localeCompare(b.regiao)
-  },
-  {
-    key: 'freguesia',
-    title: 'Freguesia',
-    dataIndex: 'freguesia',
-    width: '15%',
-    sorter: (a, b) => a.freguesia.localeCompare(b.freguesia)
-  },
-  {
-    key: 'morada',
-    title: 'Morada',
-    dataIndex: 'morada',
+    key: 'local',
+    title: 'Local',
+    dataIndex: 'local',
     width: '15%',
   },
 ];
@@ -86,7 +72,7 @@ export default function Visitas() {
 
     const { trigger, data, filters, selectedOption } = useVisitasDataStore(state => state);
     const { updateVisitasFetchTrigger, updateSelectedOption } = useVisitasDataStore();
-    const { hasFetched, doctors, pharmacies } = useFormDataStore((state) => state) 
+    const { hasFetched, doctors, pharmacies, instituitions } = useFormDataStore((state) => state) 
     
     // If the form data fetch didnt happen, then fetch the data, 
     // update the store and set the form's selects
@@ -209,9 +195,9 @@ export default function Visitas() {
                             {showComprador && (
                                 <Form.Item
                                     label={tipoComprador}
-                                    name="Comprador"
+                                    name="Entidade de Saúde"
                                     hasFeedback
-                                    rules={[{ required: true, message: `Por favor selecione um comprador` }]}
+                                    rules={[{ required: true, message: `Por favor selecione um destinatário` }]}
                                 >
                                     <Select 
                                         allowClear
@@ -220,22 +206,21 @@ export default function Visitas() {
                                         placeholder={placeholder}/>
                                 </Form.Item>
                             )}
-
                             
-                            {/* {showComprador && (
+                            {showComprador && tipoComprador==='Médico' && (
                                 <Form.Item
-                                    label="Morada"
-                                    name="Morada"
+                                    label="Instituição"
+                                    name="Instituicao"
                                     hasFeedback
-                                    rules={[{ required: true, message: `Por favor selecione uma morada` }]}
+                                    rules={[{ required: true, message: `Por favor selecione uma instituição` }]}
                                 >
                                     <Select 
                                         allowClear
                                         optionLabelProp='label'
-                                        options={adresses}
-                                        placeholder="Selecione uma morada"/>
+                                        options={instituitions}
+                                        placeholder="Selecione uma instituição"/>
                                 </Form.Item>
-                            )} */}
+                            )}
 
                             <Form.Item>
                                 <Flex gap="large">
@@ -281,27 +266,6 @@ export default function Visitas() {
                                     <Select                       
                                         placeholder="Entidade de Saúde"
                                         options={filters.compradores} 
-                                        onChange={() => form_filtros.submit()}
-                                        showSearch
-                                        filterOption={(input, option) => 
-                                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                                </Form.Item>
-                                
-                                
-                                <Form.Item className="large-select" label='Distrito' name='distrito'>
-                                    <Select                     
-                                        placeholder="Distrito"
-                                        options={filters.distritos} 
-                                        onChange={() => form_filtros.submit()}
-                                        showSearch
-                                        filterOption={(input, option) => 
-                                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}/>
-                                </Form.Item>
-
-                                <Form.Item className="large-select" label='Região' name='regiao'>
-                                    <Select                     
-                                        placeholder="Região"
-                                        options={filters.regioes} 
                                         onChange={() => form_filtros.submit()}
                                         showSearch
                                         filterOption={(input, option) => 

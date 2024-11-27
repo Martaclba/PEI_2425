@@ -198,18 +198,14 @@ router.post('/visitas/:id', async function(req, res, next) {
   const option_selected = req.body
   console.log(option_selected)
 
-  // try{
-  //   const date = option_selected.date
-  //   const entity = option_selected.entity                       // default: Todos
-  //   const district = option_selected.district                   // default: Todos
-  //   const region = option_selected.region                       // default: Todos
+  try{
+     const date = option_selected.date
+     const entity = option_selected.entity                       
 
-  //   data = await Queries.getVisits(idDelegate)   
-  //   filters.date = await Queries.getDelegates(year,idCompany,idBrick, null)
-  //   filters.entities = await Queries.getYears(idDelegate,idCompany,idBrick, null)
-  //   filters.districts = await Queries.getCompanies(idDelegate,year,idBrick, null)
-  //   filters.regions = await Queries.getBricks(idDelegate,year,idCompany, null)
-
+     data = await Queries.getVisits(idDelegate,date,entity) 
+     filters.date = await Queries.getDate(idDelegate,entity)  
+     filters.entities = await Queries.getEntities(idDelegate,data)
+  }
   //   // Add missing default option 
   //   filters.date.unshift(default_filter)
   //   filters.entities.unshift(default_filter)
@@ -217,10 +213,10 @@ router.post('/visitas/:id', async function(req, res, next) {
   //   filters.regions.unshift(default_filter)
 
   //   res.status(200).json({ data, filters })
-  // } catch (err) {
-  //   res.status(501).json({error: err, msg: "Error obtaining scheduled visits"});
+    } catch (err) {
+     res.status(501).json({error: err, msg: "Error obtaining scheduled visits"});
   // }
-
+  
 });
 
 

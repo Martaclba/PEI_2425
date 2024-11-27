@@ -10,15 +10,11 @@ const useVisitasDataStore = create((set) => ({
     filters: {
         date: [],
         entities: [], 
-        districts: [],
-        regions: []
     },
 
     selectedOption: {
         date: dayjs().format('DD-MM-YYYY'),
         comprador : '-- Todos --',
-        distrito: '-- Todos --',
-        regiao: '-- Todos --'
     },
 
     updateVisitasFetchTrigger: () => {
@@ -46,17 +42,17 @@ const useVisitasDataStore = create((set) => ({
 
     reset: () => set({
         triggers: false,
+        
         data: [],
+
         filters: {
-            compradores: [], 
-            distritos: [],
-            regioes: []
+            date: [],
+            entities: []
         },
+
         selectedOption: {
             date: dayjs().format('DD-MM-YYYY'),
             comprador: '-- Todos --',
-            distrito: '-- Todos --',
-            regiao: '-- Todos --'
         }                   
       }),
 }))

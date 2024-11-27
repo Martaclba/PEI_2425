@@ -134,7 +134,6 @@ LEFT JOIN Address addr ON da.fk_id_Address = addr.id_Address
 LEFT JOIN HMR_Zone hz ON addr.fk_brick = hz.brick
 LEFT JOIN District d ON hz.fk_id_District = d.id_District;
 
-
 CREATE MATERIALIZED VIEW general_pharmacies AS
 SELECT DISTINCT
     ph.id_Pharmacy AS id_pharmacy,
@@ -147,7 +146,9 @@ SELECT DISTINCT
     t.id_Town AS id_parish,
     t.name AS parish,
     CONCAT(addr.street, ', ', addr.zip_code, 
-        CASE WHEN addr.building IS NOT NULL THEN ', ' || addr.building ELSE '' END) AS address
+        CASE WHEN addr.building IS NOT NULL THEN ', ' || addr.building ELSE '' END) AS address,
+    rep.id_Representative AS id_representative,
+    rep.name AS representative
 FROM 
     Pharmacy ph
 LEFT JOIN 
@@ -159,7 +160,9 @@ LEFT JOIN
 LEFT JOIN 
     Region r ON hz.fk_id_Region = r.id_Region
 LEFT JOIN 
-    Town t ON hz.fk_id_Town = t.id_Town;
+    Town t ON hz.fk_id_Town = t.id_Town
+LEFT JOIN 
+    Representative rep ON ph.fk_id_Representative = rep.id_Representative;
 
 
 

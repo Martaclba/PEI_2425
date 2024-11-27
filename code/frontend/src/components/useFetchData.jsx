@@ -40,16 +40,16 @@ export function useFetchData(path, fetchTrigger, selectedOption) {
                         updateDelegatesFiltersData(response.data.filters)
                     } else if (path ==='/medicos'){
                         updateMedicosFetchTrigger()
-                        //updateMedicosFiltersData()
-                        //updateMedicosData()
+                        updateMedicosData(response.data.data)
+                        updateMedicosFiltersData(response.data.filters)
                     } else if (path === '/farmacias'){
                         updateFarmaciasFetchTrigger()
-                        // updateFarmaciasFiltersData()
-                        // updateFarmaciasData()
+                        updateFarmaciasData(response.data.data)
+                        updateFarmaciasFiltersData(response.data.filters)
                     } else if (path === '/visitas'){
                         updateVisitasFetchTrigger()
-                        // updateVisitasFiltersData()
-                        // updateVisitasData()
+                        // updateVisitasData(response.data.data)
+                        // updateVisitasFiltersData(response.data.filters)
                     }
                 } else {
                     console.error('Data loaded failed:', response.status);

@@ -57,13 +57,13 @@ module.exports.getSaleTotalProducts = async (idDelegate, idCompany, idBrick, idP
     idBrick = Number.isInteger(idBrick) ? parseInt(idBrick) : null;
     idProduct = Number.isInteger(idProduct) ? parseInt(idProduct) : null;
     let query = `SELECT ROW_NUMBER() OVER () -1 as key, product_name,
-                SUM("2018") AS "2018", 
-                SUM("2019") AS "2019",
-                SUM("2020") AS "2020",
-                SUM("2021") AS "2021",
-                SUM("2022") AS "2022",
-                SUM("2023") AS "2023",
-                SUM("2024") AS "2024"
+                CAST(SUM("2018") AS INT) AS "2018", 
+                CAST(SUM("2019") AS INT) AS "2019",
+                CAST(SUM("2020") AS INT) AS "2020",
+                CAST(SUM("2021") AS INT) AS "2021",
+                CAST(SUM("2022") AS INT) AS "2022",
+                CAST(SUM("2023") AS INT) AS "2023",
+                CAST(SUM("2024") AS INT) AS "2024"
                 FROM general_table_per_years
                 WHERE (id_delegate = $1 OR $1 IS NULL)
                 AND (company_id = $2 OR $2 IS NULL)
@@ -87,10 +87,10 @@ module.exports.getSaleProducts = async (idDelegate, year, idCompany, idBrick, id
     companyName = idCompany === null ? 'MyPharma' : null;
     idBrick = Number.isInteger(idBrick) ? parseInt(idBrick) : null;
     idProduct = Number.isInteger(idProduct) ? parseInt(idProduct) : null;
-    let query = `SELECT ROW_NUMBER() OVER () -1 as key,  product_name, SUM(jan) AS jan,
-            SUM(feb) AS feb, SUM(mar) AS mar, SUM(apr) AS apr, SUM(may) AS may,
-            SUM(jun) AS jun, SUM(jul) AS jul, SUM(aug) AS aug, SUM(sep) AS sep,
-            SUM(oct) AS oct, SUM(nov) AS nov, SUM (dec) AS dec
+    let query = `SELECT ROW_NUMBER() OVER () -1 as key,  product_name,  CAST(SUM(jan) AS INT) AS jan,
+             CAST(SUM(feb) AS INT) AS feb, CAST(SUM(mar) AS INT) AS mar, CAST(SUM(apr)) AS INT) AS apr, CAST(SUM(may) AS INT) AS may,
+             CAST(SUM(jun) AS INT) AS jun, CAST(SUM(jul) AS INT) AS jul, CAST(SUM(aug) AS INT) AS aug,  CAST(SUM(sep) AS INT) AS sep,
+             CAST(SUM(oct) AS INT) AS oct, CAST(SUM(nov) AS INT) AS nov, CAST(SUM(dec) AS INT) AS dec
             FROM general_table
             WHERE (id_delegate = $1 OR $1 IS NULL)
             AND (year = $2 OR $2 IS NULL)
@@ -115,10 +115,10 @@ module.exports.getSaleBricks = async (idDelegate, year, idCompany, idBrick) => {
     idCompany = Number.isInteger(idCompany) ? parseInt(idCompany) : null;
     companyName = idCompany === null ? 'MyPharma' : null;
     idBrick = Number.isInteger(idBrick) ? parseInt(idBrick) : null;
-    let query = `SELECT ROW_NUMBER() OVER () -1 as key, brick, SUM(jan) AS jan,
-                  SUM(feb) AS feb, SUM(mar) AS mar, SUM(apr) AS apr, SUM(may) AS may,
-                  SUM(jun) AS jun, SUM(jul) AS jul, SUM(aug) AS aug, SUM(sep) AS sep,
-                  SUM(oct) AS oct, SUM(nov) AS nov, SUM (dec) AS dec
+    let query = `SELECT ROW_NUMBER() OVER () -1 as key, brick, CAST(SUM(jan) AS INT) AS jan,
+                    CAST(SUM(feb) AS INT) AS feb, CAST(SUM(mar) AS INT) AS mar, CAST(SUM(apr)) AS INT) AS apr, CAST(SUM(may) AS INT) AS may,
+                    CAST(SUM(jun) AS INT) AS jun, CAST(SUM(jul) AS INT) AS jul, CAST(SUM(aug) AS INT) AS aug,  CAST(SUM(sep) AS INT) AS sep,
+                    CAST(SUM(oct) AS INT) AS oct, CAST(SUM(nov) AS INT) AS nov, CAST(SUM(dec) AS INT) AS dec
                   FROM general_table
                   WHERE (id_delegate = $1 OR $1 IS NULL)
                   AND (year = $2 OR $2 IS NULL)
@@ -318,7 +318,7 @@ module.exports.getTableDelegates = async (idDelegate,idDistrict,idRegion) => {
                                     id_delegate, 
                                     delegate AS delegate_name, 
                                     brick, district, region, 
-                                    parish AS town, 
+                                    COALESCE(parish, '') AS town, 
                                     state 
                                         FROM general_delegates_and_bricks
                                         WHERE (id_delegate = $1 OR $1 IS NULL) 
@@ -403,7 +403,7 @@ module.exports.getTablePharmacies = async (idPharmacy,idDistrict,idRegion, idDel
                                     id_pharmacy, 
                                     pharmacy AS pharmacy_name, 
                                     brick, district, region, 
-                                    parish AS town, 
+                                    COALESCE(parish, '') AS town, 
                                     address 
                                         FROM general_pharmacies AS gp
                                         WHERE 
@@ -510,7 +510,7 @@ module.exports.getTableDoctors = async (idDoctor,idDistrict,idInstitution, idDel
     idDistrict = Number.isInteger(idDistrict) ? parseInt(idDistrict) : null;
     idInstitution = Number.isInteger(idInstitution) ? parseInt(idInstitution) : null;
     idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
-
+    
     const results = await db.query(`SELECT DISTINCT ROW_NUMBER() OVER () -1 as key, 
                                     id_doctor, 
                                     medico AS doctor_name, 
