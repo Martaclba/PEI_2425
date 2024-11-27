@@ -212,10 +212,10 @@ router.post('/visitas/:id', async function(req, res, next) {
   //   filters.districts.unshift(default_filter)
   //   filters.regions.unshift(default_filter)
 
-  //   res.status(200).json({ data, filters })
-    } catch (err) {
-     res.status(501).json({error: err, msg: "Error obtaining scheduled visits"});
-  // }
+    //    res.status(200).json({ data, filters })
+    // } catch (err) {
+    //  res.status(501).json({error: err, msg: "Error obtaining scheduled visits"});
+    // }
   
 });
 
