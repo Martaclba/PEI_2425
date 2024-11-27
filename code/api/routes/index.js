@@ -402,8 +402,8 @@ router.get('/medicos/detalhes/:idDoctor',async function(req, res, next) {
     const address = parseAddress(doctor_raw.full_address)
     
     doctor.Nome = doctor_raw.medico
-    doctor.Instituicao = doctor_raw.instituition
-    doctor.Especialidade = doctor_raw.specialty
+    doctor.Instituicao = doctor_raw.institution
+    doctor.Especialidade = doctor_raw.speciality
     doctor.Distrito = doctor_raw.district
     doctor.Regiao = doctor_raw.region
     doctor.Freguesia = doctor_raw.town
@@ -414,8 +414,6 @@ router.get('/medicos/detalhes/:idDoctor',async function(req, res, next) {
     doctor.Email = doctor_raw.email
     doctor.Estado.push(doctor_raw.state)
     doctor.Notas = doctor_raw.notes
-
-    console.log("GET DOCTOR: ", doctor)
 
     res.status(200).json(doctor);
   } catch (err) {

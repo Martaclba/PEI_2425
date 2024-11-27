@@ -739,7 +739,7 @@ module.exports.getDoctorById = async (idDoctor) => {
                                   
                                   [idDoctor]);
 
-      console.log(result.rows)
+      // console.log(result.rows)
       return result.rows[0];
   } catch (err) {
     console.log("ERROR: ", err)

@@ -73,7 +73,7 @@ export default function Visitas() {
 
     const { trigger, data, filters, selectedOption } = useVisitasDataStore(state => state);
     const { updateVisitasFetchTrigger, updateSelectedOption } = useVisitasDataStore();
-    const { hasFetched, doctors, pharmacies, instituitions } = useFormDataStore((state) => state) 
+    const { hasFetched, doctors, pharmacies } = useFormDataStore((state) => state) 
     const [institutions, setInstitutions] = useState([]);
 
     // If the form data fetch didnt happen, then fetch the data, 
