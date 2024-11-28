@@ -819,37 +819,106 @@ module.exports.updateDelegate= (delegate_id, res, req) => {
 }
 
 
-
-
-
-
-
-
 // Obtain list of visits 
 // TODO
-module.exports.getVisits = async (idDelegate,date,entity) => {
-  db.query(`SELECT DISTINCT ROW_NUMBER() OVER () -1 as key,  
-                                    pv.date AS data, 
-                                    brick, district, 
-                                    
-                                    gd.district, 
-                                    gd.full_address, 
-                                    gd.state, 
-                                    da.notes, 
-                                    c.phone, 
-                                    c.email,                                  
-                                    d.name AS district,
-                                    r.name AS region,
-                                    t.name AS town
-                                  FROM public.visit pv
-                                  JOIN doctor_activity da ON gd.id_doctor = da.fk_doctor
-                                  JOIN contact c ON da.fk_id_contact = c.id_contact;` ,[idDelegate,date,entity],(err,results) => {
-    if (err) {
-      res.status(520).json({error: err, msg: "Could not obtain list of Visits"});
-    }
-    res.status(200).json(results.rows)
-  })
-}
+module.exports.getVisits = async (idDelegate, date, entity) => {
+
+  entity = (entity !== "-- Todos --") ? entity : null;
+  console.log("DATE: ", date)
+  try {
+    // Execute the query
+    const results = await db.query(
+      `SELECT DISTINCT ROW_NUMBER() OVER () -1 as key,  
+              TO_CHAR(v.date, 'DD-MM-YYYY') AS data,
+              v.fk_brick AS brick,
+              COALESCE(gd.medico, '') AS medico,
+              COALESCE(gp.pharmacy,'') AS pharmacy
+       FROM visit v
+       LEFT JOIN general_doctors gd ON v.fk_doctor = gd.id_doctor
+       LEFT JOIN general_pharmacies gp ON v.fk_pharmacy = gp.id_pharmacy
+       LEFT JOIN general_delegates_and_bricks gdb ON v.fk_brick = gdb.brick
+       WHERE gdb.id_delegate = $1 AND DATE(v.date) = TO_DATE( $2, 'DD-MM-YYYY') AND ((gd.medico = $3 OR $3 IS NULL) OR (gp.pharmacy = $3 OR $3 IS NULL))`,
+      [idDelegate, date, entity]
+    );
+
+    // Transform the results to the desired format
+    const data = results.rows.map(row => ({
+      key: row.key,
+      data: row.data,
+      comprador: row.medico || row.pharmacy, // Either 'medico' or 'pharmacy'
+      brick: row.brick
+    }));
+    
+    console.log("VISITAS: ", data)
+
+    // Return the formatted response
+    return data;
+  } catch (err) {
+    console.log("ERROR: ", err);
+    throw new Error("Could not obtain list of Visits");
+  }
+};
+
+module.exports.getDate = async (idDelegate,entity) => {
+  console.log(entity.localCompare("-- Todos --"))
+  entity = (entity !== "-- Todos --") ? entity : null;
+  
+  try {
+    console.log("AaA: ", entity)
+
+    const results = await db.query(`SELECT ROW_NUMBER() OVER (ORDER BY v.date ASC) - 1 AS value,
+                                          TO_CHAR(v.date, 'YYYY-MM-DD') AS label
+                                        FROM 
+                                          visit v
+                                        LEFT JOIN 
+                                          hmr_zone hz ON v.fk_brick = hz.brick
+                                        WHERE 
+                                          hz.fk_id_delegate = $1
+                                          AND (
+                                            $2 IS NULL OR 
+                                            v.fk_doctor = $2 OR
+                                            v.fk_pharmacy = $2
+                                          )
+                                        ORDER BY v.date ASC;`, [idDelegate,entity]);
+    return results.rows;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining districts.');
+  }
+};
+
+
+module.exports.getEntities = async (idDelegate,date) => {
+
+  try {
+    const results = await db.query(`SELECT DISTINCT
+              v.date,
+              v.fk_doctor,
+              v.fk_pharmacy,
+              COALESCE(gd.medico, '') AS medico,
+              COALESCE(gp.pharmacy,'') AS pharmacy
+                FROM visit v
+                LEFT JOIN general_doctors gd ON v.fk_doctor = gd.id_doctor
+                LEFT JOIN general_pharmacies gp ON v.fk_pharmacy = gp.id_pharmacy
+                LEFT JOIN general_delegates_and_bricks gdb ON v.fk_brick = gdb.brick
+                WHERE gdb.id_delegate = $1 AND DATE(v.date) = TO_DATE( $2, 'DD-MM-YYYY')`, [idDelegate, date]);
+
+    // Transform the result to the desired format
+    const comprador = results.rows.map(row => {
+      if (row.medico) {
+        return { label: row.medico, value: row.fk_doctor }; // Doctor
+      } else if (row.pharmacy) {
+        return { label: row.pharmacy, value: row.fk_pharmacy }; // Pharmacy
+      }
+    }).filter(Boolean); // Remove any undefined entries (just in case)
+
+    console.log("comprador",comprador)
+    return comprador;
+  } catch (err) {
+    console.log("ERROR: ", err)
+    throw new Error('Error obtaining districts.');
+  }
+};
 
 // Add visit
 module.exports.createVisit = (visit) => {

@@ -50,7 +50,7 @@ const Login = () => {
     // Simulate authentication process from the backend
     // remover depois
     if (email === "admin" && password === "admin") {
-      const userID = "2";
+      const userID = "1";
       const isAdmin = true; 
       const token = "user-auth-token";
 
@@ -58,7 +58,7 @@ const Login = () => {
 
       navigate('/');
     } else if (email === "user" && password === "user") {     
-        const userID = "2";
+        const userID = "1";
         const isAdmin = false; 
         const token = "user-auth-token";
 

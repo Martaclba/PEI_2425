@@ -157,9 +157,9 @@ export default function Visitas() {
   
     const { loading } = useFetchData('/visitas', modalTrigger || !trigger, selectedOption)
 
-    // if (loading) {
-    //     return <Spin fullscreen tip="Carregando dados..." />;
-    // }
+    if (loading) {
+        return <Spin fullscreen tip="Carregando dados..." />;
+    }
 
     return (
         <div id="contact">
@@ -281,7 +281,7 @@ export default function Visitas() {
                                 <Form.Item className="large-select" label='Entidade de Saúde' name='comprador'>
                                     <Select                       
                                         placeholder="Entidade de Saúde"
-                                        options={filters.compradores} 
+                                        options={filters.entities} 
                                         onChange={() => form_filtros.submit()}
                                         showSearch
                                         filterOption={(input, option) => 

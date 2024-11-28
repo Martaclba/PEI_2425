@@ -36,6 +36,7 @@ function parseAddress(address) {
   };
 }
 
+
 const path = require('path');
 const dirPath = path.join(__dirname, '../uploads');
 
@@ -96,7 +97,7 @@ router.post('/import/competition', upload.single('excelFile'), async function(re
   const path = req.file.destination + "/" + req.file.filename
 
   try {
-    const child = spawnSync('python3',["../database/import_conc.py", path], {capture: ['stdout', 'stderr', 'on']});
+    const child = spawnSync('python3', ["../database/import_conc.py", path], {capture: ['stdout', 'stderr', 'on']});
     
     console.log('File uploaded:', req.file);
     res.status(201).json({ message: child.stdout });
@@ -115,8 +116,13 @@ router.post('/import/', upload.single('excelFile'), async function(req, res, nex
   }
   
   const spawnSync = require("child_process").spawnSync;
-  const path = `${req.file.destination}/${req.file.filename}`
-  const child = spawnSync('python3',["../database/import_mp.py", path], {capture: ['stdout', 'stderr', 'on']});
+  const path_arg = `${req.file.destination}/${req.file.filename}`
+  // const child = spawnSync('python3',["../database/import_mp.py", path], {capture: ['stdout', 'stderr', 'on']});
+
+  const pythonExecutable = path.resolve(__dirname, '../myenv/Scripts/python.exe');
+  console.log(`Using Python executable: ${pythonExecutable}`);
+
+  const child = spawnSync(pythonExecutable,["../database/import_mp.py", path_arg]);
   
   // try {
         
@@ -136,10 +142,10 @@ router.post('/import/', upload.single('excelFile'), async function(req, res, nex
   if (child.status === 0) {
     console.log('Python script executed successfully!');
     console.log(child.stdout.toString());
-    return res.status(201).json({ message: child.stdout.toString() });
+    return res.status(201).json({ message: child.stdout?.toString() });
   } else {
-    console.error('Error running Python script:', child.stderr.toString());
-    return res.status(500).json({ error: 'Script error', msg: child.stderr.toString() });
+    console.error('Error running Python script: ', child.stderr?.toString());
+    return res.status(500).json({ error: 'Script error', msg: child.stderr?.toString() });
   }
 });
 
@@ -247,7 +253,7 @@ router.post('/visitas/registar', async function(req, res, next) {
   console.log("VISIT: ", visit)
 
   try {
-
+    Queries.createVisit(visit)
   } catch (err) {
     res.status(501).json({error: err, msg: "Error scheduling a visit"});
   }
@@ -267,28 +273,32 @@ const data_visits = [
   }
 ]
 router.post('/visitas/:id', async function(req, res, next) {
-  const data = []
+  let data = []
 
   const filters = {
     date: [],
     entities: [], 
   }
 
-  const default_filter = { label: '-- Todos --', value: 'Todos'}
+  const default_filter = { label: '-- Todos --', value: '-- Todos --'}
   const idDelegate = req.params.id
 
   const option_selected = req.body
   console.log(option_selected)
 
+
+
   try{
      const date = option_selected.date
-     const entity = option_selected.entity                       
+     const entity = option_selected.comprador                       
 
     data = await Queries.getVisits(idDelegate,date,entity) 
-    filters.date = await Queries.getDate(idDelegate,entity)  
-    filters.entities = await Queries.getEntities(idDelegate,data)
-    // Add missing default option 
-    filters.date.unshift(default_filter)
+
+    // filters.date = await Queries.getDate(idDelegate,entity)  
+    filters.entities = await Queries.getEntities(idDelegate,date)
+    
+    // // Add missing default option 
+    // filters.date.unshift(default_filter)
     filters.entities.unshift(default_filter)
   
 
@@ -343,7 +353,7 @@ router.post('/delegados', async function(req, res, next) {;
 
   const option = req.body
 
-  const default_filter = { label: '-- Todos --', value: 'Todos'}
+  const default_filter = { label: '-- Todos --', value: '-- Todos --'}
 
   try { 
       const idDelegate = option.delegado
@@ -493,7 +503,7 @@ router.post('/medicos/:id', async function(req, res, next) {
 
   const idDelegate = req.params.id
 
-  const default_filter = { label: '-- Todos --', value: 'Todos'}
+  const default_filter = { label: '-- Todos --', value: '-- Todos --'}
 
   try{ 
       const idDoctor = option.medico
@@ -529,7 +539,7 @@ router.post('/medicos', async function(req, res, next) {
 
   const option = req.body
 
-  const default_filter = { label: '-- Todos --', value: 'Todos'}
+  const default_filter = { label: '-- Todos --', value: '-- Todos --'}
 
   try{ 
       const idDoctor = option.medico
@@ -569,7 +579,7 @@ router.post('/farmacias/:id', async function(req, res, next) {
 
   const option = req.body
 
-  const default_filter = { label: '-- Todos --', value: 'Todos'}
+  const default_filter = { label: '-- Todos --', value: '-- Todos --'}
 
   try{ 
     const idPharmacy = option.farmacia
@@ -605,7 +615,7 @@ router.post('/farmacias', async function(req, res, next) {
 
   const option = req.body
 
-  const default_filter = { label: '-- Todos --', value: 'Todos'}
+  const default_filter = { label: '-- Todos --', value: '-- Todos --'}
 
   try{ 
     const idPharmacy = option.farmacia
@@ -705,7 +715,7 @@ router.post('/:id', async function(req, res, next) {
     bricks: {}
   }
   
-  const default_filter = { label: '-- Todos --', value: 'Todos'}
+  const default_filter = { label: '-- Todos --', value: '-- Todos --'}
   const year = new Date().getFullYear()
 
   const idDelegate = req.params.id
@@ -771,7 +781,7 @@ router.post('/', async function(req, res, next) {
     bricks: {}
   }
 
-  const default_filter = { label: '-- Todos --', value: 'Todos'}
+  const default_filter = { label: '-- Todos --', value: '-- Todos --'}
 
   const { type, option_selected } = req.body
   
