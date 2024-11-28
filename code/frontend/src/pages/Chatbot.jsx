@@ -34,7 +34,8 @@ const Chatbot = () => {
                 <div
                     key={index}
                     style={{
-                        textAlign: msg.sender === 'user' ? 'right' : 'left',
+                        display: 'flex', // Garante alinhamento flexível
+                        justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start',
                     }}
                 >
                     <span
@@ -88,11 +89,15 @@ const styles = {
         flexDirection: 'column',
         gap: '10px',
         backgroundColor: '#f5f5f5',
+        maxWidth: '100%', 
     },
     message: {
         padding: '10px 15px',
         borderRadius: '20px',
         maxWidth: '70%',
+        wordWrap: 'break-word', // Permite quebra em palavras longas
+        wordBreak: 'break-word', // Força quebra se necessário
+        whiteSpace: 'pre-wrap', // Preserva quebras de linha
     },
     inputContainer: {
         display: 'flex',
