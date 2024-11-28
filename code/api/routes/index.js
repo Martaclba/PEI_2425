@@ -5,10 +5,6 @@ const fs = require('fs');
 
 var Queries = require('./queries')
 
-const path = require('path');
-const dirPath = path.join(__dirname, '../uploads');
-
-
 //
 function splitName(fullName) {
   // Trim any leading or trailing whitespace
@@ -40,6 +36,12 @@ function parseAddress(address) {
   };
 }
 
+const path = require('path');
+const dirPath = path.join(__dirname, '../uploads');
+
+// Regex para validar o nome do ficheiro
+const regex = /(\d{1,2})_(\d{2}|\d{4})(?=\.xlsx$)/;
+
 // Configure multer storage
 const storage = multer.diskStorage({  
   // Where to store the files
@@ -60,6 +62,23 @@ const storage = multer.diskStorage({
     const uniqueSuffix = Date.now()
     cb(null, file.originalname + '-' + uniqueSuffix + '.xlsx')
   },
+
+  // fileFilter: function (req, file, cb) {
+  //   // Validar o nome do ficheiro com regex
+  //   if (!regex.test(file.originalname)) {
+  //     console.error('Invalid file name format');
+  //     return cb(new Error('Invalid file name format. Expected format: mes_ano.xlsx'), false);
+  //   }
+  
+  //   // Validar extensão do ficheiro
+  //   const ext = path.extname(file.originalname);
+  //   if (ext !== '.xlsx') {
+  //     console.error('Invalid file extension');
+  //     return cb(new Error('Invalid file extension. Only .xlsx files are allowed'), false);
+  //   }
+  
+  //   cb(null, true); // Nome e extensão válidos
+  // },
 });
 
 // Configure multer upload settings
@@ -72,9 +91,13 @@ router.post('/import/competition', upload.single('excelFile'), async function(re
   if (!req.file) {
       return res.status(400).json({ error: 'No competition sales file uploaded' });
   }
+  
   const spawnSync = require("node:child_process").spawnSync;
+  const path = req.file.destination + "/" + req.file.filename
+
   try {
-    const child = await spawnSync('python3',["../database/import_conc.py", req.file.destination + "/" + req.file.filename], {capture: ['stdout', 'stderr', 'on']});
+    const child = spawnSync('python3',["../database/import_conc.py", path], {capture: ['stdout', 'stderr', 'on']});
+    
     console.log('File uploaded:', req.file);
     res.status(201).json({ message: child.stdout });
   }
@@ -90,14 +113,33 @@ router.post('/import/', upload.single('excelFile'), async function(req, res, nex
   if (!req.file) {
       return res.status(400).json({ error: 'No sales file uploaded' });
   }
-  const spawnSync = require("node:child_process").spawnSync;
-  try {
-    const child = await spawnSync('python3',["../database/import_mp.py", req.file.destination + "/" + req.file.filename], {capture: ['stdout', 'stderr', 'on']});
-    console.log('File uploaded:', req.file);
-    res.status(201).json({ message: child.stdout });
-  }
-  catch (err) {
-    res.status(530).json({ error:err, msg: child.stdout});
+  
+  const spawnSync = require("child_process").spawnSync;
+  const path = `${req.file.destination}/${req.file.filename}`
+  const child = spawnSync('python3',["../database/import_mp.py", path], {capture: ['stdout', 'stderr', 'on']});
+  
+  // try {
+        
+  //   console.log('File uploaded:', req.file);
+  //   res.status(201).json({ message: child.stdout.toString() });
+
+  //   if (child.stderr.toString()) {
+  //     console.error('Error from Python script:', child.stderr.toString());
+  //     return res.status(500).json({ error: 'Script error', msg: child.stderr.toString() });
+  //   }
+  // }
+  // catch (err) {
+  //   console.error('Unexpected error:', err);
+  //   res.status(530).json({ error:err, msg: child.stderr.toString() });
+  // }
+
+  if (child.status === 0) {
+    console.log('Python script executed successfully!');
+    console.log(child.stdout.toString());
+    return res.status(201).json({ message: child.stdout.toString() });
+  } else {
+    console.error('Error running Python script:', child.stderr.toString());
+    return res.status(500).json({ error: 'Script error', msg: child.stderr.toString() });
   }
 });
 
@@ -176,15 +218,17 @@ router.get('/forms', async function(req, res, next) {
 });
 
 
-router.get('/institutions/:idDoctor', async function(req, res, next) { 
+router.get('/bricks/:idDoctor', async function(req, res, next) { 
+  let bricks = []
+  const idDoctor = parseInt(req.params.idDoctor)
 
   try{
 
-
-    // res.status(200).json({data})
+    bricks = await Queries.getBricksOfDoctor(idDoctor)
+    res.status(200).json(bricks)
 
   } catch (err) {
-    res.status(501).json({error: err, msg: "Error obtaining form's data"});
+    res.status(501).json({error: err, msg: "Error obtaining doctor's bricks"});
   }
 });
 
@@ -193,7 +237,8 @@ router.get('/institutions/:idDoctor', async function(req, res, next) {
 // Route responsible for registering a visit
 const visit = {
   Entidade: 'Médico',
-  Comprador: 2,
+  Entidade_saude:'',
+  Brick: 2,
   date: '24-11-2025',
 }
 router.post('/visitas/registar', async function(req, res, next) {
@@ -202,7 +247,7 @@ router.post('/visitas/registar', async function(req, res, next) {
   console.log("VISIT: ", visit)
 
   try {
-    
+
   } catch (err) {
     res.status(501).json({error: err, msg: "Error scheduling a visit"});
   }
@@ -218,10 +263,7 @@ const data_visits = [
     key: 0,
     data: '12-01-2025',
     comprador: 'Médico i',                  // pode ser um médico ou uma farmácia
-    distrito: `Distrito i`,
-    regiao: `Região i`,      
-    freguesia: `Freguesia i`,
-    morada: `Rua i`,  
+    brick: `i`,  
   }
 ]
 router.post('/visitas/:id', async function(req, res, next) {
@@ -230,9 +272,8 @@ router.post('/visitas/:id', async function(req, res, next) {
   const filters = {
     date: [],
     entities: [], 
-    districts: [],
-    regions: []
   }
+
   const default_filter = { label: '-- Todos --', value: 'Todos'}
   const idDelegate = req.params.id
 
@@ -243,14 +284,13 @@ router.post('/visitas/:id', async function(req, res, next) {
      const date = option_selected.date
      const entity = option_selected.entity                       
 
-    //  data = await Queries.getVisits(idDelegate,date,entity) 
-    //  filters.date = await Queries.getDate(idDelegate,entity)  
-    //  filters.entities = await Queries.getEntities(idDelegate,data)
-  //   // Add missing default option 
-  //   filters.date.unshift(default_filter)
-  //   filters.entities.unshift(default_filter)
-  //   filters.districts.unshift(default_filter)
-  //   filters.regions.unshift(default_filter)
+    data = await Queries.getVisits(idDelegate,date,entity) 
+    filters.date = await Queries.getDate(idDelegate,entity)  
+    filters.entities = await Queries.getEntities(idDelegate,data)
+    // Add missing default option 
+    filters.date.unshift(default_filter)
+    filters.entities.unshift(default_filter)
+  
 
     res.status(200).json({ data, filters })
   } catch (err) {
@@ -283,7 +323,7 @@ router.post('/delegados/registar', function(req, res, next) {
   try {
     Queries.createDelegate(delegate)
 
-    res.status(201).json({msg: "Doctor successfully registered"})
+    res.status(201).json({msg: "Delegate successfully registered"})
   } catch (err) {
     res.status(503).json({error: err, msg: "Error registering a doctor"});
   }

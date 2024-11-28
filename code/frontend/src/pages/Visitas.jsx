@@ -39,13 +39,6 @@ const columns = [
     width: '15%',
     sorter: (a, b) => a.brick - b.brick          
   },
-  {
-    key: 'local',
-    title: 'Local',
-    dataIndex: 'local',
-    width: '15%',
-    sorter: (a, b) => a.local.localeCompare(b.local) 
-  },
 ];
 
 const compradores = [
@@ -74,7 +67,7 @@ export default function Visitas() {
     const { trigger, data, filters, selectedOption } = useVisitasDataStore(state => state);
     const { updateVisitasFetchTrigger, updateSelectedOption } = useVisitasDataStore();
     const { hasFetched, doctors, pharmacies } = useFormDataStore((state) => state) 
-    const [institutions, setInstitutions] = useState([]);
+    const [bricks, setBricks] = useState([]);
 
     // If the form data fetch didnt happen, then fetch the data, 
     // update the store and set the form's selects
@@ -134,18 +127,18 @@ export default function Visitas() {
         }
     }
 
-    // Fetch institutions for the selected doctor
-    const getInstitutions = async (doctorId) => {
+    // Fetch bricks for the selected doctor
+    const getBricks = async (doctorId) => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_PATH}/institutions/${doctorId}`);
+            const response = await axios.get(`${process.env.REACT_APP_API_PATH}/bricks/${doctorId}`);
             
             if (response.status === 200) {                
-                setInstitutions(response.data);
+                setBricks(response.data);
             } else {
-                message.error("Erro ao buscar instituições.");
+                message.error("Erro ao buscar bricks.");
             }
         } catch (error) {
-            message.error("Erro ao buscar instituições.");
+            message.error("Erro ao buscar bricks.");
         }
     };
 
@@ -211,9 +204,9 @@ export default function Visitas() {
                             {showComprador && (
                                 <Form.Item
                                     label={tipoComprador}
-                                    name="Entidade de Saúde"
+                                    name="Entidade_Saude"
                                     hasFeedback
-                                    rules={[{ required: true, message: `Por favor selecione um destinatário` }]}
+                                    rules={[{ required: true, message: `Por favor selecione uma entidade de saúde` }]}
                                 >
                                     <Select 
                                         allowClear
@@ -222,8 +215,8 @@ export default function Visitas() {
                                         placeholder={placeholder}
                                         onChange={(value) => {
                                             if (tipoComprador === 'Médico') {
-                                                // Fetch institutions when a doctor is selected
-                                                getInstitutions(value); 
+                                                // Fetch bricks when a doctor is selected
+                                                getBricks(value); 
                                             }
                                         }}
                                     />
@@ -232,16 +225,16 @@ export default function Visitas() {
                             
                             {showComprador && tipoComprador==='Médico' && (
                                 <Form.Item
-                                    label="Instituição"
-                                    name="Instituicao"
+                                    label="Brick"
+                                    name="Brick"
                                     hasFeedback
-                                    rules={[{ required: true, message: `Por favor selecione uma instituição` }]}
+                                    rules={[{ required: true, message: `Por favor selecione uma brick` }]}
                                 >
                                     <Select 
                                         allowClear
                                         optionLabelProp='label'
-                                        options={institutions}
-                                        placeholder="Selecione uma instituição"/>
+                                        options={bricks}
+                                        placeholder="Selecione um brick"/>
                                 </Form.Item>
                             )}
 

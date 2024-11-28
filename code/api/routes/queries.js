@@ -17,6 +17,31 @@ db.connect((err) => {
   }
 });
 
+module.exports.getBricksOfDoctor = async (idDoctor) => {
+  try {
+    idDoctor = Number.isInteger(idDoctor) ? idDoctor : null;
+
+    const results = await db.query(
+      `SELECT DISTINCT brick as value 
+       FROM general_doctors 
+       WHERE id_doctor = $1`,
+      [idDoctor]
+    );
+
+    // Transform the results to the desired format
+    const bricks = results.rows.map(row => ({
+      label: row.value,
+      value: row.value
+    }));
+
+    return bricks;
+  } catch (err) {
+    console.log("ERROR: ", err);
+    throw new Error('Error obtaining doctors.');
+  }
+};
+
+
 
 // ESTA É A BASE DAS QUERIES ---- deste estilo
 module.exports.getSaleHistogram = async (idDelegate, year) => {
@@ -802,8 +827,23 @@ module.exports.updateDelegate= (delegate_id, res, req) => {
 
 // Obtain list of visits 
 // TODO
-module.exports.getVisits = (res, req) => {
-  db.query('SELECT * FROM visit ORDER BY id ASC', (err,results) => {
+module.exports.getVisits = async (idDelegate,date,entity) => {
+  db.query(`SELECT DISTINCT ROW_NUMBER() OVER () -1 as key,  
+                                    pv.date AS data, 
+                                    brick, district, 
+                                    
+                                    gd.district, 
+                                    gd.full_address, 
+                                    gd.state, 
+                                    da.notes, 
+                                    c.phone, 
+                                    c.email,                                  
+                                    d.name AS district,
+                                    r.name AS region,
+                                    t.name AS town
+                                  FROM public.visit pv
+                                  JOIN doctor_activity da ON gd.id_doctor = da.fk_doctor
+                                  JOIN contact c ON da.fk_id_contact = c.id_contact;` ,[idDelegate,date,entity],(err,results) => {
     if (err) {
       res.status(520).json({error: err, msg: "Could not obtain list of Visits"});
     }
