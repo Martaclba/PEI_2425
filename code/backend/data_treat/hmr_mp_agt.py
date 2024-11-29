@@ -34,8 +34,6 @@ def clean_entidade(entidade):
         return ent.lstrip('-')
     return entidade
 
-
-
 df['Entity'] = df['Entity'].apply(clean_entidade)
 df['Region'] = df['Region'].apply(clean_entidade)
 
@@ -44,5 +42,7 @@ for coluna in df.columns:
     df[coluna] = df[coluna].astype(str)
 
 df = df.iloc[10:]
+
+# df.drop(df[df['Region'] == 'National'].index, inplace=True)
 
 df.to_csv('output.csv',sep=';', encoding='utf-8',index=False)
