@@ -40,6 +40,7 @@ function parseAddress(address) {
 const path = require('path');
 const dirPath = path.join(__dirname, '../uploads');
 
+
 // Regex para validar o nome do ficheiro
 const regex = /(\d{1,2})_(\d{2}|\d{4})(?=\.xlsx$)/;
 
@@ -61,7 +62,7 @@ const storage = multer.diskStorage({
   // Set an unique name
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now()
-    cb(null, file.originalname + '-' + uniqueSuffix + '.xlsx')
+    cb(null, uniqueSuffix + '-' + file.originalname)
   },
 
   // fileFilter: function (req, file, cb) {
@@ -108,44 +109,45 @@ router.post('/import/competition', upload.single('excelFile'), async function(re
 
 });
 
+
+
 /*    POST sales (import)   */
 // Route responsible for sending the hmr file to the database
 router.post('/import/', upload.single('excelFile'), async function(req, res, next) {
   if (!req.file) {
       return res.status(400).json({ error: 'No sales file uploaded' });
   }
-  
+
   const spawnSync = require("child_process").spawnSync;
-  const path_arg = `${req.file.destination}/${req.file.filename}`
+  // const path_arg = `${req.file.destination}/${req.file.filename}`
   // const child = spawnSync('python3',["../database/import_mp.py", path], {capture: ['stdout', 'stderr', 'on']});
 
-  const pythonExecutable = path.resolve(__dirname, '../myenv/Scripts/python.exe');
-  console.log(`Using Python executable: ${pythonExecutable}`);
+  // const pythonExecutable = path.resolve(__dirname, 'myenv/Scripts/python.exe');
+  // console.log(`Using Python executable: ${pythonExecutable}`);
+  const path_arg = path.resolve(req.file.destination, req.file.filename);
+  console.log(`Using the path argument: ${path_arg}`);
 
-  const child = spawnSync(pythonExecutable,["../database/import_mp.py", path_arg]);
+  const child = spawnSync('c:\\Users\\Marta\\Desktop\\pei-2425\\code\\myenv\\Scripts\\python.exe',["../database/import_mp.py", path_arg]);
   
-  // try {
-        
-  //   console.log('File uploaded:', req.file);
-  //   res.status(201).json({ message: child.stdout.toString() });
+  // Check for execution errors
+  if (child.error) {
+    console.error('Failed to start Python script:', child.error);
+    return res.status(500).json({ error: 'Failed to execute script', details: child.error.message });
+  }
 
-  //   if (child.stderr.toString()) {
-  //     console.error('Error from Python script:', child.stderr.toString());
-  //     return res.status(500).json({ error: 'Script error', msg: child.stderr.toString() });
-  //   }
-  // }
-  // catch (err) {
-  //   console.error('Unexpected error:', err);
-  //   res.status(530).json({ error:err, msg: child.stderr.toString() });
-  // }
+  // Check the Python script's stderr for errors
+  if (child.stderr) {
+    console.error('Error from Python script:', child.stderr.toString());
+    return res.status(500).json({ error: 'Script execution error', details: child.stderr.toString() });
+  }
 
-  if (child.status === 0) {
-    console.log('Python script executed successfully!');
-    console.log(child.stdout.toString());
-    return res.status(201).json({ message: child.stdout?.toString() });
-  } else {
-    console.error('Error running Python script: ', child.stderr?.toString());
-    return res.status(500).json({ error: 'Script error', msg: child.stderr?.toString() });
+  // If successful, return stdout
+  try {
+    console.log('Python script output:', child.stdout.toString());
+    return res.status(201).json({ message: child.stdout.toString() });
+  } catch (err) {
+      console.error('Unexpected error:', err);
+      return res.status(500).json({ error: 'Unexpected error', details: err.message });
   }
 });
 
@@ -241,12 +243,6 @@ router.get('/bricks/:idDoctor', async function(req, res, next) {
 
 /*    POST visits    */
 // Route responsible for registering a visit
-const visit = {
-  Entidade: 'Médico',
-  Entidade_saude:'',
-  Brick: 2,
-  date: '24-11-2025',
-}
 router.post('/visitas/registar', async function(req, res, next) {
 
   const visit = req.body
@@ -254,6 +250,7 @@ router.post('/visitas/registar', async function(req, res, next) {
 
   try {
     Queries.createVisit(visit)
+    res.status(201).json({msg: "Visita agendada!"});
   } catch (err) {
     res.status(501).json({error: err, msg: "Error scheduling a visit"});
   }
@@ -264,14 +261,6 @@ router.post('/visitas/registar', async function(req, res, next) {
 /*    GET visits   */
 // Route responsible for retrieving the visits of a delegate (id)
 // Should return a json structured variable with relevant information
-const data_visits = [
-  {
-    key: 0,
-    data: '12-01-2025',
-    comprador: 'Médico i',                  // pode ser um médico ou uma farmácia
-    brick: `i`,  
-  }
-]
 router.post('/visitas/:id', async function(req, res, next) {
   let data = []
 
@@ -284,9 +273,6 @@ router.post('/visitas/:id', async function(req, res, next) {
   const idDelegate = req.params.id
 
   const option_selected = req.body
-  console.log(option_selected)
-
-
 
   try{
      const date = option_selected.date
@@ -294,19 +280,15 @@ router.post('/visitas/:id', async function(req, res, next) {
 
     data = await Queries.getVisits(idDelegate,date,entity) 
 
-    // filters.date = await Queries.getDate(idDelegate,entity)  
     filters.entities = await Queries.getEntities(idDelegate,date)
     
     // // Add missing default option 
-    // filters.date.unshift(default_filter)
     filters.entities.unshift(default_filter)
   
-
     res.status(200).json({ data, filters })
   } catch (err) {
      res.status(501).json({error: err, msg: "Error obtaining scheduled visits"});
   }
-  
 });
 
 

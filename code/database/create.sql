@@ -235,3 +235,32 @@ USING CASE
     WHEN state = FALSE THEN 'Inativo'
     ELSE 'Indisponível'
 END;
+
+
+
+
+-- Acho que precisamos de adicionar mais restrições (ainda falta validar)
+
+ALTER TABLE Contact ADD CONSTRAINT unique_email_phone UNIQUE (email, phone);
+
+ALTER TABLE Doctor ADD CONSTRAINT unique_doctor_name_contact UNIQUE (professional_id_card,name);
+
+ALTER TABLE Doctor_Activity ADD CONSTRAINT unique_doctor_activity UNIQUE (fk_Doctor, fk_id_Contact, fk_id_Institution, fk_id_Specialty); --problemas
+
+ALTER TABLE HMR_Zone ADD CONSTRAINT unique_hmr_zone UNIQUE (fk_id_Region, fk_id_District, fk_id_Town); --problemas
+
+ALTER TABLE Address ADD CONSTRAINT unique_address UNIQUE (street, zip_code, building);
+
+ALTER TABLE Representative ADD CONSTRAINT unique_representative UNIQUE (name, fk_id_Contact);
+
+ALTER TABLE Pharmacy ADD CONSTRAINT unique_pharmacy UNIQUE (name, fk_id_Address, fk_id_Representative);
+
+ALTER TABLE Visit ADD CONSTRAINT unique_visit_date UNIQUE (date,fk_brick);
+
+ALTER TABLE Visit ADD CONSTRAINT unique_visit_combination UNIQUE (fk_Doctor, fk_Pharmacy, date);
+
+-- ALTER TABLE Product ADD CONSTRAINT unique_product UNIQUE (CNP, name);
+
+-- ALTER TABLE Manager ADD CONSTRAINT unique_manager UNIQUE (name, fk_id_Company);
+
+ALTER TABLE Sale_Product ADD CONSTRAINT unique_sale_product UNIQUE (fk_id_Sale, fk_CNP);`

@@ -57,7 +57,6 @@ export default function Visitas() {
     const [form] = Form.useForm();
 
     const [modalOpen, setModalState] = useState(false)
-    const [modalTrigger, setModalTrigger] = useState(false)
 
     const [showComprador, setShowComprador] = useState(false)
     const [tipoComprador, setTipoComprador] = useState()
@@ -91,10 +90,12 @@ export default function Visitas() {
         try {
             const response = await axios.post(process.env.REACT_APP_API_PATH + "/visitas/registar", values_formatted, { headers: { 'Content-Type': 'application/json' } })
 
-            if(response.status === 200) {
-                message.success("Registado com sucesso")
+            if(response.status === 201) {
+                message.success("Visita agendada com sucesso!")
                 console.log('Form submitted successfully:', response.data);
-                setModalTrigger(true);
+
+                // Set a trigger to fetch data
+                updateVisitasFetchTrigger();
             } else {
                 message.error("Oops! Ocorreu algum erro...")
                 console.error('Form submission failed:', response.status);
@@ -148,14 +149,14 @@ export default function Visitas() {
             ...values,
             date: values.date.format('DD-MM-YYYY')
         }
-        
         // Update selected option with the latest form input
         updateSelectedOption(values_formatted)
+
         // Set a trigger to fetch data
         updateVisitasFetchTrigger();
     };
   
-    const { loading } = useFetchData('/visitas', modalTrigger || !trigger, selectedOption)
+    const { loading } = useFetchData('/visitas', !trigger, selectedOption)
 
     if (loading) {
         return <Spin fullscreen tip="Carregando dados..." />;
@@ -185,7 +186,7 @@ export default function Visitas() {
                                 name="date"
                                 rules={[{ required: true, message: 'Por favor selecione uma data' }]}
                             >
-                                    <DatePicker placeholder='Insira uma data' style={{width: '100%'}} format="DD-MM-YYYY"/>
+                                <DatePicker allowClear={false} placeholder='Insira uma data' style={{width: '100%'}} format="DD-MM-YYYY"/>
                             </Form.Item>
 
                             <Form.Item
@@ -271,6 +272,7 @@ export default function Visitas() {
                             <div className="costum-form" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
                                 <Form.Item className='large-select' label="Data" name="date">
                                         <DatePicker 
+                                            allowClear={false}
                                             placeholder='Insira uma data'
                                             style={{width: '100%'}}
                                             onChange={() => form_filtros.submit()}

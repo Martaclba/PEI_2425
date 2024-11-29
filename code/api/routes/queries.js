@@ -426,9 +426,19 @@ module.exports.createDelegate = async (delegate) => {
 
   try{
     const results = await db.query('INSERT INTO delegate (name, state) VALUES ($1, $2) RETURNING id_delegate;',  [name, state])
-    
     // Access the generated ID from the result
     const id_delegate = results.rows[0].id_delegate;
+    const results1 = await db.query('INSERT INTO district (state,name) VALUES ($1, $2) RETURNING id_district;',  [true, delegate.Distrito])
+    // Access the generated ID from the result1
+    const id_district = results1.rows[0].id_district;
+    const results2 = await db.query('INSERT INTO region (state,name) VALUES ($1, $2) RETURNING id_region;',  [true, delegate.Regiao])
+    // Access the generated ID from the result1
+    const id_region = results2.rows[0].id_region;
+    const results3 = await db.query('INSERT INTO town (state,name) VALUES ($1, $2) RETURNING id_town;',  [true, town])
+    // Access the generated ID from the result1
+    const id_town = results3.rows[0].id_town;
+    const results4 = await db.query('INSERT INTO hmr_zone (state,fk_id_delegate,fk_id_region,fk_id_district,fk_id_town) VALUES ($1, $2, $3, $4, $5)',  [true, id_delegate,id_region,id_district,id_town])
+    
 
     // const results2 = await db.query(`SELECT DISTINCT 
     //                                     id_region AS value, 
@@ -820,11 +830,10 @@ module.exports.updateDelegate= (delegate_id, res, req) => {
 
 
 // Obtain list of visits 
-// TODO
 module.exports.getVisits = async (idDelegate, date, entity) => {
 
   entity = (entity !== "-- Todos --") ? entity : null;
-  console.log("DATE: ", date)
+
   try {
     // Execute the query
     const results = await db.query(
@@ -837,7 +846,7 @@ module.exports.getVisits = async (idDelegate, date, entity) => {
        LEFT JOIN general_doctors gd ON v.fk_doctor = gd.id_doctor
        LEFT JOIN general_pharmacies gp ON v.fk_pharmacy = gp.id_pharmacy
        LEFT JOIN general_delegates_and_bricks gdb ON v.fk_brick = gdb.brick
-       WHERE gdb.id_delegate = $1 AND DATE(v.date) = TO_DATE( $2, 'DD-MM-YYYY') AND ((gd.medico = $3 OR $3 IS NULL) OR (gp.pharmacy = $3 OR $3 IS NULL))`,
+       WHERE gdb.id_delegate = $1 AND DATE(v.date) = TO_DATE( $2, 'DD-MM-YYYY') AND ((gd.id_doctor = $3 OR $3 IS NULL) OR (gp.id_pharmacy = $3 OR $3 IS NULL))`,
       [idDelegate, date, entity]
     );
 
@@ -849,7 +858,6 @@ module.exports.getVisits = async (idDelegate, date, entity) => {
       brick: row.brick
     }));
     
-    console.log("VISITAS: ", data)
 
     // Return the formatted response
     return data;
@@ -858,35 +866,6 @@ module.exports.getVisits = async (idDelegate, date, entity) => {
     throw new Error("Could not obtain list of Visits");
   }
 };
-
-module.exports.getDate = async (idDelegate,entity) => {
-  console.log(entity.localCompare("-- Todos --"))
-  entity = (entity !== "-- Todos --") ? entity : null;
-  
-  try {
-    console.log("AaA: ", entity)
-
-    const results = await db.query(`SELECT ROW_NUMBER() OVER (ORDER BY v.date ASC) - 1 AS value,
-                                          TO_CHAR(v.date, 'YYYY-MM-DD') AS label
-                                        FROM 
-                                          visit v
-                                        LEFT JOIN 
-                                          hmr_zone hz ON v.fk_brick = hz.brick
-                                        WHERE 
-                                          hz.fk_id_delegate = $1
-                                          AND (
-                                            $2 IS NULL OR 
-                                            v.fk_doctor = $2 OR
-                                            v.fk_pharmacy = $2
-                                          )
-                                        ORDER BY v.date ASC;`, [idDelegate,entity]);
-    return results.rows;
-  } catch (err) {
-    console.log("ERROR: ", err)
-    throw new Error('Error obtaining districts.');
-  }
-};
-
 
 module.exports.getEntities = async (idDelegate,date) => {
 
@@ -912,24 +891,57 @@ module.exports.getEntities = async (idDelegate,date) => {
       }
     }).filter(Boolean); // Remove any undefined entries (just in case)
 
-    console.log("comprador",comprador)
     return comprador;
   } catch (err) {
     console.log("ERROR: ", err)
-    throw new Error('Error obtaining districts.');
+    throw new Error('Error obtaining entities.');
   }
 };
 
 // Add visit
-module.exports.createVisit = (visit) => {
-  db.query('INSERT INTO visit (date, visit_state, fk_Brick, fk_doctor, fk_pharmacy) VALUES (?, ?, ?, ?, ?)', [visit.date, visit.visit_state, visit.fk_Brick, visit.fk_doctor, visit.fk_pharmacy], (err,results) => {
-    if (err) {
-      res.status(521).json({error: err, msg: "Could not add new Visit"});
+module.exports.createVisit = async (visit) => {
+  let medico = null;
+  let pharma = null;
+  let brick = visit.Brick; // Default to the brick provided in the visit object
+
+  if (visit.Entidade === 'Médico') {
+    medico = visit.Entidade_Saude;
+    console.log("Médicos: ", medico);
+  } else if (visit.Entidade === 'Farmácia') {
+    pharma = visit.Entidade_Saude;
+    console.log("Farmácia: ", pharma);
+
+    // Query the brick from general_pharmacies when Entidade is 'Farmácia'
+    try {
+      const brickResult = await db.query(
+        'SELECT brick FROM general_pharmacies WHERE id_pharmacy = $1',
+        [pharma]
+      );
+
+      if (brickResult.rows.length > 0) {
+        brick = brickResult.rows[0].brick;
+      } else {
+        throw new Error(`No brick found for pharmacy ID: ${pharma}`);
+      }
+    } catch (err) {
+      console.error("Error fetching brick for pharmacy: ", err);
+      throw new Error('Error fetching brick for pharmacy.');
     }
-    res.status(201).json({msg: "Visit successfully added with ID: ${results.insertId}"})
-  })
-}
+  } else {
+    console.error("Error obtaining entity");
+    throw new Error('Invalid entity type provided.');
+  }
 
-
-
+  // Insert the visit into the database
+  try {
+    const result = await db.query(
+      'INSERT INTO visit (date, visit_state, fk_brick, fk_doctor, fk_pharmacy) VALUES ($1, $2, $3, $4, $5)',
+      [visit.date, 1, brick, medico, pharma]
+    );
+    console.log("Visit created successfully:", result);
+  } catch (err) {
+    console.error("ERROR: ", err);
+    throw new Error('Error creating visit.');
+  }
+};
 
