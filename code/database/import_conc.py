@@ -5,6 +5,7 @@ import psycopg
 from tqdm import tqdm
 import random
 import argparse
+import re
 
 DB_USER = "mypharma"
 DB_PASSWORD = "mypharma"
@@ -13,6 +14,52 @@ DB_PORT = 5432
 DB_NAME = "mypharma"
 
 conn_string = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+Distritos_Sigla = {   
+    'Açores':'Ac',
+    'Aveiro':'Av',
+    'Beja': 'BJ',
+    'Braga':'Br',
+    'Bragança':'Bg',
+    'Castelo Branco': 'Cb',
+    'Coimbra' : 'Co',
+    'Évora' : 'Ev',
+    'Faro':'Fr',
+    'Guarda': 'Gr',
+    'Leiria': 'Lr',
+    'Lisboa': 'Lx',
+    'Madeira': 'Md',
+    'Portalegre':'Pt',
+    'Porto':'Po',
+    'Santarém':'Sr',
+    'Setúbal':'St',
+    'Viana do Castelo': 'Vc',
+    'Vila Real':'Vr',
+    'Viseu':'Vs'
+}
+
+Sigla_Distritos = {   
+    'Ac':'Açores',
+    'Av':'Aveiro',
+    'Bj':'Beja',
+    'Br':'Braga',
+    'Bg':'Bragança',
+    'Cb':'Castelo Branco',
+    'Co':'Coimbra',
+    'Ev':'Évora',
+    'Fr':'Faro',
+    'Gr':'Guarda',
+    'Lr':'Leiria',
+    'Lx':'Lisboa',
+    'Md':'Madeira',
+    'Pt':'Portalegre',
+    'Po':'Porto',
+    'Sr':'Santarém',
+    'St':'Setúbal',
+    'Vc':'Viana do Castelo',
+    'Vr':'Vila Real',
+    'Vs':'Viseu'
+}
 
 parser = argparse.ArgumentParser(description="Load concurrency monthly hmr file")
 parser.add_argument("path", help="path to file")
@@ -55,6 +102,15 @@ dates = {
     "Mes3": datetime(current_year, 9, 1)   # September
 }
 
+# Função para processar a string
+regex = r"(?P<brick>\d{3})\s+(?P<Distrito>\w{2})\s+-\s+(?P<Regiao>[^;]+?)(?:\s+\((?P<Freguesia>[^)]+\)))"
+def extrair_dados(texto):
+    match = re.match(regex, texto)
+    if match:
+        return match.groupdict()  # Retorna os grupos como dicionário
+    else:
+        return None  # Retorna None se não houver correspondência
+
 # Insert data into the database
 print("Inserting data into the database...")
 with psycopg.connect(conn_string) as conn:
@@ -63,92 +119,143 @@ with psycopg.connect(conn_string) as conn:
             cur.execute('BEGIN')  # Start transaction
             
             for _, row in tqdm(df.iterrows(), total=len(df)):
-                region_name = row['Regiao'].strip()
+                delegate_name = row['Delegado'].strip()
+                full_region= row['Regiao'].strip()
                 company_name = row['Empresa'].strip()
                 market_name = row['Market'].strip()
                 product_name = row['Product'].strip() if pd.notna(row['Product']) else None
                 pack_name = row['Pack'].strip() if pd.notna(row['Pack']) else None
 
-                # Insert or find Region
-                cur.execute(f"SELECT id_region FROM region WHERE name = '{region_name}';")
-                region = cur.fetchone()
-                if region is None:
-                    cur.execute(f"INSERT INTO region (name) VALUES ('{region_name}') RETURNING id_region;")
+
+                if (not full_region == 'N/D' and pack_name == 'N/D' and "All Market" not in market_name):
+
+                    fields = extrair_dados(full_region)
+                    brick_name = fields['brick']
+                    district_name = fields['Distrito']
+                    region_name = fields['Regiao']
+                    town_name = fields['Freguesia']
+
+                    print(fields)
+                    
+                    # Delegate
+                    cur.execute(f"SELECT id_delegate FROM delegate WHERE name = '{delegate_name}';")
+                    delegate = cur.fetchone()
+                    if delegate is None:
+                        cur.execute(f"INSERT INTO delegate (name) VALUES ('{delegate_name}') RETURNING id_delegate;")
+                        delegate = cur.fetchone()
+                    delegate_id = delegate[0]
+
+                    # Insert or find Region
+                    cur.execute(f"SELECT id_region FROM region WHERE name = '{region_name}';")
                     region = cur.fetchone()
-                region_id = region[0]
+                    if region is None:
+                        cur.execute(f"INSERT INTO region (name) VALUES ('{region_name}') RETURNING id_region;")
+                        region = cur.fetchone()
+                    region_id = region[0]
 
-                # Insert or find Company
-                cur.execute(f"SELECT id_company FROM company WHERE name = '{company_name}';")
-                company = cur.fetchone()
-                if company is None:
-                    cur.execute(f"INSERT INTO company (name) VALUES ('{company_name}') RETURNING id_company;")
+                    # District
+                    cur.execute(f"SELECT id_district FROM district WHERE name = '{Sigla_Distritos[district_name]}';")
+                    district = cur.fetchone()
+                    if district is None:
+                        cur.execute(f"INSERT INTO district (name) VALUES ('{Sigla_Distritos[district_name]}') RETURNING id_district;")
+                        district = cur.fetchone()
+                    district_id = district[0]
+                    
+                    # Town
+                    town_id = None
+                    if len(row[4]) > 1:
+                        cur.execute(f"SELECT id_town FROM town WHERE name = '{town_name}';")
+                        town = cur.fetchone()
+                        if town is None:
+                            cur.execute(f"INSERT INTO town (name) VALUES ('{town_name}') RETURNING id_town;")
+                            town = cur.fetchone()
+                        town_id = town[0]
+
+
+                    # Insert or find Company
+                    cur.execute(f"SELECT id_company FROM company WHERE name = '{company_name}';")
                     company = cur.fetchone()
-                company_id = company[0]
+                    if company is None:
+                        cur.execute(f"INSERT INTO company (name) VALUES ('{company_name}') RETURNING id_company;")
+                        company = cur.fetchone()
+                    company_id = company[0]
 
-                # Insert or find Product
-                if product_name:
-                    cur.execute(f"""
-                        SELECT cnp FROM product WHERE name = '{product_name}' AND fk_id_company = {company_id};
-                    """)
-                    product_row = cur.fetchone()
-                    if product_row is None:
+                    # Hmr_Zone
+                    cur.execute(f"SELECT brick FROM hmr_zone WHERE brick = {brick_name};")
+                    hmr_zone = cur.fetchone()
+                    if hmr_zone is None:
                         cur.execute(f"""
-                            INSERT INTO product (cnp, name, fk_id_company) 
-                            VALUES ({random.randint(1, 1000000000)}, '{product_name}', {company_id}) 
-                            RETURNING cnp;
+                            INSERT INTO hmr_zone (brick, fk_id_delegate, fk_id_region, fk_id_district, fk_id_town) 
+                            VALUES ({brick_name}, {delegate_id}, {region_id}, {district_id}, {town_id if town_id else 'NULL'}) 
+                            RETURNING brick;
+                        """)
+                        hmr_zone = cur.fetchone()
+                    hmr_zone_id = hmr_zone[0]
+
+                    # Insert or find Product
+                    if product_name:
+                        cur.execute(f"""
+                            SELECT cnp FROM product WHERE name = '{product_name}' AND fk_id_company = {company_id};
                         """)
                         product_row = cur.fetchone()
-                    product_id = product_row[0]
-                else:
-                    product_id = None
-
-                # Insert or find Pack
-                if pack_name:
-                    cur.execute(f"""
-                        SELECT id_pack FROM pack WHERE name = '{pack_name}' AND fk_id_product = {product_id};
-                    """)
-                    pack = cur.fetchone()
-                    if pack is None:
-                        cur.execute(f"""
-                            INSERT INTO pack (name, fk_id_product) 
-                            VALUES ('{pack_name}', {product_id}) 
-                            RETURNING id_pack;
-                        """)
-                        pack = cur.fetchone()
-                    pack_id = pack[0]
-                else:
-                    pack_id = None
-
-                # Insert sales data for July, August, and September
-                for month_col, registry_date in dates.items():
-                    so_units = int(row[month_col]) if pd.notna(row[month_col]) else 0
-                    if so_units > 0:
-                        # Insert or find Sale
-                        cur.execute(f"""
-                            SELECT id_sale FROM sale 
-                            WHERE fk_brick = {region_id} AND registry_date = '{registry_date}';
-                        """)
-                        sale = cur.fetchone()
-                        if sale is None:
+                        if product_row is None:
                             cur.execute(f"""
-                                INSERT INTO sale (registry_date, fk_brick) 
-                                VALUES ('{registry_date}', {region_id}) 
-                                RETURNING id_sale;
+                                INSERT INTO product (cnp, name, fk_id_company) 
+                                VALUES ({random.randint(1, 1000000000)}, '{product_name}', {company_id}) 
+                                RETURNING cnp;
+                            """)
+                            product_row = cur.fetchone()
+                        product_id = product_row[0]
+                    else:
+                        product_id = None
+
+                    # # Insert or find Pack
+                    # if pack_name:
+                    #     cur.execute(f"""
+                    #         SELECT id_pack FROM pack WHERE name = '{pack_name}' AND fk_id_product = {product_id};
+                    #     """)
+                    #     pack = cur.fetchone()
+                    #     if pack is None:
+                    #         cur.execute(f"""
+                    #             INSERT INTO pack (name, fk_id_product) 
+                    #             VALUES ('{pack_name}', {product_id}) 
+                    #             RETURNING id_pack;
+                    #         """)
+                    #         pack = cur.fetchone()
+                    #     pack_id = pack[0]
+                    # else:
+                    #     pack_id = None
+
+                    # Insert sales data for July, August, and September
+                    for month_col, registry_date in dates.items():
+                        so_units = int(row[month_col]) if pd.notna(row[month_col]) else 0
+                        if so_units > 0:
+                            # Insert or find Sale
+                            cur.execute(f"""
+                                SELECT id_sale FROM sale 
+                                WHERE fk_brick = {region_id} AND registry_date = '{registry_date}';
                             """)
                             sale = cur.fetchone()
-                        sale_id = sale[0]
+                            if sale is None:
+                                cur.execute(f"""
+                                    INSERT INTO sale (registry_date, fk_brick) 
+                                    VALUES ('{registry_date}', {region_id}) 
+                                    RETURNING id_sale;
+                                """)
+                                sale = cur.fetchone()
+                            sale_id = sale[0]
 
-                        # Insert SO_Units into sale_product table
-                        if product_id:
-                            cur.execute(f"""
-                                INSERT INTO sale_product (fk_id_sale, fk_cnp, product_amount) 
-                                VALUES (
-                                    {sale_id}, 
-                                    {product_id}, 
-                                    {so_units}
-                                ) 
-                                ON CONFLICT DO NOTHING;
-                            """)
+                            # Insert SO_Units into sale_product table
+                            if product_id:
+                                cur.execute(f"""
+                                    INSERT INTO sale_product (fk_id_sale, fk_cnp, product_amount) 
+                                    VALUES (
+                                        {sale_id}, 
+                                        {product_id}, 
+                                        {so_units}
+                                    ) 
+                                    ON CONFLICT DO NOTHING;
+                                """)
 
             conn.commit()  # Commit transaction
             print("Data inserted successfully.")
