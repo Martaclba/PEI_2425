@@ -111,7 +111,7 @@ input_file = "scripts/processa_hmr_concorrencia_mensal.py"  # Generates the clea
 # Step 1: Run the input script to generate the cleaned data
 print(f"Running input script: {input_file} for file {args.path}...")
 try:
-    subprocess.call(['c:\\Users\\Marta\\Desktop\\pei-2425\\code\\myenv\\Scripts\\python.exe', input_file, args.path])
+    subprocess.call(['C:\\Users\\Rafa\\AppData\\Local\\Programs\\Python\\Python313\\python.exe', input_file, args.path])
     print(f"Input file {input_file} for {args.path} executed successfully.")
 except subprocess.CalledProcessError as e:
     print(f"Failed to execute {input_file}!")
@@ -123,29 +123,23 @@ cleaned_csv, month, year = find_most_recent_csv("uploads/conc_csv")  # File gene
 df = pd.read_csv('uploads/conc_csv/' + cleaned_csv, delimiter=';', encoding='utf-8')
 
 # Define registry dates for July, August, and September
-if month  >= 4 :
+if month  >= 3 :
     dates = {
-    "Mes1": datetime(year, month-3, 1),
-    "Mes2": datetime(year, month-2, 1),
-    "Mes3": datetime(year, month-1, 1)
+    "Mes1": datetime(year, month-2, 1), # January or superior
+    "Mes2": datetime(year, month-1, 1), # February or superior
+    "Mes3": datetime(year, month, 1) # March or superior
     }
 if month  == 1 :
     dates = {
-        "Mes1": datetime(year-1, 10, 1),  # October
-        "Mes2": datetime(year-1, 11, 1),  # November
-        "Mes3": datetime(year-1, 12, 1)   # December
+        "Mes1": datetime(year-1, 11, 1),  # November
+        "Mes2": datetime(year-1, 12, 1),  # December
+        "Mes3": datetime(year, month, 1)   # January
     }
 if month  == 2 :
     dates = {
-        "Mes1": datetime(year-1, 11, 1),  # November
-        "Mes2": datetime(year-1, 12, 1),  # December
-        "Mes3": datetime(year, month-1, 1)   # January
-    }
-if month  == 3 :
-    dates = {
         "Mes1": datetime(year-1, 12, 1),  # December
-        "Mes2": datetime(year, month-2, 1),  # January
-        "Mes3": datetime(year, month-1, 1)   # February
+        "Mes2": datetime(year, month-1, 1),  # January
+        "Mes3": datetime(year, month, 1)   # February
     }
 
 
