@@ -3,8 +3,6 @@ const router = express.Router();
 const multer  = require('multer')
 const fs = require('fs');
 
-const log4js = require('log4js');
-const logger = log4js.getLogger('myLogger');
 
 var Queries = require('./queries')
 
@@ -103,14 +101,13 @@ router.post('/import/competition', upload.single('excelFile'), async function(re
 
   try {
 
-    // var child = spawnSync('c:\\Users\\Marta\\Desktop\\pei-2425\\code\\myenv\\Scripts\\python.exe', ["scripts/import_conc.py", path], {capture: ['stdout', 'stderr', 'on' ], stdio: 'inherit' });
-    var child = spawnSync('c:\\Users\\Marta\\Desktop\\pei-2425\\code\\myenv\\Scripts\\python.exe', ["scripts/import_conc.py", path], {capture: ['stdout', 'stderr', 'on' ]});
+    var child = spawnSync('python', ["scripts/import_conc.py", path], {capture: ['stdout', 'stderr', 'on' ]});
 
     // const output = child.stdout.toString();
     // logger.info(output);
 
     console.log('File uploaded:', req.file);
-    res.status(201).json({ message: child.stdout });
+    res.status(201).json({ message: child.stdout.toString() });
   }
   catch (err) {
     res.status(530).json({ error:err, msg: child.stdout})
@@ -127,31 +124,18 @@ router.post('/import/', upload.single('excelFile'), async function(req, res, nex
   }
 
   const spawnSync = require("child_process").spawnSync;
+  const path = req.file.destination + "/" + req.file.filename
 
-  const path_arg = path.resolve(req.file.destination, req.file.filename);
-  console.log(`Using the path argument: ${path_arg}`);
 
-  const child = spawnSync('c:\\Users\\Marta\\Desktop\\pei-2425\\code\\myenv\\Scripts\\python.exe',["scripts/import_mp.py", path_arg], { stdio: 'inherit' });
-  
-  // Check for execution errors
-  if (child.error) {
-    console.error('Failed to start Python script:', child.error);
-    return res.status(500).json({ error: 'Failed to execute script', details: child.error.message });
-  }
-
-  // Check the Python script's stderr for errors
-  if (child.stderr) {
-    console.error('Error from Python script:', child.stderr.toString());
-    return res.status(500).json({ error: 'Script execution error', details: child.stderr.toString() });
-  }
-
-  // If successful, return stdout
   try {
-    console.log('Python script output:', child.stdout.toString());
-    return res.status(201).json({ message: child.stdout.toString() });
-  } catch (err) {
-      console.error('Unexpected error:', err);
-      return res.status(500).json({ error: 'Unexpected error', details: err.message });
+
+    var child = spawnSync('python', ["scripts/import_mp.py", path], {capture: ['stdout', 'stderr', 'on' ]});
+
+    console.log('File uploaded:', req.file);
+    res.status(201).json({ message: child.stdout.toString() });
+  }
+  catch (err) {
+    res.status(530).json({ error:err, msg: child.stdout})
   }
 });
 

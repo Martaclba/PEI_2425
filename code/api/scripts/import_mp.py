@@ -2,37 +2,87 @@ import os
 import subprocess
 import pandas as pd
 import psycopg
-import tqdm
+from tqdm import tqdm
 import random
 from datetime import datetime
 import argparse
 import re
-#from dotenv import load_dotenv
+from dotenv import load_dotenv
 
-#load_dotenv('config/postgresql.cfg')
+load_dotenv('config/postgresql.cfg')
 
-#DB_USER = os.getenv('DB_USER')
-#DB_PASSWORD = os.getenv('DB_PASSWORD')
-#DB_HOST = os.getenv('DB_HOST')
-#DB_PORT = os.getenv('DB_PORT')
-#DB_NAME = os.getenv('DB_NAME')
+DB_USER = os.getenv('DB_USER')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_HOST = os.getenv('DB_HOST')
+DB_PORT = os.getenv('DB_PORT')
+DB_NAME = os.getenv('DB_NAME')
 
-DB_USER = "mypharma_admin"
-DB_PASSWORD = "admin"
-DB_HOST = "localhost"
-DB_PORT = 5432
-DB_NAME = "mypharma"
+
+Distritos_Sigla = {   
+    'Açores':'Ac',
+    'Aveiro':'Av',
+    'Beja': 'BJ',
+    'Braga':'Br',
+    'Bragança':'Bg',
+    'Castelo Branco': 'Cb',
+    'Coimbra' : 'Co',
+    'Évora' : 'Ev',
+    'Faro':'Fr',
+    'Guarda': 'Gr',
+    'Leiria': 'Lr',
+    'Lisboa': 'Lx',
+    'Madeira': 'Md',
+    'Portalegre':'Pr',
+    'Porto':'Po',
+    'Santarém':'Sr',
+    'Setúbal':'St',
+    'Viana do Castelo': 'Vc',
+    'Vila Real':'Vr',
+    'Viseu':'Vs'
+}
+
+Sigla_Distritos = {   
+    'Ac':'Açores',
+    'Av':'Aveiro',
+    'Bj':'Beja',
+    'Br':'Braga',
+    'Bg':'Bragança',
+    'Cb':'Castelo Branco',
+    'Co':'Coimbra',
+    'Ev':'Évora',
+    'Fr':'Faro',
+    'Gr':'Guarda',
+    'Lr':'Leiria',
+    'Lx':'Lisboa',
+    'Md':'Madeira',
+    'Pr':'Portalegre',
+    'Po':'Porto',
+    'Sr':'Santarém',
+    'St':'Setúbal',
+    'Vc':'Viana do Castelo',
+    'Vr':'Vila Real',
+    'Vs':'Viseu'
+}
 
 def process_line(line):
 
     if "National" in line or "Mypharma" in line:
-        return True
-    return False
+        return False
+    return True
 
 # Função para processar a string
-regex = r"(?P<brick>\d{3})\s+(?P<Distrito>\w{2})\s+-\s+(?P<Regiao>[^;]+?)(?:\s+\((?P<Freguesia>[^)]+)\))?;\s+(?P<Produto>\w+);\s*(?P<Quantidade>\d+)"
+# regex = r"(?P<brick>\d{3})\s+(?P<Distrito>\w{2})\s+-\s+(?P<Regiao>[^;]+?)(?:\s+\((?P<Freguesia>[^)]+)\))?;\s+(?P<Produto>\w+);\s*(?P<Quantidade>\d+)"
+regex = r"(?P<brick>\d{3})\s+(?P<Distrito>\w{2})\s+-\s+(?P<Regiao>[^;]+?)(?:\s+\((?P<Freguesia>[^)]+\)))?;?$"
 def extrair_dados(texto):
     match = re.match(regex, texto)
+    if match:
+        return match.groupdict()  # Retorna os grupos como dicionário
+    else:
+        return None  # Retorna None se não houver correspondência
+
+linha_regex = r'^(.*?);\s*(.*?);\s*(\d+)$'
+def extrair_linha(texto):
+    match = re.match(linha_regex, texto)
     if match:
         return match.groupdict()  # Retorna os grupos como dicionário
     else:
@@ -81,12 +131,12 @@ def find_most_recent_csv(directory):
 
 
 # Paths
-input_file,month,year = find_most_recent_csv("uploads/mypharma_csv/")            # Generates the cleaned CSV
+input_file = "scripts/hmr_mp_agt.py"            # Generates the cleaned CSV
 
 # Step 1: Run the input script to generate the cleaned data
 print(f"Running input script: {input_file}...")
 try:
-    subprocess.call(['C:\\Users\\Rafa\\AppData\\Local\\Programs\\Python\\Python313\\python.exe', input_file, args.path])
+    subprocess.call(['python', input_file, args.path])
     print(f"Input file {input_file} executed successfully.")
 except subprocess.CalledProcessError as e:
     print(f"Failed to execute {input_file}!")
@@ -105,27 +155,29 @@ with psycopg.connect(conn_string) as conn:
         try:
             cur.execute('BEGIN')  # Start transaction
             
-            for row in tqdm.tqdm(df.values):
-
-                if (not process_line(str(row))):
+            for _, row in tqdm(df.iterrows(), total=len(df)):
+                if (process_line(row['Region'].strip()) and process_line(row['Entity'].strip())):
                     # print(str(row))
                     
-                    fields = extrair_dados(str(row))
+                    fields_region = extrair_dados(row['Region'].strip())
 
                     # region_name = row[0].strip()
                     # entity_name = row[1].strip()
                     # so_units = int(row[2].strip())
                     # so_units = row[2]  # Ensure it's an integer
+                    
+                    
+                    #print("FIELDS: ", fields_region)
 
-                    if fields:
-                        brick = fields['brick']
-                        district = fields['Distrito']
-                        region_name = fields['Regiao']
-                        town = fields['Freguesia']
-                        entity_name = fields['Produto']
-                        so_units = fields['Quantidade']
+                    if fields_region:
+                        brick = fields_region['brick'].strip()
+                        district = fields_region['Distrito'].strip()
+                        region_name = fields_region['Regiao'].strip()
+                        town_name = fields_region['Freguesia']
+                        product_name = row['Entity'].strip()
+                        so_units = int(row['SO_Units'])
 
-                        print(str(region_name) + " " + str(entity_name) + " " + str(so_units))
+                        # print(str(region_name) + " " + str(product_name) + " " + str(so_units))
 
                         # Insert or find Region
                         cur.execute(f"SELECT id_region FROM region WHERE name = '{region_name}';")
@@ -134,34 +186,53 @@ with psycopg.connect(conn_string) as conn:
                             cur.execute(f"INSERT INTO region (name) VALUES ('{region_name}') RETURNING id_region;")
                             region = cur.fetchone()
                         region_id = region[0]
-                        
-                        entity_parts = entity_name.split(" - ")
-                        company = entity_parts[0].strip()
-                        product = entity_parts[1].strip() if len(entity_parts) > 1 else None
-                        pack = entity_parts[2].strip() if len(entity_parts) > 2 else None
 
-                        # Insert or find Company
-                        cur.execute(f"SELECT id_company FROM company WHERE name = '{company}';")
+
+                        # District
+                        cur.execute(f"SELECT id_district FROM district WHERE name = '{Sigla_Distritos[district]}';")
+                        district = cur.fetchone()
+                        if district is None:
+                            cur.execute(f"INSERT INTO district (name) VALUES ('{Sigla_Distritos[district]}') RETURNING id_district;")
+                            district = cur.fetchone()
+                        district_id = district[0]
+                        
+                        # Town
+                        town_id = None
+                        if town_name:
+                            cur.execute(f"SELECT id_town FROM town WHERE name = '{town_name.strip()}';")
+                            town = cur.fetchone()
+                            if town is None:
+                                cur.execute(f"INSERT INTO town (name) VALUES ('{town_name.strip()}') RETURNING id_town;")
+                                town = cur.fetchone()
+                            town_id = town[0]
+                        
+                        # entity_parts = entity_name.split(" - ")
+                        # company = entity_parts[0].strip()
+                        # product = entity_parts[1].strip() if len(entity_parts) > 1 else None
+                        # pack = entity_parts[2].strip() if len(entity_parts) > 2 else None
+
+                        # # Insert or find Company
+                        cur.execute(f"SELECT id_company FROM company WHERE name = 'MyPharma';")
                         company = cur.fetchone()
                         if company is None:
-                            cur.execute(f"INSERT INTO company (name) VALUES ('{company}') RETURNING id_company;")
+                            cur.execute(f"INSERT INTO company (name) VALUES ('MyPharma') RETURNING id_company;")
                             company = cur.fetchone()
                         company_id = company[0]
 
                         # Insert or find Product
-                        if product:
+                        if product_name:
                             cur.execute(f"""
-                                SELECT cnp FROM product WHERE name = '{product}' AND fk_id_company = {company_id};
+                                SELECT cnp FROM product WHERE name = '{product_name}' AND fk_id_company = {company_id};
                             """)
-                            product_row = cur.fetchone()
-                            if product_row is None:
+                            product = cur.fetchone()
+                            if product is None:
                                 cur.execute(f"""
                                 INSERT INTO product (cnp, name, fk_id_company) 
-                                VALUES ({random.randint(1, 1000000000)}, '{product}', {company_id}) 
+                                VALUES ({random.randint(1, 1000000000)}, '{product_name}', {company_id}) 
                                 RETURNING cnp;
                             """)
-                                product_row = cur.fetchone()
-                            product_id = product_row[0]
+                                product = cur.fetchone()
+                            product_id = product[0]
                         else:
                             product_id = None  # If no product, handle appropriately
 

@@ -111,7 +111,7 @@ input_file = "scripts/processa_hmr_concorrencia_mensal.py"  # Generates the clea
 # Step 1: Run the input script to generate the cleaned data
 print(f"Running input script: {input_file} for file {args.path}...")
 try:
-    subprocess.call(['C:\\Users\\Rafa\\AppData\\Local\\Programs\\Python\\Python313\\python.exe', input_file, args.path])
+    subprocess.call(['python', input_file, args.path])
     print(f"Input file {input_file} for {args.path} executed successfully.")
 except subprocess.CalledProcessError as e:
     print(f"Failed to execute {input_file}!")
