@@ -3,6 +3,9 @@ const router = express.Router();
 const multer  = require('multer')
 const fs = require('fs');
 
+const log4js = require('log4js');
+const logger = log4js.getLogger('myLogger');
+
 var Queries = require('./queries')
 
 //
@@ -65,22 +68,22 @@ const storage = multer.diskStorage({
     cb(null, uniqueSuffix + '-' + file.originalname)
   },
 
-  // fileFilter: function (req, file, cb) {
-  //   // Validar o nome do ficheiro com regex
-  //   if (!regex.test(file.originalname)) {
-  //     console.error('Invalid file name format');
-  //     return cb(new Error('Invalid file name format. Expected format: mes_ano.xlsx'), false);
-  //   }
+  fileFilter: function (req, file, cb) {
+    // Validar o nome do ficheiro com regex
+    if (!regex.test(file.originalname)) {
+      console.error('Invalid file name format');
+      return cb(new Error('Invalid file name format. Expected format: mes_ano.xlsx'), false);
+    }
   
-  //   // Validar extensão do ficheiro
-  //   const ext = path.extname(file.originalname);
-  //   if (ext !== '.xlsx') {
-  //     console.error('Invalid file extension');
-  //     return cb(new Error('Invalid file extension. Only .xlsx files are allowed'), false);
-  //   }
+    // Validar extensão do ficheiro
+    const ext = path.extname(file.originalname);
+    if (ext !== '.xlsx') {
+      console.error('Invalid file extension');
+      return cb(new Error('Invalid file extension. Only .xlsx files are allowed'), false);
+    }
   
-  //   cb(null, true); // Nome e extensão válidos
-  // },
+    cb(null, true); // Nome e extensão válidos
+  },
 });
 
 // Configure multer upload settings
@@ -97,16 +100,21 @@ router.post('/import/competition', upload.single('excelFile'), async function(re
   const spawnSync = require("node:child_process").spawnSync;
   const path = req.file.destination + "/" + req.file.filename
 
+
   try {
-    const child = spawnSync('python3', ["../database/import_conc.py", path], {capture: ['stdout', 'stderr', 'on']});
-    
+
+    // var child = spawnSync('c:\\Users\\Marta\\Desktop\\pei-2425\\code\\myenv\\Scripts\\python.exe', ["scripts/import_conc.py", path], {capture: ['stdout', 'stderr', 'on' ], stdio: 'inherit' });
+    var child = spawnSync('c:\\Users\\Marta\\Desktop\\pei-2425\\code\\myenv\\Scripts\\python.exe', ["scripts/import_conc.py", path], {capture: ['stdout', 'stderr', 'on' ]});
+
+    // const output = child.stdout.toString();
+    // logger.info(output);
+
     console.log('File uploaded:', req.file);
     res.status(201).json({ message: child.stdout });
   }
   catch (err) {
     res.status(530).json({ error:err, msg: child.stdout})
   }
-
 });
 
 
@@ -119,15 +127,11 @@ router.post('/import/', upload.single('excelFile'), async function(req, res, nex
   }
 
   const spawnSync = require("child_process").spawnSync;
-  // const path_arg = `${req.file.destination}/${req.file.filename}`
-  // const child = spawnSync('python3',["../database/import_mp.py", path], {capture: ['stdout', 'stderr', 'on']});
 
-  // const pythonExecutable = path.resolve(__dirname, 'myenv/Scripts/python.exe');
-  // console.log(`Using Python executable: ${pythonExecutable}`);
   const path_arg = path.resolve(req.file.destination, req.file.filename);
   console.log(`Using the path argument: ${path_arg}`);
 
-  const child = spawnSync('c:\\Users\\Marta\\Desktop\\pei-2425\\code\\myenv\\Scripts\\python.exe',["../database/import_mp.py", path_arg]);
+  const child = spawnSync('c:\\Users\\Marta\\Desktop\\pei-2425\\code\\myenv\\Scripts\\python.exe',["scripts/import_mp.py", path_arg], { stdio: 'inherit' });
   
   // Check for execution errors
   if (child.error) {
