@@ -5,6 +5,7 @@ import pandas as pd
 import re
 import argparse
 
+
 def processar_ficheiro(nomeficheiro,nomesheet):
     # Carregar o arquivo Excel
     df = pd.read_excel(nomeficheiro, sheet_name=nomesheet, dtype=str)
@@ -92,11 +93,28 @@ def processar_ficheiro(nomeficheiro,nomesheet):
 
     # Criação do DataFrame de saída
     df_final = pd.DataFrame(data, columns=['Delegado', 'Regiao', 'Empresa', 'Market', 'Product', 'Pack', 'Mes1', 'Mes2', 'Mes3'])
+    
+    # Expressão regular para capturar o padrão
+    pattern = r".*_(\d{1,2})_(\d{2}|\d{4})\.xlsx$"
 
-    # Salvar como CSV
-    df_final.to_csv('dados_hmr_concorrencia.csv', sep=';', index=False)
+    # Aplicar a regex
+    match = re.match(pattern, nomeficheiro)
+    
+    new_filename = ""
+    if match:
+        # Captura o mês e o ano
+        month = match.group(1).zfill(2)  # Adiciona zero à esquerda se necessário
+        year = match.group(2)[-2:]       # Garante que o ano é de 2 dígitos
+        # Cria o novo nome
+        new_filename = f"{month}_{year}.csv"
+        print(f"Novo nome do ficheiro: {new_filename}")
+    else:
+        print("Formato do nome do ficheiro inválido!")
 
-    print("CSV gerado com sucesso!")
+        # Salvar como CSV
+        df_final.to_csv(new_filename, sep=';', index=False)
+
+        print("CSV gerado com sucesso!")
 
 
 if __name__ == "__main__":
