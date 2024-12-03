@@ -285,7 +285,7 @@ module.exports.getSpecialities = async () => {
 module.exports.getDoctors = async (idDelegate) => {
   try {
     idDelegate = Number.isInteger(idDelegate) ? parseInt(idDelegate) : null;
-    const results = await db.query(`SELECT 
+    const results = await db.query(`SELECT DISTINCT
                                         gd.id_doctor AS value,
                                         gd.medico AS label
                                     FROM 
@@ -475,6 +475,7 @@ module.exports.getDelegateById = async (brick) => {
 module.exports.getTablePharmacies = async (idPharmacy,idDistrict,idRegion, idDelegate) => {
   try {
     
+
     idPharmacy = Number.isInteger(idPharmacy) ? parseInt(idPharmacy) : null;
     idDistrict = Number.isInteger(idDistrict) ? parseInt(idDistrict) : null;
     idRegion = Number.isInteger(idRegion) ? parseInt(idRegion) : null;
@@ -840,13 +841,13 @@ module.exports.getVisits = async (idDelegate, date, entity) => {
       `SELECT DISTINCT ROW_NUMBER() OVER () -1 as key,  
               TO_CHAR(v.date, 'DD-MM-YYYY') AS data,
               v.fk_brick AS brick,
-              COALESCE(gd.medico, '') AS medico,
+              COALESCE(d.name, '') AS medico,
               COALESCE(gp.pharmacy,'') AS pharmacy
        FROM visit v
-       LEFT JOIN general_doctors gd ON v.fk_doctor = gd.id_doctor
+       LEFT JOIN doctor d ON v.fk_doctor = d.professional_id_card
        LEFT JOIN general_pharmacies gp ON v.fk_pharmacy = gp.id_pharmacy
        LEFT JOIN general_delegates_and_bricks gdb ON v.fk_brick = gdb.brick
-       WHERE gdb.id_delegate = $1 AND DATE(v.date) = TO_DATE( $2, 'DD-MM-YYYY') AND ((gd.id_doctor = $3 OR $3 IS NULL) OR (gp.id_pharmacy = $3 OR $3 IS NULL))`,
+       WHERE gdb.id_delegate = $1 AND DATE(v.date) = TO_DATE( $2, 'DD-MM-YYYY') AND ((d.professional_id_card = $3 OR $3 IS NULL) OR (gp.id_pharmacy = $3 OR $3 IS NULL))`,
       [idDelegate, date, entity]
     );
 
@@ -858,7 +859,6 @@ module.exports.getVisits = async (idDelegate, date, entity) => {
       brick: row.brick
     }));
     
-
     // Return the formatted response
     return data;
   } catch (err) {

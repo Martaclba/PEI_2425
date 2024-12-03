@@ -258,7 +258,8 @@ router.post('/visitas/:id', async function(req, res, next) {
   }
 
   const default_filter = { label: '-- Todos --', value: '-- Todos --'}
-  const idDelegate = req.params.id
+  
+  const idDelegate = parseInt(req.params.id)
 
   const option_selected = req.body
 
@@ -471,7 +472,7 @@ router.post('/medicos/:id', async function(req, res, next) {
 
   const option = req.body
 
-  const idDelegate = req.params.id
+  const idDelegate = parseInt(req.params.id)
 
   const default_filter = { label: '-- Todos --', value: '-- Todos --'}
 
@@ -545,7 +546,7 @@ router.post('/farmacias/:id', async function(req, res, next) {
     regions: {}
   }
 
-  const idDelegate = req.params.id
+  const idDelegate = parseInt(req.params.id)
 
   const option = req.body
 
@@ -688,7 +689,7 @@ router.post('/:id', async function(req, res, next) {
   const default_filter = { label: '-- Todos --', value: '-- Todos --'}
   const year = new Date().getFullYear()
 
-  const idDelegate = req.params.id
+  const idDelegate = parseInt(req.params.id)
   const { type, option_selected } = req.body
 
 
